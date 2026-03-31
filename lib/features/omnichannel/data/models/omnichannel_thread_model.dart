@@ -1,3 +1,4 @@
+import '../../../../core/config/app_config.dart';
 import 'omnichannel_payload_parser.dart';
 
 class OmnichannelThreadGroupModel {
@@ -202,6 +203,18 @@ class OmnichannelThreadMessageModel {
         ], omnichannelString) ??
         'text';
     final media = omnichannelFirstMap(json, const <String>['media']);
+    final resolvedImageUrl = _normalizeImageUrl(
+      omnichannelFirstMappedFromSources<String>(
+        <Map<String, dynamic>>[media, json],
+        const <String>['image_url', 'media.image_url'],
+        omnichannelString,
+      ) ??
+          (messageType == 'image'
+              ? omnichannelFirstMapped<String>(json, const <String>[
+                  'image_url',
+                ], omnichannelString)
+              : null),
+    );
 
     return OmnichannelThreadMessageModel(
       id:
@@ -231,17 +244,7 @@ class OmnichannelThreadMessageModel {
       isMine: isMine,
       statusLabel: statusLabel,
       deliveryStatus: deliveryStatus,
-      imageUrl:
-          omnichannelFirstMappedFromSources<String>(
-            <Map<String, dynamic>>[media, json],
-            const <String>['image_url', 'media.image_url'],
-            omnichannelString,
-          ) ??
-          (messageType == 'image'
-              ? omnichannelFirstMapped<String>(json, const <String>[
-                  'image_url',
-                ], omnichannelString)
-              : null),
+      imageUrl: resolvedImageUrl,
       mediaCaption: omnichannelFirstMappedFromSources<String>(
         <Map<String, dynamic>>[media, json],
         const <String>['caption', 'media.caption'],
@@ -293,4 +296,40 @@ List<OmnichannelThreadGroupModel> _buildGroupsFromMessages(
           : right.messages.first.sentAt.millisecondsSinceEpoch;
       return leftTimestamp.compareTo(rightTimestamp);
     });
+}
+
+String? _normalizeImageUrl(String? rawValue) {
+  final value = rawValue?.trim() ?? '';
+  if (value.isEmpty) {
+    return null;
+  }
+
+  final baseUri = Uri.tryParse(AppConfig.baseUrl);
+  if (value.startsWith('//')) {
+    final scheme =
+        baseUri != null && baseUri.scheme.isNotEmpty ? baseUri.scheme : 'https';
+    return '$scheme:$value';
+  }
+
+  var normalized = value;
+  var parsed = Uri.tryParse(normalized);
+
+  if (parsed == null) {
+    return value;
+  }
+
+  if (!parsed.hasScheme && baseUri != null) {
+    parsed = baseUri.resolve(normalized);
+    normalized = parsed.toString();
+  }
+
+  if (parsed.scheme == 'http' &&
+      baseUri != null &&
+      baseUri.scheme == 'https' &&
+      parsed.host.toLowerCase() == baseUri.host.toLowerCase()) {
+    parsed = parsed.replace(scheme: 'https');
+    normalized = parsed.toString();
+  }
+
+  return normalized;
 }
