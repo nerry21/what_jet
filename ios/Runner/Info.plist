@@ -45,5 +45,7 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>App membutuhkan akses galeri untuk memilih gambar yang akan dikirim ke percakapan WhatsApp.</string>
 </dict>
 </plist>

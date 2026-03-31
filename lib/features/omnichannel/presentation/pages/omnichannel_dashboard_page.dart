@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../../../core/network/api_client.dart';
@@ -41,6 +42,7 @@ class OmnichannelDashboardPage extends StatefulWidget {
 class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     with WidgetsBindingObserver {
   late final OmnichannelShellController _controller;
+  final ImagePicker _imagePicker = ImagePicker();
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _conversationListScrollController = ScrollController();
 
@@ -165,6 +167,67 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     } catch (error) {
       if (mounted) {
         _showSnackBar('Gagal mengirim balasan admin: $error');
+      }
+      return false;
+    } finally {
+      if (mounted) {
+        setState(() => _isSendingReply = false);
+      }
+    }
+  }
+
+  Future<bool> _sendAdminGalleryImage(String? caption) async {
+    final conversation = _controller.selectedConversation;
+    final conversationId = conversation?.id;
+
+    if (conversationId == null || conversationId <= 0) {
+      _showSnackBar('Conversation belum dipilih.');
+      return false;
+    }
+
+    if (conversation?.channel != 'whatsapp') {
+      _showSnackBar('Galeri saat ini hanya aktif untuk conversation WhatsApp.');
+      return false;
+    }
+
+    if (_isSendingReply || _isSendingContact) {
+      return false;
+    }
+
+    final pickedImage = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 92,
+    );
+
+    if (pickedImage == null) {
+      return false;
+    }
+
+    setState(() => _isSendingReply = true);
+
+    try {
+      final notice = await widget.repository.sendAdminImageReply(
+        conversationId: conversationId,
+        fileBytes: await pickedImage.readAsBytes(),
+        fileName: pickedImage.name,
+        caption: caption,
+      );
+
+      await _controller.softRefreshAfterExternalAction();
+
+      if (mounted) {
+        _showSnackBar(notice);
+      }
+
+      return true;
+    } on ApiException catch (error) {
+      if (mounted) {
+        _showSnackBar(error.message);
+      }
+      return false;
+    } catch (error) {
+      if (mounted) {
+        _showSnackBar('Gagal mengirim gambar dari galeri: $error');
       }
       return false;
     } finally {
@@ -389,6 +452,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 isSendingReply: _isSendingReply,
                 isSendingContact: _isSendingContact,
                 onSendReply: _sendAdminReply,
+                onSendGalleryImage: _sendAdminGalleryImage,
                 onSendContact: _sendAdminContact,
                 isTogglingBot: _isTogglingBot,
                 onToggleBot: _toggleBot,
@@ -462,6 +526,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   isSendingReply: _isSendingReply,
                   isSendingContact: _isSendingContact,
                   onSendReply: _sendAdminReply,
+                  onSendGalleryImage: _sendAdminGalleryImage,
                   onSendContact: _sendAdminContact,
                   isTogglingBot: _isTogglingBot,
                   onToggleBot: _toggleBot,

@@ -5,6 +5,7 @@ import '../../../live_chat/presentation/widgets/channel_badge.dart';
 import '../../data/models/omnichannel_conversation_detail_model.dart';
 import '../../data/models/omnichannel_thread_model.dart';
 import 'omnichannel_surface.dart';
+import 'whatsapp_attachment_sheet.dart';
 import 'whatsapp_emoji_picker.dart';
 
 enum _MobileConversationMenuAction { sendContact, toggleBot }
@@ -19,6 +20,7 @@ class OmnichannelCenterPane extends StatefulWidget {
     required this.isSendingReply,
     required this.isSendingContact,
     required this.onSendReply,
+    required this.onSendGalleryImage,
     required this.onSendContact,
     required this.isTogglingBot,
     required this.onToggleBot,
@@ -32,6 +34,7 @@ class OmnichannelCenterPane extends StatefulWidget {
   final bool isSendingReply;
   final bool isSendingContact;
   final Future<bool> Function(String message) onSendReply;
+  final Future<bool> Function(String? caption) onSendGalleryImage;
   final Future<bool> Function({
     required String fullName,
     required String phone,
@@ -100,6 +103,19 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
     );
   }
 
+  Future<void> _finalizeSuccessfulComposerSend() async {
+    _composerController.clear();
+
+    await Future<void>.delayed(const Duration(milliseconds: 120));
+    if (_threadScrollController.hasClients) {
+      _threadScrollController.animateTo(
+        _threadScrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 240),
+        curve: Curves.easeOutCubic,
+      );
+    }
+  }
+
   void _deleteSelectedTextOrLastCharacter() {
     final value = _composerController.value;
     final text = value.text;
@@ -151,16 +167,18 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
 
     final success = await widget.onSendReply(text);
     if (success && mounted) {
-      _composerController.clear();
+      await _finalizeSuccessfulComposerSend();
+    }
+  }
 
-      await Future<void>.delayed(const Duration(milliseconds: 120));
-      if (_threadScrollController.hasClients) {
-        _threadScrollController.animateTo(
-          _threadScrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 240),
-          curve: Curves.easeOutCubic,
-        );
-      }
+  Future<void> _handleGalleryAttachment() async {
+    final caption = _composerController.text.trim();
+    final success = await widget.onSendGalleryImage(
+      caption.isEmpty ? null : caption,
+    );
+
+    if (success && mounted) {
+      await _finalizeSuccessfulComposerSend();
     }
   }
 
@@ -186,6 +204,26 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
       ..showSnackBar(
         SnackBar(content: Text('$feature belum diaktifkan di backend.')),
       );
+  }
+
+  Future<void> _openAttachmentSheet() async {
+    if (widget.conversation == null ||
+        widget.isSendingReply ||
+        widget.isSendingContact) {
+      return;
+    }
+
+    await showWhatsAppAttachmentSheet(
+      context: context,
+      onGalleryTap: _handleGalleryAttachment,
+      onCameraTap: () async => _showComingSoon('Kamera'),
+      onLocationTap: () async => _showComingSoon('Lokasi'),
+      onContactTap: _openSendContactDialog,
+      onDocumentTap: () async => _showComingSoon('Dokumen'),
+      onAudioTap: () async => _showComingSoon('Audio'),
+      onPollTap: () async => _showComingSoon('Polling'),
+      onEventTap: () async => _showComingSoon('Acara'),
+    );
   }
 
   Future<void> _handleMobileMenuAction(
@@ -226,7 +264,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         composerFocusNode: _composerFocusNode,
         onOpenInbox: widget.onOpenInbox!,
         onSubmit: _submitReply,
-        onSendContact: _openSendContactDialog,
+        onOpenAttachmentSheet: _openAttachmentSheet,
         onEmojiTap: _openEmojiPicker,
         onVideoTap: () => _showComingSoon('Video call'),
         onCallTap: () => _showComingSoon('Panggilan telepon'),
@@ -344,7 +382,7 @@ class _MobileConversationScaffold extends StatelessWidget {
     required this.composerFocusNode,
     required this.onOpenInbox,
     required this.onSubmit,
-    required this.onSendContact,
+    required this.onOpenAttachmentSheet,
     required this.onEmojiTap,
     required this.onVideoTap,
     required this.onCallTap,
@@ -365,7 +403,7 @@ class _MobileConversationScaffold extends StatelessWidget {
   final FocusNode composerFocusNode;
   final VoidCallback onOpenInbox;
   final Future<void> Function() onSubmit;
-  final Future<void> Function() onSendContact;
+  final Future<void> Function() onOpenAttachmentSheet;
   final Future<void> Function() onEmojiTap;
   final VoidCallback onVideoTap;
   final VoidCallback onCallTap;
@@ -470,7 +508,7 @@ class _MobileConversationScaffold extends StatelessWidget {
               isSending: isSendingReply,
               isSendingContact: isSendingContact,
               onSubmit: onSubmit,
-              onAttachTap: onSendContact,
+              onAttachTap: onOpenAttachmentSheet,
               onEmojiTap: onEmojiTap,
               onCameraTap: onCameraTap,
               onVoiceNoteTap: onVoiceNoteTap,
@@ -856,14 +894,31 @@ class _MobileConversationBubble extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
-                message.text.trim().isEmpty ? '-' : message.text.trim(),
-                style: const TextStyle(
-                  fontSize: 15,
-                  height: 1.35,
-                  color: Colors.black,
+              if (message.hasImage) ...<Widget>[
+                _ConversationImagePreview(
+                  imageUrl: message.imageUrl!,
+                  maxWidth: maxWidth - 24,
                 ),
-              ),
+                if (message.displayText.isNotEmpty) const SizedBox(height: 8),
+              ],
+              if (message.displayText.isNotEmpty)
+                Text(
+                  message.displayText,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    height: 1.35,
+                    color: Colors.black,
+                  ),
+                ),
+              if (message.displayText.isEmpty && !message.hasImage)
+                const Text(
+                  '-',
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 1.35,
+                    color: Colors.black,
+                  ),
+                ),
               const SizedBox(height: 6),
               Row(
                 mainAxisSize: MainAxisSize.min,
@@ -988,7 +1043,7 @@ class _MobileConversationComposer extends StatelessWidget {
                           ),
                         ),
                         IconButton(
-                          onPressed: isSendingContact
+                          onPressed: isSending || isSendingContact
                               ? null
                               : () => onAttachTap(),
                           icon: isSendingContact
@@ -1459,14 +1514,31 @@ class _ThreadBubble extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 5),
-              Text(
-                message.text,
-                style: const TextStyle(
-                  fontSize: 14,
-                  height: 1.5,
-                  color: Colors.black,
+              if (message.hasImage) ...<Widget>[
+                _ConversationImagePreview(
+                  imageUrl: message.imageUrl!,
+                  maxWidth: maxWidth - 28,
                 ),
-              ),
+                if (message.displayText.isNotEmpty) const SizedBox(height: 8),
+              ],
+              if (message.displayText.isNotEmpty)
+                Text(
+                  message.displayText,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    height: 1.5,
+                    color: Colors.black,
+                  ),
+                ),
+              if (message.displayText.isEmpty && !message.hasImage)
+                const Text(
+                  '-',
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.5,
+                    color: Colors.black,
+                  ),
+                ),
               const SizedBox(height: 8),
               Row(
                 mainAxisSize: MainAxisSize.min,
@@ -1493,6 +1565,72 @@ class _ThreadBubble extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ConversationImagePreview extends StatelessWidget {
+  const _ConversationImagePreview({
+    required this.imageUrl,
+    required this.maxWidth,
+  });
+
+  final String imageUrl;
+  final double maxWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    final previewWidth = maxWidth.clamp(160.0, 240.0).toDouble();
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: SizedBox(
+        width: previewWidth,
+        height: previewWidth,
+        child: Image.network(
+          imageUrl,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              return child;
+            }
+
+            return const DecoratedBox(
+              decoration: BoxDecoration(color: Color(0xFFEDEDED)),
+              child: Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppConfig.green,
+                ),
+              ),
+            );
+          },
+          errorBuilder: (_, __, ___) {
+            return const DecoratedBox(
+              decoration: BoxDecoration(color: Color(0xFFEDEDED)),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(
+                      Icons.broken_image_outlined,
+                      color: AppConfig.subtleText,
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      'Gambar tidak tersedia',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppConfig.mutedText,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

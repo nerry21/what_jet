@@ -105,6 +105,7 @@ class OmnichannelThreadGroupModel {
 class OmnichannelThreadMessageModel {
   const OmnichannelThreadMessageModel({
     required this.id,
+    required this.messageType,
     required this.senderLabel,
     required this.text,
     required this.sentAt,
@@ -112,10 +113,13 @@ class OmnichannelThreadMessageModel {
     this.statusLabel,
     this.deliveryStatus,
     this.deliveryError,
+    this.imageUrl,
+    this.mediaCaption,
     this.isReadByCustomer = false,
   });
 
   final int id;
+  final String messageType;
   final String senderLabel;
   final String text;
   final DateTime sentAt;
@@ -123,7 +127,23 @@ class OmnichannelThreadMessageModel {
   final String? statusLabel;
   final String? deliveryStatus;
   final String? deliveryError;
+  final String? imageUrl;
+  final String? mediaCaption;
   final bool isReadByCustomer;
+
+  bool get hasImage => messageType == 'image' && imageUrl != null;
+  String get displayText {
+    final caption = mediaCaption?.trim() ?? '';
+    if (caption.isNotEmpty) {
+      return caption;
+    }
+
+    if (hasImage) {
+      return '';
+    }
+
+    return text.trim();
+  }
 
   bool get isFailed => deliveryStatus == 'failed';
   bool get isRead => isReadByCustomer || statusLabel == 'read';
@@ -175,6 +195,13 @@ class OmnichannelThreadMessageModel {
           'delivery.label',
         ], omnichannelString) ??
         (isMine ? 'sent' : null);
+    final messageType =
+        omnichannelFirstMapped<String>(json, const <String>[
+          'message_type',
+          'type',
+        ], omnichannelString) ??
+        'text';
+    final media = omnichannelFirstMap(json, const <String>['media']);
 
     return OmnichannelThreadMessageModel(
       id:
@@ -183,6 +210,7 @@ class OmnichannelThreadMessageModel {
             'message_id',
           ], omnichannelInt) ??
           sentAt.microsecondsSinceEpoch,
+      messageType: messageType,
       senderLabel:
           omnichannelFirstMappedFromSources<String>(
             <Map<String, dynamic>>[json, sender],
@@ -203,10 +231,25 @@ class OmnichannelThreadMessageModel {
       isMine: isMine,
       statusLabel: statusLabel,
       deliveryStatus: deliveryStatus,
-      deliveryError:
-          omnichannelFirstMapped<String>(json, const <String>[
-            'delivery_error',
-          ], omnichannelString),
+      imageUrl:
+          omnichannelFirstMappedFromSources<String>(
+            <Map<String, dynamic>>[media, json],
+            const <String>['image_url', 'media.image_url'],
+            omnichannelString,
+          ) ??
+          (messageType == 'image'
+              ? omnichannelFirstMapped<String>(json, const <String>[
+                  'image_url',
+                ], omnichannelString)
+              : null),
+      mediaCaption: omnichannelFirstMappedFromSources<String>(
+        <Map<String, dynamic>>[media, json],
+        const <String>['caption', 'media.caption'],
+        omnichannelString,
+      ),
+      deliveryError: omnichannelFirstMapped<String>(json, const <String>[
+        'delivery_error',
+      ], omnichannelString),
       isReadByCustomer:
           omnichannelFirstMapped<bool>(json, const <String>[
             'is_read_by_customer',

@@ -19,6 +19,18 @@ class ApiException implements Exception {
   String toString() => 'ApiException($statusCode): $message';
 }
 
+class ApiMultipartFile {
+  const ApiMultipartFile({
+    required this.field,
+    required this.bytes,
+    required this.filename,
+  });
+
+  final String field;
+  final List<int> bytes;
+  final String filename;
+}
+
 class ApiClient {
   ApiClient({http.Client? httpClient})
     : _httpClient = httpClient ?? http.Client();
@@ -53,6 +65,23 @@ class ApiClient {
     );
   }
 
+  Future<Map<String, dynamic>> postMultipart(
+    String path, {
+    Map<String, Object?> queryParameters = const <String, Object?>{},
+    Map<String, Object?> fields = const <String, Object?>{},
+    List<ApiMultipartFile> files = const <ApiMultipartFile>[],
+    Map<String, String> headers = const <String, String>{},
+  }) {
+    return _sendMultipart(
+      method: 'POST',
+      path: path,
+      queryParameters: queryParameters,
+      fields: fields,
+      files: files,
+      headers: headers,
+    );
+  }
+
   Future<Map<String, dynamic>> _send({
     required String method,
     required String path,
@@ -76,6 +105,56 @@ class ApiClient {
       } else {
         throw ApiException(message: 'HTTP method tidak didukung: $method');
       }
+
+      return _decodeResponse(response);
+    } on ApiException {
+      rethrow;
+    } on http.ClientException catch (error) {
+      throw ApiException(message: 'Koneksi ke server gagal: ${error.message}');
+    } catch (error) {
+      throw ApiException(message: 'Permintaan ke server gagal: $error');
+    }
+  }
+
+  Future<Map<String, dynamic>> _sendMultipart({
+    required String method,
+    required String path,
+    Map<String, Object?> queryParameters = const <String, Object?>{},
+    Map<String, Object?> fields = const <String, Object?>{},
+    List<ApiMultipartFile> files = const <ApiMultipartFile>[],
+    Map<String, String> headers = const <String, String>{},
+  }) async {
+    final uri = _buildUri(path, queryParameters);
+
+    try {
+      if (method != 'POST') {
+        throw ApiException(message: 'HTTP multipart tidak didukung: $method');
+      }
+
+      final request = http.MultipartRequest(method, uri)
+        ..headers.addAll(_multipartHeaders(headers));
+
+      for (final entry in fields.entries) {
+        final value = entry.value;
+        if (value == null) {
+          continue;
+        }
+
+        request.fields[entry.key] = value.toString();
+      }
+
+      for (final file in files) {
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            file.field,
+            file.bytes,
+            filename: file.filename,
+          ),
+        );
+      }
+
+      final streamed = await request.send();
+      final response = await http.Response.fromStream(streamed);
 
       return _decodeResponse(response);
     } on ApiException {
@@ -116,6 +195,10 @@ class ApiClient {
       'Content-Type': 'application/json',
       ...headers,
     };
+  }
+
+  Map<String, String> _multipartHeaders(Map<String, String> headers) {
+    return <String, String>{'Accept': 'application/json', ...headers};
   }
 
   Map<String, dynamic> _decodeResponse(http.Response response) {

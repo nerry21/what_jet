@@ -245,41 +245,64 @@ class OmnichannelRepository {
     return 'Balasan admin berhasil diproses.';
   }
 
+  Future<String> sendAdminImageReply({
+    required int conversationId,
+    required List<int> fileBytes,
+    required String fileName,
+    String? caption,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.sendAdminImageReply(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        fileBytes: fileBytes,
+        fileName: fileName,
+        caption: caption,
+      ),
+    );
 
+    final notice = payload['notice']?.toString().trim();
+    if (notice != null && notice.isNotEmpty) {
+      return notice;
+    }
 
-Future<String> turnBotOn({required int conversationId}) async {
-  final accessToken = await _ensureAdminSession();
-  final payload = await _readWithRetry(
-    () => _apiService.turnBotOn(
-      accessToken: accessToken,
-      conversationId: conversationId,
-    ),
-  );
+    return 'Gambar admin berhasil diproses.';
+  }
 
-  final notice = payload['message']?.toString().trim();
-  return (notice != null && notice.isNotEmpty)
-      ? notice
-      : 'Bot berhasil diaktifkan.';
-}
+  Future<String> turnBotOn({required int conversationId}) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.turnBotOn(
+        accessToken: accessToken,
+        conversationId: conversationId,
+      ),
+    );
 
-Future<String> turnBotOff({
-  required int conversationId,
-  int autoResumeMinutes = 15,
-}) async {
-  final accessToken = await _ensureAdminSession();
-  final payload = await _readWithRetry(
-    () => _apiService.turnBotOff(
-      accessToken: accessToken,
-      conversationId: conversationId,
-      autoResumeMinutes: autoResumeMinutes,
-    ),
-  );
+    final notice = payload['message']?.toString().trim();
+    return (notice != null && notice.isNotEmpty)
+        ? notice
+        : 'Bot berhasil diaktifkan.';
+  }
 
-  final notice = payload['message']?.toString().trim();
-  return (notice != null && notice.isNotEmpty)
-      ? notice
-      : 'Bot berhasil dinonaktifkan sementara.';
-}
+  Future<String> turnBotOff({
+    required int conversationId,
+    int autoResumeMinutes = 15,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.turnBotOff(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        autoResumeMinutes: autoResumeMinutes,
+      ),
+    );
+
+    final notice = payload['message']?.toString().trim();
+    return (notice != null && notice.isNotEmpty)
+        ? notice
+        : 'Bot berhasil dinonaktifkan sementara.';
+  }
 
   Future<String> sendAdminContact({
     required int conversationId,

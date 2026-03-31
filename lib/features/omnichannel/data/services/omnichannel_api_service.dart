@@ -66,6 +66,27 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> sendAdminImageReply({
+    required String accessToken,
+    required int conversationId,
+    required List<int> fileBytes,
+    required String fileName,
+    String? caption,
+  }) {
+    return _apiClient.postMultipart(
+      ApiEndpoints.adminConversationReply(conversationId),
+      headers: _headers(accessToken),
+      fields: <String, Object?>{'message_type': 'image', 'caption': caption},
+      files: <ApiMultipartFile>[
+        ApiMultipartFile(
+          field: 'image_file',
+          bytes: fileBytes,
+          filename: fileName,
+        ),
+      ],
+    );
+  }
+
   Future<Map<String, dynamic>> sendAdminContact({
     required String accessToken,
     required int conversationId,
@@ -86,40 +107,38 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> fetchBotControlStatus({
+    required String accessToken,
+    required int conversationId,
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminConversationBotControl(conversationId),
+      headers: _headers(accessToken),
+    );
+  }
 
+  Future<Map<String, dynamic>> turnBotOn({
+    required String accessToken,
+    required int conversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationBotOn(conversationId),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
 
-Future<Map<String, dynamic>> fetchBotControlStatus({
-  required String accessToken,
-  required int conversationId,
-}) {
-  return _apiClient.get(
-    ApiEndpoints.adminConversationBotControl(conversationId),
-    headers: _headers(accessToken),
-  );
-}
-
-Future<Map<String, dynamic>> turnBotOn({
-  required String accessToken,
-  required int conversationId,
-}) {
-  return _apiClient.post(
-    ApiEndpoints.adminConversationBotOn(conversationId),
-    headers: _headers(accessToken),
-    body: const <String, Object?>{},
-  );
-}
-
-Future<Map<String, dynamic>> turnBotOff({
-  required String accessToken,
-  required int conversationId,
-  int autoResumeMinutes = 15,
-}) {
-  return _apiClient.post(
-    ApiEndpoints.adminConversationBotOff(conversationId),
-    headers: _headers(accessToken),
-    body: <String, Object?>{'auto_resume_minutes': autoResumeMinutes},
-  );
-}
+  Future<Map<String, dynamic>> turnBotOff({
+    required String accessToken,
+    required int conversationId,
+    int autoResumeMinutes = 15,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationBotOff(conversationId),
+      headers: _headers(accessToken),
+      body: <String, Object?>{'auto_resume_minutes': autoResumeMinutes},
+    );
+  }
 
   Future<Map<String, dynamic>> fetchPollList({
     required String accessToken,
