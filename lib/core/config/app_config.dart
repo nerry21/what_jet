@@ -41,6 +41,19 @@ class AppConfig {
     }
 
     if (kIsWeb) {
+      final host = Uri.base.host.toLowerCase();
+
+      if (host == 'localhost' || host == '127.0.0.1') {
+        return chatbotAiLocalBaseUrl;
+      }
+
+      if (host.isNotEmpty) {
+        final origin = Uri.base.origin;
+        if (origin.isNotEmpty) {
+          return origin;
+        }
+      }
+
       return chatbotAiProductionBaseUrl;
     }
 
