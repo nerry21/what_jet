@@ -5,6 +5,7 @@ import '../../../live_chat/presentation/widgets/channel_badge.dart';
 import '../../data/models/omnichannel_conversation_detail_model.dart';
 import '../../data/models/omnichannel_thread_model.dart';
 import 'omnichannel_surface.dart';
+import 'whatsapp_emoji_picker.dart';
 
 enum _MobileConversationMenuAction { sendContact, toggleBot }
 
@@ -49,6 +50,7 @@ class OmnichannelCenterPane extends StatefulWidget {
 class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
   final TextEditingController _composerController = TextEditingController();
   final ScrollController _threadScrollController = ScrollController();
+  final FocusNode _composerFocusNode = FocusNode();
 
   bool get _isMobileConversationLayout => widget.onOpenInbox != null;
 
@@ -56,7 +58,89 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
   void dispose() {
     _composerController.dispose();
     _threadScrollController.dispose();
+    _composerFocusNode.dispose();
     super.dispose();
+  }
+
+  Future<void> _openEmojiPicker() async {
+    if (widget.conversation == null || widget.isSendingReply) {
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
+
+    await showWhatsAppEmojiPicker(
+      context: context,
+      onEmojiSelected: _insertEmoji,
+      onBackspacePressed: _deleteSelectedTextOrLastCharacter,
+    );
+
+    if (mounted && !widget.isSendingReply) {
+      _composerFocusNode.requestFocus();
+    }
+  }
+
+  void _insertEmoji(String emoji) {
+    final value = _composerController.value;
+    final text = value.text;
+    final selection = value.selection;
+    final start = selection.isValid && selection.start >= 0
+        ? selection.start
+        : text.length;
+    final end = selection.isValid && selection.end >= 0
+        ? selection.end
+        : text.length;
+    final newText = text.replaceRange(start, end, emoji);
+    final newOffset = start + emoji.length;
+
+    _composerController.value = value.copyWith(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newOffset),
+      composing: TextRange.empty,
+    );
+  }
+
+  void _deleteSelectedTextOrLastCharacter() {
+    final value = _composerController.value;
+    final text = value.text;
+    if (text.isEmpty) {
+      return;
+    }
+
+    final selection = value.selection;
+    final start = selection.isValid && selection.start >= 0
+        ? selection.start
+        : text.length;
+    final end = selection.isValid && selection.end >= 0
+        ? selection.end
+        : text.length;
+
+    if (start != end) {
+      final newText = text.replaceRange(start, end, '');
+      _composerController.value = value.copyWith(
+        text: newText,
+        selection: TextSelection.collapsed(offset: start),
+        composing: TextRange.empty,
+      );
+      return;
+    }
+
+    if (start <= 0) {
+      return;
+    }
+
+    final prefix = text.substring(0, start);
+    final prefixLength = prefix.characters.length;
+    final truncatedPrefix = prefixLength > 0
+        ? prefix.characters.take(prefixLength - 1).toString()
+        : '';
+    final newText = truncatedPrefix + text.substring(end);
+
+    _composerController.value = value.copyWith(
+      text: newText,
+      selection: TextSelection.collapsed(offset: truncatedPrefix.length),
+      composing: TextRange.empty,
+    );
   }
 
   Future<void> _submitReply() async {
@@ -139,9 +223,11 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         isTogglingBot: widget.isTogglingBot,
         threadScrollController: _threadScrollController,
         composerController: _composerController,
+        composerFocusNode: _composerFocusNode,
         onOpenInbox: widget.onOpenInbox!,
         onSubmit: _submitReply,
         onSendContact: _openSendContactDialog,
+        onEmojiTap: _openEmojiPicker,
         onVideoTap: () => _showComingSoon('Video call'),
         onCallTap: () => _showComingSoon('Panggilan telepon'),
         onCameraTap: () => _showComingSoon('Kamera'),
@@ -226,11 +312,13 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
               top: false,
               child: _ActiveComposer(
                 controller: _composerController,
+                focusNode: _composerFocusNode,
                 channel: conversation.channel,
                 isSending: widget.isSendingReply,
                 isSendingContact: widget.isSendingContact,
                 onSubmit: _submitReply,
                 onSendContact: _openSendContactDialog,
+                onEmojiTap: _openEmojiPicker,
                 onVoiceNoteTap: () => _showComingSoon('Voice note'),
                 onCallTap: () => _showComingSoon('Panggilan telepon'),
               ),
@@ -253,9 +341,11 @@ class _MobileConversationScaffold extends StatelessWidget {
     required this.isTogglingBot,
     required this.threadScrollController,
     required this.composerController,
+    required this.composerFocusNode,
     required this.onOpenInbox,
     required this.onSubmit,
     required this.onSendContact,
+    required this.onEmojiTap,
     required this.onVideoTap,
     required this.onCallTap,
     required this.onCameraTap,
@@ -272,9 +362,11 @@ class _MobileConversationScaffold extends StatelessWidget {
   final bool isTogglingBot;
   final ScrollController threadScrollController;
   final TextEditingController composerController;
+  final FocusNode composerFocusNode;
   final VoidCallback onOpenInbox;
   final Future<void> Function() onSubmit;
   final Future<void> Function() onSendContact;
+  final Future<void> Function() onEmojiTap;
   final VoidCallback onVideoTap;
   final VoidCallback onCallTap;
   final VoidCallback onCameraTap;
@@ -374,10 +466,12 @@ class _MobileConversationScaffold extends StatelessWidget {
           if (conversation != null)
             _MobileConversationComposer(
               controller: composerController,
+              focusNode: composerFocusNode,
               isSending: isSendingReply,
               isSendingContact: isSendingContact,
               onSubmit: onSubmit,
               onAttachTap: onSendContact,
+              onEmojiTap: onEmojiTap,
               onCameraTap: onCameraTap,
               onVoiceNoteTap: onVoiceNoteTap,
             ),
@@ -823,19 +917,23 @@ class _MobileConversationBubble extends StatelessWidget {
 class _MobileConversationComposer extends StatelessWidget {
   const _MobileConversationComposer({
     required this.controller,
+    required this.focusNode,
     required this.isSending,
     required this.isSendingContact,
     required this.onSubmit,
     required this.onAttachTap,
+    required this.onEmojiTap,
     required this.onCameraTap,
     required this.onVoiceNoteTap,
   });
 
   final TextEditingController controller;
+  final FocusNode focusNode;
   final bool isSending;
   final bool isSendingContact;
   final Future<void> Function() onSubmit;
   final Future<void> Function() onAttachTap;
+  final Future<void> Function() onEmojiTap;
   final VoidCallback onCameraTap;
   final VoidCallback onVoiceNoteTap;
 
@@ -864,7 +962,7 @@ class _MobileConversationComposer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: <Widget>[
                         IconButton(
-                          onPressed: () {},
+                          onPressed: isSending ? null : () => onEmojiTap(),
                           icon: const Icon(
                             Icons.emoji_emotions_outlined,
                             color: AppConfig.subtleText,
@@ -873,9 +971,12 @@ class _MobileConversationComposer extends StatelessWidget {
                         Expanded(
                           child: TextField(
                             controller: controller,
+                            focusNode: focusNode,
                             enabled: !isSending,
                             minLines: 1,
                             maxLines: 5,
+                            keyboardType: TextInputType.multiline,
+                            textInputAction: TextInputAction.newline,
                             decoration: const InputDecoration(
                               hintText: 'Ketik pesan',
                               border: InputBorder.none,
@@ -1401,21 +1502,25 @@ class _ThreadBubble extends StatelessWidget {
 class _ActiveComposer extends StatelessWidget {
   const _ActiveComposer({
     required this.controller,
+    required this.focusNode,
     required this.channel,
     required this.isSending,
     required this.isSendingContact,
     required this.onSubmit,
     required this.onSendContact,
+    required this.onEmojiTap,
     required this.onVoiceNoteTap,
     required this.onCallTap,
   });
 
   final TextEditingController controller;
+  final FocusNode focusNode;
   final String channel;
   final bool isSending;
   final bool isSendingContact;
   final Future<void> Function() onSubmit;
   final Future<void> Function() onSendContact;
+  final Future<void> Function() onEmojiTap;
   final VoidCallback onVoiceNoteTap;
   final VoidCallback onCallTap;
 
@@ -1440,6 +1545,14 @@ class _ActiveComposer extends StatelessWidget {
             onTap: isSendingContact ? null : onSendContact,
           ),
           const SizedBox(width: 8),
+          if (isWhatsApp) ...<Widget>[
+            _ComposerIconButton(
+              icon: Icons.emoji_emotions_outlined,
+              tooltip: 'Emoji',
+              onTap: isSending ? null : () => onEmojiTap(),
+            ),
+            const SizedBox(width: 8),
+          ],
           _ComposerIconButton(
             icon: Icons.mic_none_rounded,
             tooltip: 'Voice Note',
@@ -1455,9 +1568,12 @@ class _ActiveComposer extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: controller,
+              focusNode: focusNode,
               enabled: !isSending,
               minLines: 1,
               maxLines: 4,
+              keyboardType: TextInputType.multiline,
+              textInputAction: TextInputAction.newline,
               onSubmitted: (_) => onSubmit(),
               decoration: InputDecoration(
                 hintText: isWhatsApp
@@ -1595,7 +1711,7 @@ class _ComposerIconButton extends StatelessWidget {
 
   final IconData icon;
   final String tooltip;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1614,7 +1730,11 @@ class _ComposerIconButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(999),
               border: Border.all(color: AppConfig.softBackgroundAlt),
             ),
-            child: Icon(icon, color: AppConfig.mutedText, size: 18),
+            child: Icon(
+              icon,
+              color: onTap == null ? AppConfig.subtleText : AppConfig.mutedText,
+              size: 18,
+            ),
           ),
         ),
       ),
