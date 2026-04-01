@@ -1,23 +1,31 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
 import '../config/app_config.dart';
 
 class ApiException implements Exception {
-  ApiException({required this.message, this.statusCode, this.payload});
+  ApiException({
+    required this.message,
+    this.statusCode,
+    this.payload,
+    this.rawBody,
+  });
 
   final String message;
   final int? statusCode;
   final Object? payload;
+  final String? rawBody;
 
   bool get isUnauthorized => statusCode == 401 || statusCode == 403;
 
   bool get isOffline => statusCode == null;
 
   @override
-  String toString() => 'ApiException($statusCode): $message';
+  String toString() =>
+      'ApiException(statusCode: $statusCode, message: $message, payload: $payload, rawBody: $rawBody)';
 }
 
 class ApiMultipartFile {
@@ -97,6 +105,13 @@ class ApiClient {
     try {
       final http.Response response;
 
+      _logRequest(
+        method: method,
+        uri: uri,
+        headers: _headers(headers),
+        body: body,
+      );
+
       if (method == 'GET') {
         response = await _httpClient.get(uri, headers: _headers(headers));
       } else if (method == 'POST') {
@@ -108,6 +123,8 @@ class ApiClient {
       } else {
         throw ApiException(message: 'HTTP method tidak didukung: $method');
       }
+
+      _logResponse(response);
 
       return _decodeResponse(response);
     } on ApiException {
@@ -137,13 +154,21 @@ class ApiClient {
       final request = http.MultipartRequest(method, uri)
         ..headers.addAll(_multipartHeaders(headers));
 
+      final normalizedFields = <String, String>{};
+
       for (final entry in fields.entries) {
         final value = entry.value;
         if (value == null) {
           continue;
         }
 
-        request.fields[entry.key] = value.toString();
+        final text = value.toString().trim();
+        if (text.isEmpty) {
+          continue;
+        }
+
+        request.fields[entry.key] = text;
+        normalizedFields[entry.key] = text;
       }
 
       for (final file in files) {
@@ -152,15 +177,23 @@ class ApiClient {
             file.field,
             file.bytes,
             filename: file.filename,
-            contentType: file.contentType != null
-                ? MediaType.parse(file.contentType!)
-                : null,
+            contentType: _tryParseMediaType(file.contentType),
           ),
         );
       }
 
+      _logMultipartRequest(
+        method: method,
+        uri: uri,
+        headers: request.headers,
+        fields: normalizedFields,
+        files: files,
+      );
+
       final streamed = await request.send();
       final response = await http.Response.fromStream(streamed);
+
+      _logResponse(response);
 
       return _decodeResponse(response);
     } on ApiException {
@@ -175,6 +208,7 @@ class ApiClient {
   Uri _buildUri(String path, Map<String, Object?> queryParameters) {
     final baseUri = Uri.parse(AppConfig.baseUrl);
     final normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+
     final segments = <String>[
       ...baseUri.pathSegments.where((segment) => segment.isNotEmpty),
       ...normalizedPath.split('/').where((segment) => segment.isNotEmpty),
@@ -186,6 +220,7 @@ class ApiClient {
       if (value == null) {
         continue;
       }
+
       filteredQuery[entry.key] = value.toString();
     }
 
@@ -209,7 +244,7 @@ class ApiClient {
 
   Map<String, dynamic> _decodeResponse(http.Response response) {
     final body = response.body.trim();
-    final payload = body.isEmpty ? <String, dynamic>{} : jsonDecode(body);
+    final payload = _tryDecodeJson(body);
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       if (payload is Map<String, dynamic>) {
@@ -225,10 +260,15 @@ class ApiClient {
         return payload;
       }
 
+      if (body.isEmpty) {
+        return <String, dynamic>{};
+      }
+
       throw ApiException(
         message: 'Response server tidak valid.',
         statusCode: response.statusCode,
         payload: payload,
+        rawBody: body,
       );
     }
 
@@ -240,6 +280,7 @@ class ApiClient {
       message: message,
       statusCode: response.statusCode,
       payload: payload,
+      rawBody: body,
     );
   }
 
@@ -274,6 +315,68 @@ class ApiClient {
     }
 
     return 'Permintaan ke server gagal.';
+  }
+
+  Object? _tryDecodeJson(String body) {
+    if (body.isEmpty) {
+      return <String, dynamic>{};
+    }
+
+    try {
+      return jsonDecode(body);
+    } catch (_) {
+      return body;
+    }
+  }
+
+  MediaType? _tryParseMediaType(String? value) {
+    if (value == null) {
+      return null;
+    }
+
+    final text = value.trim();
+    if (text.isEmpty) {
+      return null;
+    }
+
+    try {
+      return MediaType.parse(text);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _logRequest({
+    required String method,
+    required Uri uri,
+    required Map<String, String> headers,
+    Object? body,
+  }) {
+    debugPrint('API REQUEST => $method $uri');
+    debugPrint('API REQUEST HEADERS => $headers');
+    if (body != null) {
+      debugPrint('API REQUEST BODY => $body');
+    }
+  }
+
+  void _logMultipartRequest({
+    required String method,
+    required Uri uri,
+    required Map<String, String> headers,
+    required Map<String, String> fields,
+    required List<ApiMultipartFile> files,
+  }) {
+    debugPrint('API MULTIPART REQUEST => $method $uri');
+    debugPrint('API MULTIPART HEADERS => $headers');
+    debugPrint('API MULTIPART FIELDS => $fields');
+    debugPrint(
+      'API MULTIPART FILES => ${files.map((file) => {'field': file.field, 'filename': file.filename, 'contentType': file.contentType, 'bytesLength': file.bytes.length}).toList()}',
+    );
+  }
+
+  void _logResponse(http.Response response) {
+    debugPrint('API RESPONSE STATUS => ${response.statusCode}');
+    debugPrint('API RESPONSE BODY => ${response.body}');
   }
 
   void dispose() {

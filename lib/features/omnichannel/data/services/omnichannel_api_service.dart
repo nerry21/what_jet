@@ -62,7 +62,7 @@ class OmnichannelApiService {
     return _apiClient.post(
       ApiEndpoints.adminConversationReply(conversationId),
       headers: _headers(accessToken),
-      body: <String, Object?>{'message': message},
+      body: <String, Object?>{'message_type': 'text', 'message': message},
     );
   }
 
@@ -74,10 +74,16 @@ class OmnichannelApiService {
     String? caption,
     String? mimeType,
   }) {
+    final fields = <String, Object?>{
+      'message_type': 'image',
+      'caption': _normalizedNullableText(caption),
+      'mime_type': _normalizedNullableText(mimeType),
+    };
+
     return _apiClient.postMultipart(
       ApiEndpoints.adminConversationReply(conversationId),
       headers: _headers(accessToken),
-      fields: <String, Object?>{'message_type': 'image', 'caption': caption},
+      fields: fields,
       files: <ApiMultipartFile>[
         ApiMultipartFile(
           field: 'image_file',
@@ -97,20 +103,25 @@ class OmnichannelApiService {
     String? mimeType,
     String? caption,
   }) {
+    final normalizedMimeType = _normalizedNullableText(mimeType);
+
+    final fields = <String, Object?>{
+      'message_type': 'audio',
+      'caption': _normalizedNullableText(caption),
+      'voice': '1',
+      'mime_type': normalizedMimeType,
+    };
+
     return _apiClient.postMultipart(
       ApiEndpoints.adminConversationReply(conversationId),
       headers: _headers(accessToken),
-      fields: <String, Object?>{
-        'message_type': 'audio',
-        'caption': caption,
-        'voice': true,
-      },
+      fields: fields,
       files: <ApiMultipartFile>[
         ApiMultipartFile(
           field: 'audio_file',
           bytes: fileBytes,
           filename: fileName,
-          contentType: mimeType,
+          contentType: normalizedMimeType,
         ),
       ],
     );
@@ -198,5 +209,14 @@ class OmnichannelApiService {
 
   Map<String, String> _headers(String accessToken) {
     return <String, String>{'Authorization': 'Bearer $accessToken'};
+  }
+
+  String? _normalizedNullableText(String? value) {
+    if (value == null) {
+      return null;
+    }
+
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
   }
 }
