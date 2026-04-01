@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../../core/config/app_config.dart';
@@ -24,6 +26,7 @@ class OmnichannelCenterPane extends StatefulWidget {
     required this.onSendCameraImage,
     required this.onSendContact,
     required this.onSendVoiceNote,
+    required this.onCancelVoiceNote,
     required this.isRecordingVoiceNote,
     required this.isTogglingBot,
     required this.onToggleBot,
@@ -47,6 +50,7 @@ class OmnichannelCenterPane extends StatefulWidget {
   })
   onSendContact;
   final Future<bool> Function() onSendVoiceNote;
+  final Future<bool> Function() onCancelVoiceNote;
   final bool isRecordingVoiceNote;
   final bool isTogglingBot;
   final Future<bool> Function(bool turnOn) onToggleBot;
@@ -227,6 +231,14 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
     }
   }
 
+  Future<void> _handleCancelVoiceNoteTap() async {
+    if (widget.conversation == null || !widget.isRecordingVoiceNote) {
+      return;
+    }
+
+    await widget.onCancelVoiceNote();
+  }
+
   Future<void> _openSendContactDialog() async {
     if (widget.conversation == null || widget.isSendingContact) {
       return;
@@ -316,6 +328,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         onCallTap: () => _showComingSoon('Panggilan telepon'),
         onCameraTap: _handleDirectCameraTap,
         onVoiceNoteTap: _handleVoiceNoteTap,
+        onCancelVoiceNoteTap: _handleCancelVoiceNoteTap,
         onMenuSelected: _handleMobileMenuAction,
       );
     }
@@ -436,6 +449,7 @@ class _MobileConversationScaffold extends StatelessWidget {
     required this.onCallTap,
     required this.onCameraTap,
     required this.onVoiceNoteTap,
+    required this.onCancelVoiceNoteTap,
     required this.onMenuSelected,
   });
 
@@ -458,6 +472,7 @@ class _MobileConversationScaffold extends StatelessWidget {
   final VoidCallback onCallTap;
   final VoidCallback onCameraTap;
   final VoidCallback onVoiceNoteTap;
+  final Future<void> Function() onCancelVoiceNoteTap;
   final Future<void> Function(_MobileConversationMenuAction action)
   onMenuSelected;
 
@@ -562,6 +577,7 @@ class _MobileConversationScaffold extends StatelessWidget {
               onEmojiTap: onEmojiTap,
               onCameraTap: onCameraTap,
               onVoiceNoteTap: onVoiceNoteTap,
+              onCancelVoiceNoteTap: onCancelVoiceNoteTap,
             ),
         ],
       ),
@@ -1019,7 +1035,7 @@ class _MobileConversationBubble extends StatelessWidget {
   }
 }
 
-class _MobileConversationComposer extends StatelessWidget {
+class _MobileConversationComposer extends StatefulWidget {
   const _MobileConversationComposer({
     required this.controller,
     required this.focusNode,
@@ -1030,6 +1046,7 @@ class _MobileConversationComposer extends StatelessWidget {
     required this.onEmojiTap,
     required this.onCameraTap,
     required this.onVoiceNoteTap,
+    required this.onCancelVoiceNoteTap,
     required this.isRecordingVoiceNote,
   });
 
@@ -1042,17 +1059,173 @@ class _MobileConversationComposer extends StatelessWidget {
   final Future<void> Function() onEmojiTap;
   final VoidCallback onCameraTap;
   final VoidCallback onVoiceNoteTap;
+  final Future<void> Function() onCancelVoiceNoteTap;
   final bool isRecordingVoiceNote;
 
   @override
+  State<_MobileConversationComposer> createState() =>
+      _MobileConversationComposerState();
+}
+
+class _MobileConversationComposerState
+    extends State<_MobileConversationComposer> {
+  Timer? _timer;
+  int _recordingSeconds = 0;
+
+  @override
+  void didUpdateWidget(covariant _MobileConversationComposer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (!oldWidget.isRecordingVoiceNote && widget.isRecordingVoiceNote) {
+      _startTimer();
+    } else if (oldWidget.isRecordingVoiceNote && !widget.isRecordingVoiceNote) {
+      _stopTimer(reset: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _stopTimer(reset: false);
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _stopTimer(reset: false);
+    _recordingSeconds = 0;
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _recordingSeconds += 1;
+      });
+    });
+  }
+
+  void _stopTimer({required bool reset}) {
+    _timer?.cancel();
+    _timer = null;
+
+    if (reset && mounted) {
+      setState(() {
+        _recordingSeconds = 0;
+      });
+    } else if (reset) {
+      _recordingSeconds = 0;
+    }
+  }
+
+  String _formatDuration(int totalSeconds) {
+    final minutes = totalSeconds ~/ 60;
+    final seconds = totalSeconds % 60;
+    final mm = minutes.toString().padLeft(2, '0');
+    final ss = seconds.toString().padLeft(2, '0');
+    return '$mm.$ss';
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (widget.isRecordingVoiceNote) {
+      return Container(
+        padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+        color: const Color(0xFFF0E7DD),
+        child: SafeArea(
+          top: false,
+          child: Row(
+            children: <Widget>[
+              IconButton(
+                onPressed: widget.isSending
+                    ? null
+                    : () => widget.onCancelVoiceNoteTap(),
+                icon: const Icon(
+                  Icons.delete_outline_rounded,
+                  color: AppConfig.subtleText,
+                  size: 28,
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  height: 58,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(28),
+                  ),
+                  child: Row(
+                    children: <Widget>[
+                      Text(
+                        _formatDuration(_recordingSeconds),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      const Expanded(child: _VoiceNoteWaveform()),
+                      const SizedBox(width: 10),
+                      Container(
+                        width: 34,
+                        height: 34,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFFFF0F0),
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.pause_rounded,
+                          color: Color(0xFFE53935),
+                          size: 22,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Material(
+                color: AppConfig.green,
+                borderRadius: BorderRadius.circular(999),
+                child: InkWell(
+                  onTap: widget.isSending ? null : widget.onVoiceNoteTap,
+                  borderRadius: BorderRadius.circular(999),
+                  child: SizedBox(
+                    width: 54,
+                    height: 54,
+                    child: Center(
+                      child: widget.isSending
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(
+                              Icons.send_rounded,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
       color: const Color(0xFFF0E7DD),
       child: SafeArea(
         top: false,
         child: ValueListenableBuilder<TextEditingValue>(
-          valueListenable: controller,
+          valueListenable: widget.controller,
           builder: (context, value, _) {
             final hasText = value.text.trim().isNotEmpty;
 
@@ -1069,7 +1242,9 @@ class _MobileConversationComposer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: <Widget>[
                         IconButton(
-                          onPressed: isSending ? null : () => onEmojiTap(),
+                          onPressed: widget.isSending
+                              ? null
+                              : () => widget.onEmojiTap(),
                           icon: const Icon(
                             Icons.emoji_emotions_outlined,
                             color: AppConfig.subtleText,
@@ -1077,9 +1252,9 @@ class _MobileConversationComposer extends StatelessWidget {
                         ),
                         Expanded(
                           child: TextField(
-                            controller: controller,
-                            focusNode: focusNode,
-                            enabled: !isSending,
+                            controller: widget.controller,
+                            focusNode: widget.focusNode,
+                            enabled: !widget.isSending,
                             minLines: 1,
                             maxLines: 5,
                             keyboardType: TextInputType.multiline,
@@ -1095,10 +1270,10 @@ class _MobileConversationComposer extends StatelessWidget {
                           ),
                         ),
                         IconButton(
-                          onPressed: isSending || isSendingContact
+                          onPressed: widget.isSending || widget.isSendingContact
                               ? null
-                              : () => onAttachTap(),
-                          icon: isSendingContact
+                              : () => widget.onAttachTap(),
+                          icon: widget.isSendingContact
                               ? const SizedBox(
                                   width: 18,
                                   height: 18,
@@ -1113,7 +1288,7 @@ class _MobileConversationComposer extends StatelessWidget {
                                 ),
                         ),
                         IconButton(
-                          onPressed: onCameraTap,
+                          onPressed: widget.onCameraTap,
                           icon: const Icon(
                             Icons.camera_alt_outlined,
                             color: AppConfig.subtleText,
@@ -1128,17 +1303,17 @@ class _MobileConversationComposer extends StatelessWidget {
                   color: AppConfig.green,
                   borderRadius: BorderRadius.circular(999),
                   child: InkWell(
-                    onTap: isSending
+                    onTap: widget.isSending
                         ? null
                         : hasText
-                        ? () => onSubmit()
-                        : onVoiceNoteTap,
+                            ? () => widget.onSubmit()
+                            : widget.onVoiceNoteTap,
                     borderRadius: BorderRadius.circular(999),
                     child: SizedBox(
                       width: 54,
                       height: 54,
                       child: Center(
-                        child: isSending
+                        child: widget.isSending
                             ? const SizedBox(
                                 width: 20,
                                 height: 20,
@@ -1150,9 +1325,7 @@ class _MobileConversationComposer extends StatelessWidget {
                             : Icon(
                                 hasText
                                     ? Icons.send_rounded
-                                    : (isRecordingVoiceNote
-                                          ? Icons.stop_rounded
-                                          : Icons.mic_rounded),
+                                    : Icons.mic_rounded,
                                 color: Colors.white,
                                 size: 24,
                               ),
@@ -1165,6 +1338,38 @@ class _MobileConversationComposer extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+}
+
+class _VoiceNoteWaveform extends StatelessWidget {
+  const _VoiceNoteWaveform();
+
+  @override
+  Widget build(BuildContext context) {
+    const bars = <double>[
+      10, 14, 18, 12, 20, 26, 16, 22, 28, 14,
+      18, 24, 30, 16, 22, 12, 26, 18, 14, 20,
+      24, 16, 28, 18, 12, 22, 26, 14,
+    ];
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: bars
+          .map(
+            (height) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 1.5),
+              child: Container(
+                width: 3,
+                height: height,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3F3F3F),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 }

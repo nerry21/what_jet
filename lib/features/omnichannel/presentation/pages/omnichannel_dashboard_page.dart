@@ -369,6 +369,25 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
   }
 
+  Future<bool> _cancelVoiceNoteRecording() async {
+    if (!_isRecordingVoiceNote) {
+      return false;
+    }
+
+    try {
+      await _audioRecorder.stop();
+    } catch (_) {
+      // abaikan error stop saat batal
+    }
+
+    if (mounted) {
+      setState(() => _isRecordingVoiceNote = false);
+      _showSnackBar('Rekaman voice note dibatalkan.');
+    }
+
+    return true;
+  }
+
   Future<bool> _toggleVoiceNoteRecording() async {
     final conversation = _controller.selectedConversation;
     final conversationId = conversation?.id;
@@ -392,6 +411,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     try {
       if (_isRecordingVoiceNote) {
         final path = await _audioRecorder.stop();
+
         if (mounted) {
           setState(() => _isRecordingVoiceNote = false);
         }
@@ -403,6 +423,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
 
         final file = XFile(path);
         final fileBytes = await file.readAsBytes();
+
         if (fileBytes.isEmpty) {
           _showSnackBar('File voice note kosong atau gagal dibaca.');
           return false;
@@ -412,6 +433,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
           file.mimeType,
           file.name,
         );
+
         final normalizedName = _normalizedVoiceFileName(
           file.name,
           guessedMimeType,
@@ -430,10 +452,22 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
           );
 
           await _controller.softRefreshAfterExternalAction();
+
           if (mounted) {
             _showSnackBar(notice);
           }
+
           return true;
+        } on ApiException catch (error) {
+          if (mounted) {
+            _showSnackBar(error.message);
+          }
+          return false;
+        } catch (error) {
+          if (mounted) {
+            _showSnackBar('Gagal mengirim voice note: $error');
+          }
+          return false;
         } finally {
           if (mounted) {
             setState(() => _isSendingReply = false);
@@ -448,12 +482,13 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       }
 
       final tempPath =
-          '${Directory.systemTemp.path}/voice_note_${DateTime.now().millisecondsSinceEpoch}.ogg';
+          '${Directory.systemTemp.path}/voice_note_${DateTime.now().millisecondsSinceEpoch}.m4a';
+
       await _audioRecorder.start(
         const RecordConfig(
-          encoder: AudioEncoder.opus,
-          bitRate: 64000,
-          sampleRate: 16000,
+          encoder: AudioEncoder.aacLc,
+          bitRate: 128000,
+          sampleRate: 44100,
         ),
         path: tempPath,
       );
@@ -461,19 +496,12 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       if (mounted) {
         setState(() => _isRecordingVoiceNote = true);
       }
-      _showSnackBar(
-        'Rekaman voice note dimulai. Tekan ikon mic sekali lagi untuk mengirim.',
-      );
-      return false;
-    } on ApiException catch (error) {
-      if (mounted) {
-        _showSnackBar(error.message);
-      }
+
       return false;
     } catch (error) {
       if (mounted) {
-        _showSnackBar('Gagal memproses voice note: $error');
         setState(() => _isRecordingVoiceNote = false);
+        _showSnackBar('Gagal memproses voice note: $error');
       }
       return false;
     }
@@ -691,6 +719,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 onSendGalleryImage: _sendAdminGalleryImage,
                 onSendCameraImage: _sendAdminCameraImage,
                 onSendVoiceNote: _toggleVoiceNoteRecording,
+                onCancelVoiceNote: _cancelVoiceNoteRecording,
                 isRecordingVoiceNote: _isRecordingVoiceNote,
                 onSendContact: _sendAdminContact,
                 isTogglingBot: _isTogglingBot,
@@ -768,6 +797,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   onSendGalleryImage: _sendAdminGalleryImage,
                   onSendCameraImage: _sendAdminCameraImage,
                   onSendVoiceNote: _toggleVoiceNoteRecording,
+                  onCancelVoiceNote: _cancelVoiceNoteRecording,
                   isRecordingVoiceNote: _isRecordingVoiceNote,
                   onSendContact: _sendAdminContact,
                   isTogglingBot: _isTogglingBot,
