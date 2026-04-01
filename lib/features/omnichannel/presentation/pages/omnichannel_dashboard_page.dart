@@ -211,7 +211,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
         fileBytes: await pickedImage.readAsBytes(),
         fileName: pickedImage.name,
         caption: caption,
-        mimeType: pickedImage.mimeType,
+        mimeType: pickedImage.mimeType ?? _mimeTypeFromFileName(pickedImage.name),
       );
 
       await _controller.softRefreshAfterExternalAction();
@@ -236,6 +236,17 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
         setState(() => _isSendingReply = false);
       }
     }
+  }
+
+  String? _mimeTypeFromFileName(String fileName) {
+    final ext = fileName.split('.').last.toLowerCase();
+    return switch (ext) {
+      'jpg' || 'jpeg' => 'image/jpeg',
+      'png' => 'image/png',
+      'gif' => 'image/gif',
+      'webp' => 'image/webp',
+      _ => null,
+    };
   }
 
   Future<bool> _toggleBot(bool turnOn) async {
