@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import '../config/app_config.dart';
 
@@ -24,11 +25,13 @@ class ApiMultipartFile {
     required this.field,
     required this.bytes,
     required this.filename,
+    this.contentType,
   });
 
   final String field;
   final List<int> bytes;
   final String filename;
+  final String? contentType;
 }
 
 class ApiClient {
@@ -149,6 +152,9 @@ class ApiClient {
             file.field,
             file.bytes,
             filename: file.filename,
+            contentType: file.contentType != null
+                ? MediaType.parse(file.contentType!)
+                : null,
           ),
         );
       }

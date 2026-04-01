@@ -250,6 +250,7 @@ class OmnichannelRepository {
     required List<int> fileBytes,
     required String fileName,
     String? caption,
+    String? mimeType,
   }) async {
     final accessToken = await _ensureAdminSession();
     final payload = await _readWithRetry(
@@ -259,6 +260,7 @@ class OmnichannelRepository {
         fileBytes: fileBytes,
         fileName: fileName,
         caption: caption,
+        mimeType: mimeType,
       ),
     );
 

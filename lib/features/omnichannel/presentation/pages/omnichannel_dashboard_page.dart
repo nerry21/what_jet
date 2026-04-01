@@ -211,6 +211,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
         fileBytes: await pickedImage.readAsBytes(),
         fileName: pickedImage.name,
         caption: caption,
+        mimeType: pickedImage.mimeType,
       );
 
       await _controller.softRefreshAfterExternalAction();

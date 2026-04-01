@@ -72,6 +72,7 @@ class OmnichannelApiService {
     required List<int> fileBytes,
     required String fileName,
     String? caption,
+    String? mimeType,
   }) {
     return _apiClient.postMultipart(
       ApiEndpoints.adminConversationReply(conversationId),
@@ -82,6 +83,7 @@ class OmnichannelApiService {
           field: 'image_file',
           bytes: fileBytes,
           filename: fileName,
+          contentType: mimeType,
         ),
       ],
     );
