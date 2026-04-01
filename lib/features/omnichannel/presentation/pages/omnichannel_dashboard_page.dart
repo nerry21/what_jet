@@ -439,6 +439,13 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
           guessedMimeType,
         );
 
+        debugPrint('VOICE NOTE SEND START');
+        debugPrint('VOICE NOTE PATH => $path');
+        debugPrint('VOICE NOTE FILE NAME => ${file.name}');
+        debugPrint('VOICE NOTE MIME => $guessedMimeType');
+        debugPrint('VOICE NOTE BYTES => ${fileBytes.length}');
+        debugPrint('VOICE NOTE CONVERSATION ID => $conversationId');
+
         if (mounted) {
           setState(() => _isSendingReply = true);
         }
@@ -451,6 +458,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
             mimeType: guessedMimeType,
           );
 
+          debugPrint('VOICE NOTE SEND SUCCESS => $notice');
+
           await _controller.softRefreshAfterExternalAction();
 
           if (mounted) {
@@ -459,11 +468,26 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
 
           return true;
         } on ApiException catch (error) {
+          final details = _buildApiErrorDetails(
+            error,
+            title: 'VOICE NOTE API ERROR',
+          );
+
+          debugPrint(details);
+
           if (mounted) {
-            _showSnackBar(error.message);
+            _showSnackBar(
+              error.statusCode != null
+                  ? 'VOICE NOTE ${error.statusCode}: ${error.message}'
+                  : 'VOICE NOTE: ${error.message}',
+            );
           }
+
           return false;
-        } catch (error) {
+        } catch (error, stackTrace) {
+          debugPrint('VOICE NOTE UNEXPECTED ERROR => $error');
+          debugPrintStack(stackTrace: stackTrace);
+
           if (mounted) {
             _showSnackBar('Gagal mengirim voice note: $error');
           }
@@ -493,12 +517,17 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
         path: tempPath,
       );
 
+      debugPrint('VOICE NOTE RECORDING START => $tempPath');
+
       if (mounted) {
         setState(() => _isRecordingVoiceNote = true);
       }
 
       return false;
-    } catch (error) {
+    } catch (error, stackTrace) {
+      debugPrint('VOICE NOTE PROCESS ERROR => $error');
+      debugPrintStack(stackTrace: stackTrace);
+
       if (mounted) {
         setState(() => _isRecordingVoiceNote = false);
         _showSnackBar('Gagal memproses voice note: $error');
@@ -599,7 +628,25 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
 
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(text)));
+      ..showSnackBar(
+        SnackBar(
+          content: Text(text),
+          duration: const Duration(seconds: 6),
+        ),
+      );
+  }
+
+  String _buildApiErrorDetails(ApiException error, {String title = 'API ERROR'}) {
+    final lines = <String>[
+      title,
+      if (error.statusCode != null) 'Status: ${error.statusCode}',
+      'Message: ${error.message}',
+      if (error.payload != null) 'Payload: ${error.payload}',
+      if (error.rawBody != null && error.rawBody!.trim().isNotEmpty)
+        'Raw: ${error.rawBody}',
+    ];
+
+    return lines.join('\n');
   }
 
   void _setMobilePane(_OmnichannelMobilePane pane) {
