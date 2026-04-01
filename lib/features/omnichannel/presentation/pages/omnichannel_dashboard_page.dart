@@ -203,15 +203,38 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       return false;
     }
 
+    final normalizedMimeType = _normalizeSendableImageMimeType(
+      pickedImage.mimeType,
+      pickedImage.name,
+    );
+
+    if (normalizedMimeType == null) {
+      _showSnackBar(
+        'Format gambar ini belum didukung untuk kirim WhatsApp. Gunakan JPG atau PNG.',
+      );
+      return false;
+    }
+
+    final fileBytes = await pickedImage.readAsBytes();
+    if (fileBytes.isEmpty) {
+      _showSnackBar('File gambar kosong atau gagal dibaca.');
+      return false;
+    }
+
+    final normalizedFileName = _normalizedImageFileName(
+      pickedImage.name,
+      normalizedMimeType,
+    );
+
     setState(() => _isSendingReply = true);
 
     try {
       final notice = await widget.repository.sendAdminImageReply(
         conversationId: conversationId,
-        fileBytes: await pickedImage.readAsBytes(),
-        fileName: pickedImage.name,
+        fileBytes: fileBytes,
+        fileName: normalizedFileName,
         caption: caption,
-        mimeType: pickedImage.mimeType ?? _mimeTypeFromFileName(pickedImage.name),
+        mimeType: normalizedMimeType,
       );
 
       await _controller.softRefreshAfterExternalAction();
@@ -238,13 +261,56 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
   }
 
+  String? _normalizeSendableImageMimeType(String? mimeType, String fileName) {
+    final normalized = (mimeType ?? _mimeTypeFromFileName(fileName) ?? '')
+        .trim()
+        .toLowerCase();
+
+    return switch (normalized) {
+      'image/jpeg' || 'image/jpg' || 'image/pjpeg' => 'image/jpeg',
+      'image/png' => 'image/png',
+      _ => null,
+    };
+  }
+
+  String _normalizedImageFileName(String fileName, String mimeType) {
+    final trimmed = fileName.trim();
+    final fallbackExtension = mimeType == 'image/png' ? 'png' : 'jpg';
+
+    if (trimmed.isEmpty) {
+      return 'whatsapp-image.$fallbackExtension';
+    }
+
+    final lastDot = trimmed.lastIndexOf('.');
+    if (lastDot <= 0 || lastDot == trimmed.length - 1) {
+      return '$trimmed.$fallbackExtension';
+    }
+
+    final ext = trimmed.substring(lastDot + 1).toLowerCase();
+    if (mimeType == 'image/jpeg' && (ext == 'jpg' || ext == 'jpeg')) {
+      return trimmed;
+    }
+    if (mimeType == 'image/png' && ext == 'png') {
+      return trimmed;
+    }
+
+    final baseName = trimmed.substring(0, lastDot);
+    return '$baseName.$fallbackExtension';
+  }
+
   String? _mimeTypeFromFileName(String fileName) {
-    final ext = fileName.split('.').last.toLowerCase();
+    final parts = fileName.split('.');
+    if (parts.length < 2) {
+      return null;
+    }
+
+    final ext = parts.last.toLowerCase();
     return switch (ext) {
       'jpg' || 'jpeg' => 'image/jpeg',
       'png' => 'image/png',
       'gif' => 'image/gif',
       'webp' => 'image/webp',
+      'heic' || 'heif' => 'image/heic',
       _ => null,
     };
   }
