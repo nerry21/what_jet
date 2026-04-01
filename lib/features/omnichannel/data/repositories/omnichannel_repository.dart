@@ -272,6 +272,33 @@ class OmnichannelRepository {
     return 'Gambar admin berhasil diproses.';
   }
 
+  Future<String> sendAdminAudioReply({
+    required int conversationId,
+    required List<int> fileBytes,
+    required String fileName,
+    String? mimeType,
+    String? caption,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.sendAdminAudioReply(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        fileBytes: fileBytes,
+        fileName: fileName,
+        mimeType: mimeType,
+        caption: caption,
+      ),
+    );
+
+    final notice = payload['notice']?.toString().trim();
+    if (notice != null && notice.isNotEmpty) {
+      return notice;
+    }
+
+    return 'Voice note admin berhasil diproses.';
+  }
+
   Future<String> turnBotOn({required int conversationId}) async {
     final accessToken = await _ensureAdminSession();
     final payload = await _readWithRetry(

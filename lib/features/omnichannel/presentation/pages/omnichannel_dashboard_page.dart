@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:record/record.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../../../core/network/api_client.dart';
@@ -43,6 +45,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     with WidgetsBindingObserver {
   late final OmnichannelShellController _controller;
   final ImagePicker _imagePicker = ImagePicker();
+  final AudioRecorder _audioRecorder = AudioRecorder();
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _conversationListScrollController = ScrollController();
 
@@ -50,6 +53,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   bool _isSendingReply = false;
   bool _isSendingContact = false;
   bool _isTogglingBot = false;
+  bool _isRecordingVoiceNote = false;
   _OmnichannelMobilePane _mobilePane = _OmnichannelMobilePane.inbox;
 
   @override
@@ -81,6 +85,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
 
     _searchController.dispose();
     _conversationListScrollController.dispose();
+    _audioRecorder.dispose();
 
     super.dispose();
   }
@@ -364,6 +369,149 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
   }
 
+  Future<bool> _toggleVoiceNoteRecording() async {
+    final conversation = _controller.selectedConversation;
+    final conversationId = conversation?.id;
+
+    if (conversationId == null || conversationId <= 0) {
+      _showSnackBar('Conversation belum dipilih.');
+      return false;
+    }
+
+    if (conversation?.channel != 'whatsapp') {
+      _showSnackBar(
+        'Voice note saat ini hanya aktif untuk conversation WhatsApp.',
+      );
+      return false;
+    }
+
+    if (_isSendingReply || _isSendingContact) {
+      return false;
+    }
+
+    try {
+      if (_isRecordingVoiceNote) {
+        final path = await _audioRecorder.stop();
+        if (mounted) {
+          setState(() => _isRecordingVoiceNote = false);
+        }
+
+        if (path == null || path.trim().isEmpty) {
+          _showSnackBar('Rekaman voice note kosong atau gagal disimpan.');
+          return false;
+        }
+
+        final file = XFile(path);
+        final fileBytes = await file.readAsBytes();
+        if (fileBytes.isEmpty) {
+          _showSnackBar('File voice note kosong atau gagal dibaca.');
+          return false;
+        }
+
+        final guessedMimeType = _normalizeVoiceMimeType(
+          file.mimeType,
+          file.name,
+        );
+        final normalizedName = _normalizedVoiceFileName(
+          file.name,
+          guessedMimeType,
+        );
+
+        if (mounted) {
+          setState(() => _isSendingReply = true);
+        }
+
+        try {
+          final notice = await widget.repository.sendAdminAudioReply(
+            conversationId: conversationId,
+            fileBytes: fileBytes,
+            fileName: normalizedName,
+            mimeType: guessedMimeType,
+          );
+
+          await _controller.softRefreshAfterExternalAction();
+          if (mounted) {
+            _showSnackBar(notice);
+          }
+          return true;
+        } finally {
+          if (mounted) {
+            setState(() => _isSendingReply = false);
+          }
+        }
+      }
+
+      final hasPermission = await _audioRecorder.hasPermission();
+      if (!hasPermission) {
+        _showSnackBar('Izin mikrofon belum diberikan.');
+        return false;
+      }
+
+      final tempPath =
+          '${Directory.systemTemp.path}/voice_note_${DateTime.now().millisecondsSinceEpoch}.ogg';
+      await _audioRecorder.start(
+        const RecordConfig(
+          encoder: AudioEncoder.opus,
+          bitRate: 64000,
+          sampleRate: 16000,
+        ),
+        path: tempPath,
+      );
+
+      if (mounted) {
+        setState(() => _isRecordingVoiceNote = true);
+      }
+      _showSnackBar(
+        'Rekaman voice note dimulai. Tekan ikon mic sekali lagi untuk mengirim.',
+      );
+      return false;
+    } on ApiException catch (error) {
+      if (mounted) {
+        _showSnackBar(error.message);
+      }
+      return false;
+    } catch (error) {
+      if (mounted) {
+        _showSnackBar('Gagal memproses voice note: $error');
+        setState(() => _isRecordingVoiceNote = false);
+      }
+      return false;
+    }
+  }
+
+  String _normalizeVoiceMimeType(String? mimeType, String fileName) {
+    final normalized =
+        (mimeType ?? _mimeTypeFromFileName(fileName) ?? 'audio/ogg')
+            .trim()
+            .toLowerCase();
+
+    return switch (normalized) {
+      'audio/ogg' || 'audio/opus' || 'application/ogg' => 'audio/ogg',
+      'audio/mpeg' || 'audio/mp3' => 'audio/mpeg',
+      'audio/mp4' || 'audio/aac' || 'audio/x-m4a' => 'audio/mp4',
+      _ => 'audio/ogg',
+    };
+  }
+
+  String _normalizedVoiceFileName(String fileName, String mimeType) {
+    final trimmed = fileName.trim();
+    final fallbackExtension = mimeType == 'audio/mpeg'
+        ? 'mp3'
+        : (mimeType == 'audio/mp4' ? 'm4a' : 'ogg');
+
+    if (trimmed.isEmpty) {
+      return 'voice-note.$fallbackExtension';
+    }
+
+    final lastDot = trimmed.lastIndexOf('.');
+    if (lastDot <= 0 || lastDot == trimmed.length - 1) {
+      return '$trimmed.$fallbackExtension';
+    }
+
+    final baseName = trimmed.substring(0, lastDot);
+    return '$baseName.$fallbackExtension';
+  }
+
   Future<bool> _sendAdminContact({
     required String fullName,
     required String phone,
@@ -542,6 +690,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 onSendReply: _sendAdminReply,
                 onSendGalleryImage: _sendAdminGalleryImage,
                 onSendCameraImage: _sendAdminCameraImage,
+                onSendVoiceNote: _toggleVoiceNoteRecording,
+                isRecordingVoiceNote: _isRecordingVoiceNote,
                 onSendContact: _sendAdminContact,
                 isTogglingBot: _isTogglingBot,
                 onToggleBot: _toggleBot,
@@ -617,6 +767,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   onSendReply: _sendAdminReply,
                   onSendGalleryImage: _sendAdminGalleryImage,
                   onSendCameraImage: _sendAdminCameraImage,
+                  onSendVoiceNote: _toggleVoiceNoteRecording,
+                  isRecordingVoiceNote: _isRecordingVoiceNote,
                   onSendContact: _sendAdminContact,
                   isTogglingBot: _isTogglingBot,
                   onToggleBot: _toggleBot,

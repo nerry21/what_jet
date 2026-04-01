@@ -23,6 +23,8 @@ class OmnichannelCenterPane extends StatefulWidget {
     required this.onSendGalleryImage,
     required this.onSendCameraImage,
     required this.onSendContact,
+    required this.onSendVoiceNote,
+    required this.isRecordingVoiceNote,
     required this.isTogglingBot,
     required this.onToggleBot,
     this.onOpenInbox,
@@ -44,6 +46,8 @@ class OmnichannelCenterPane extends StatefulWidget {
     String? company,
   })
   onSendContact;
+  final Future<bool> Function() onSendVoiceNote;
+  final bool isRecordingVoiceNote;
   final bool isTogglingBot;
   final Future<bool> Function(bool turnOn) onToggleBot;
   final VoidCallback? onOpenInbox;
@@ -205,6 +209,24 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
     await _handleCameraAttachment();
   }
 
+  Future<void> _handleVoiceNoteTap() async {
+    if (widget.conversation == null ||
+        widget.isSendingReply ||
+        widget.isSendingContact) {
+      return;
+    }
+
+    final success = await widget.onSendVoiceNote();
+    if (success && mounted && _threadScrollController.hasClients) {
+      await Future<void>.delayed(const Duration(milliseconds: 120));
+      _threadScrollController.animateTo(
+        _threadScrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 240),
+        curve: Curves.easeOutCubic,
+      );
+    }
+  }
+
   Future<void> _openSendContactDialog() async {
     if (widget.conversation == null || widget.isSendingContact) {
       return;
@@ -281,6 +303,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         isConversationLoading: isConversationLoading,
         isSendingReply: widget.isSendingReply,
         isSendingContact: widget.isSendingContact,
+        isRecordingVoiceNote: widget.isRecordingVoiceNote,
         isTogglingBot: widget.isTogglingBot,
         threadScrollController: _threadScrollController,
         composerController: _composerController,
@@ -292,7 +315,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         onVideoTap: () => _showComingSoon('Video call'),
         onCallTap: () => _showComingSoon('Panggilan telepon'),
         onCameraTap: _handleDirectCameraTap,
-        onVoiceNoteTap: () => _showComingSoon('Voice note'),
+        onVoiceNoteTap: _handleVoiceNoteTap,
         onMenuSelected: _handleMobileMenuAction,
       );
     }
@@ -380,7 +403,8 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
                 onSubmit: _submitReply,
                 onSendContact: _openSendContactDialog,
                 onEmojiTap: _openEmojiPicker,
-                onVoiceNoteTap: () => _showComingSoon('Voice note'),
+                onVoiceNoteTap: _handleVoiceNoteTap,
+                isRecordingVoiceNote: widget.isRecordingVoiceNote,
                 onCallTap: () => _showComingSoon('Panggilan telepon'),
               ),
             ),
@@ -399,6 +423,7 @@ class _MobileConversationScaffold extends StatelessWidget {
     required this.isConversationLoading,
     required this.isSendingReply,
     required this.isSendingContact,
+    required this.isRecordingVoiceNote,
     required this.isTogglingBot,
     required this.threadScrollController,
     required this.composerController,
@@ -420,6 +445,7 @@ class _MobileConversationScaffold extends StatelessWidget {
   final bool isConversationLoading;
   final bool isSendingReply;
   final bool isSendingContact;
+  final bool isRecordingVoiceNote;
   final bool isTogglingBot;
   final ScrollController threadScrollController;
   final TextEditingController composerController;
@@ -530,6 +556,7 @@ class _MobileConversationScaffold extends StatelessWidget {
               focusNode: composerFocusNode,
               isSending: isSendingReply,
               isSendingContact: isSendingContact,
+              isRecordingVoiceNote: isRecordingVoiceNote,
               onSubmit: onSubmit,
               onAttachTap: onOpenAttachmentSheet,
               onEmojiTap: onEmojiTap,
@@ -1003,6 +1030,7 @@ class _MobileConversationComposer extends StatelessWidget {
     required this.onEmojiTap,
     required this.onCameraTap,
     required this.onVoiceNoteTap,
+    required this.isRecordingVoiceNote,
   });
 
   final TextEditingController controller;
@@ -1014,6 +1042,7 @@ class _MobileConversationComposer extends StatelessWidget {
   final Future<void> Function() onEmojiTap;
   final VoidCallback onCameraTap;
   final VoidCallback onVoiceNoteTap;
+  final bool isRecordingVoiceNote;
 
   @override
   Widget build(BuildContext context) {
@@ -1121,7 +1150,9 @@ class _MobileConversationComposer extends StatelessWidget {
                             : Icon(
                                 hasText
                                     ? Icons.send_rounded
-                                    : Icons.mic_rounded,
+                                    : (isRecordingVoiceNote
+                                          ? Icons.stop_rounded
+                                          : Icons.mic_rounded),
                                 color: Colors.white,
                                 size: 24,
                               ),
@@ -1672,6 +1703,7 @@ class _ActiveComposer extends StatelessWidget {
     required this.onSendContact,
     required this.onEmojiTap,
     required this.onVoiceNoteTap,
+    required this.isRecordingVoiceNote,
     required this.onCallTap,
   });
 
@@ -1684,6 +1716,7 @@ class _ActiveComposer extends StatelessWidget {
   final Future<void> Function() onSendContact;
   final Future<void> Function() onEmojiTap;
   final VoidCallback onVoiceNoteTap;
+  final bool isRecordingVoiceNote;
   final VoidCallback onCallTap;
 
   @override
@@ -1717,7 +1750,7 @@ class _ActiveComposer extends StatelessWidget {
           ],
           _ComposerIconButton(
             icon: Icons.mic_none_rounded,
-            tooltip: 'Voice Note',
+            tooltip: isRecordingVoiceNote ? 'Kirim Voice Note' : 'Voice Note',
             onTap: onVoiceNoteTap,
           ),
           const SizedBox(width: 8),
