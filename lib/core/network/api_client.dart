@@ -285,36 +285,53 @@ class ApiClient {
   }
 
   String _errorMessageFromPayload(Map<String, dynamic> payload) {
-    if (payload['success'] == false) {
-      final wrappedMessage = payload['message'];
-      if (wrappedMessage is String && wrappedMessage.trim().isNotEmpty) {
-        return wrappedMessage;
-      }
-    }
+    final errors = payload['errors'];
+    final firstError = _extractFirstError(errors);
 
     final directMessage = payload['message'];
-    if (directMessage is String && directMessage.trim().isNotEmpty) {
-      return directMessage;
-    }
+    final normalizedMessage = directMessage is String
+        ? directMessage.trim()
+        : '';
 
-    final errors = payload['errors'];
-    if (errors is Map<String, dynamic>) {
-      final firstError = errors.values
-          .whereType<List>()
-          .expand((value) => value)
-          .whereType<String>()
-          .cast<String?>()
-          .firstWhere(
-            (value) => value != null && value.trim().isNotEmpty,
-            orElse: () => null,
-          );
-
-      if (firstError != null) {
+    if (firstError != null) {
+      if (normalizedMessage.isEmpty ||
+          normalizedMessage.toLowerCase() == 'validasi request gagal.' ||
+          normalizedMessage.toLowerCase() == 'validasi request gagal') {
         return firstError;
       }
+
+      return '$normalizedMessage\n$firstError';
+    }
+
+    if (payload['success'] == false) {
+      if (normalizedMessage.isNotEmpty) {
+        return normalizedMessage;
+      }
+    }
+
+    if (normalizedMessage.isNotEmpty) {
+      return normalizedMessage;
     }
 
     return 'Permintaan ke server gagal.';
+  }
+
+  String? _extractFirstError(Object? errors) {
+    if (errors is Map<String, dynamic>) {
+      for (final value in errors.values) {
+        if (value is List) {
+          for (final item in value) {
+            if (item is String && item.trim().isNotEmpty) {
+              return item.trim();
+            }
+          }
+        } else if (value is String && value.trim().isNotEmpty) {
+          return value.trim();
+        }
+      }
+    }
+
+    return null;
   }
 
   Object? _tryDecodeJson(String body) {
