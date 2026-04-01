@@ -21,6 +21,7 @@ class OmnichannelCenterPane extends StatefulWidget {
     required this.isSendingContact,
     required this.onSendReply,
     required this.onSendGalleryImage,
+    required this.onSendCameraImage,
     required this.onSendContact,
     required this.isTogglingBot,
     required this.onToggleBot,
@@ -35,6 +36,7 @@ class OmnichannelCenterPane extends StatefulWidget {
   final bool isSendingContact;
   final Future<bool> Function(String message) onSendReply;
   final Future<bool> Function(String? caption) onSendGalleryImage;
+  final Future<bool> Function(String? caption) onSendCameraImage;
   final Future<bool> Function({
     required String fullName,
     required String phone,
@@ -182,6 +184,27 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
     }
   }
 
+  Future<void> _handleCameraAttachment() async {
+    final caption = _composerController.text.trim();
+    final success = await widget.onSendCameraImage(
+      caption.isEmpty ? null : caption,
+    );
+
+    if (success && mounted) {
+      await _finalizeSuccessfulComposerSend();
+    }
+  }
+
+  Future<void> _handleDirectCameraTap() async {
+    if (widget.conversation == null ||
+        widget.isSendingReply ||
+        widget.isSendingContact) {
+      return;
+    }
+
+    await _handleCameraAttachment();
+  }
+
   Future<void> _openSendContactDialog() async {
     if (widget.conversation == null || widget.isSendingContact) {
       return;
@@ -216,7 +239,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
     await showWhatsAppAttachmentSheet(
       context: context,
       onGalleryTap: _handleGalleryAttachment,
-      onCameraTap: () async => _showComingSoon('Kamera'),
+      onCameraTap: _handleCameraAttachment,
       onLocationTap: () async => _showComingSoon('Lokasi'),
       onContactTap: _openSendContactDialog,
       onDocumentTap: () async => _showComingSoon('Dokumen'),
@@ -268,7 +291,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         onEmojiTap: _openEmojiPicker,
         onVideoTap: () => _showComingSoon('Video call'),
         onCallTap: () => _showComingSoon('Panggilan telepon'),
-        onCameraTap: () => _showComingSoon('Kamera'),
+        onCameraTap: _handleDirectCameraTap,
         onVoiceNoteTap: () => _showComingSoon('Voice note'),
         onMenuSelected: _handleMobileMenuAction,
       );

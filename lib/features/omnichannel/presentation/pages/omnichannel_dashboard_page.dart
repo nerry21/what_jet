@@ -177,6 +177,14 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   }
 
   Future<bool> _sendAdminGalleryImage(String? caption) async {
+    return _sendAdminImage(caption, ImageSource.gallery);
+  }
+
+  Future<bool> _sendAdminCameraImage(String? caption) async {
+    return _sendAdminImage(caption, ImageSource.camera);
+  }
+
+  Future<bool> _sendAdminImage(String? caption, ImageSource source) async {
     final conversation = _controller.selectedConversation;
     final conversationId = conversation?.id;
 
@@ -195,8 +203,9 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
 
     final pickedImage = await _imagePicker.pickImage(
-      source: ImageSource.gallery,
+      source: source,
       imageQuality: 92,
+      preferredCameraDevice: CameraDevice.rear,
     );
 
     if (pickedImage == null) {
@@ -251,7 +260,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       return false;
     } catch (error) {
       if (mounted) {
-        _showSnackBar('Gagal mengirim gambar dari galeri: $error');
+        final sourceLabel = source == ImageSource.camera ? 'kamera' : 'galeri';
+        _showSnackBar('Gagal mengirim gambar dari $sourceLabel: $error');
       }
       return false;
     } finally {
@@ -531,6 +541,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 isSendingContact: _isSendingContact,
                 onSendReply: _sendAdminReply,
                 onSendGalleryImage: _sendAdminGalleryImage,
+                onSendCameraImage: _sendAdminCameraImage,
                 onSendContact: _sendAdminContact,
                 isTogglingBot: _isTogglingBot,
                 onToggleBot: _toggleBot,
@@ -605,6 +616,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   isSendingContact: _isSendingContact,
                   onSendReply: _sendAdminReply,
                   onSendGalleryImage: _sendAdminGalleryImage,
+                  onSendCameraImage: _sendAdminCameraImage,
                   onSendContact: _sendAdminContact,
                   isTogglingBot: _isTogglingBot,
                   onToggleBot: _toggleBot,
