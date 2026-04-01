@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/config/app_config.dart';
@@ -967,6 +968,13 @@ class _MobileConversationBubble extends StatelessWidget {
                 ),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
+              if (message.hasAudio) ...<Widget>[
+                _ConversationAudioBubble(
+                  message: message,
+                  compact: true,
+                ),
+                if (message.displayText.isNotEmpty) const SizedBox(height: 8),
+              ],
               if (message.displayText.isNotEmpty)
                 Text(
                   message.displayText,
@@ -976,7 +984,9 @@ class _MobileConversationBubble extends StatelessWidget {
                     color: Colors.black,
                   ),
                 ),
-              if (message.displayText.isEmpty && !message.hasImage)
+              if (message.displayText.isEmpty &&
+                  !message.hasImage &&
+                  !message.hasAudio)
                 const Text(
                   '-',
                   style: TextStyle(
@@ -1780,6 +1790,10 @@ class _ThreadBubble extends StatelessWidget {
                 ),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
+              if (message.hasAudio) ...<Widget>[
+                _ConversationAudioBubble(message: message),
+                if (message.displayText.isNotEmpty) const SizedBox(height: 8),
+              ],
               if (message.displayText.isNotEmpty)
                 Text(
                   message.displayText,
@@ -1789,7 +1803,9 @@ class _ThreadBubble extends StatelessWidget {
                     color: Colors.black,
                   ),
                 ),
-              if (message.displayText.isEmpty && !message.hasImage)
+              if (message.displayText.isEmpty &&
+                  !message.hasImage &&
+                  !message.hasAudio)
                 const Text(
                   '-',
                   style: TextStyle(
@@ -1892,6 +1908,194 @@ class _ConversationImagePreview extends StatelessWidget {
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+class _ConversationAudioBubble extends StatefulWidget {
+  const _ConversationAudioBubble({
+    required this.message,
+    this.compact = false,
+  });
+
+  final OmnichannelThreadMessageModel message;
+  final bool compact;
+
+  @override
+  State<_ConversationAudioBubble> createState() =>
+      _ConversationAudioBubbleState();
+}
+
+class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
+  late final AudioPlayer _player;
+  bool _isPlaying = false;
+  Duration _position = Duration.zero;
+  Duration _duration = Duration.zero;
+
+  String? get _audioUrl => widget.message.audioUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _player = AudioPlayer();
+
+    _player.onPlayerStateChanged.listen((state) {
+      if (!mounted) return;
+      setState(() {
+        _isPlaying = state == PlayerState.playing;
+      });
+    });
+
+    _player.onPositionChanged.listen((position) {
+      if (!mounted) return;
+      setState(() {
+        _position = position;
+      });
+    });
+
+    _player.onDurationChanged.listen((duration) {
+      if (!mounted) return;
+      setState(() {
+        _duration = duration;
+      });
+    });
+
+    _player.onPlayerComplete.listen((_) {
+      if (!mounted) return;
+      setState(() {
+        _isPlaying = false;
+        _position = Duration.zero;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  Future<void> _togglePlay() async {
+    final url = _audioUrl;
+    if (url == null || url.trim().isEmpty) {
+      return;
+    }
+
+    if (_isPlaying) {
+      await _player.pause();
+      return;
+    }
+
+    if (_position > Duration.zero) {
+      await _player.resume();
+      return;
+    }
+
+    await _player.play(UrlSource(url));
+  }
+
+  String _formatDuration(Duration value) {
+    final totalSeconds = value.inSeconds;
+    final minutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
+    final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final compact = widget.compact;
+    final progressMax = _duration.inMilliseconds <= 0
+        ? 1.0
+        : _duration.inMilliseconds.toDouble();
+    final progressValue =
+        _position.inMilliseconds.clamp(0, progressMax.toInt()).toDouble();
+
+    return Container(
+      width: compact ? 220 : 280,
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 10 : 12,
+        vertical: compact ? 8 : 10,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.40),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        children: <Widget>[
+          InkWell(
+            onTap: _togglePlay,
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              width: compact ? 36 : 42,
+              height: compact ? 36 : 42,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                color: AppConfig.green,
+                size: compact ? 22 : 26,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackHeight: 3,
+                    thumbShape:
+                        const RoundSliderThumbShape(enabledThumbRadius: 5),
+                    overlayShape:
+                        const RoundSliderOverlayShape(overlayRadius: 10),
+                  ),
+                  child: Slider(
+                    min: 0,
+                    max: progressMax,
+                    value: progressValue,
+                    onChanged: (_duration.inMilliseconds <= 0)
+                        ? null
+                        : (value) async {
+                            final target =
+                                Duration(milliseconds: value.round());
+                            await _player.seek(target);
+                          },
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      _formatDuration(_position),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppConfig.mutedText,
+                      ),
+                    ),
+                    if ((widget.message.originalName?.trim().isNotEmpty ??
+                            false) &&
+                        !compact)
+                      Flexible(
+                        child: Text(
+                          widget.message.originalName!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppConfig.mutedText,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
