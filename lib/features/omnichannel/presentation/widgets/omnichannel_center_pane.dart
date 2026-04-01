@@ -1592,6 +1592,7 @@ class _ConversationImagePreview extends StatelessWidget {
         child: Image.network(
           imageUrl,
           fit: BoxFit.cover,
+          webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
           loadingBuilder: (context, child, loadingProgress) {
             if (loadingProgress == null) {
               return child;
