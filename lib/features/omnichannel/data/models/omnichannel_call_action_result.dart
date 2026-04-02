@@ -5,7 +5,9 @@ class OmnichannelCallActionResult {
     required this.success,
     required this.message,
     required this.callAction,
+    required this.permissionStatus,
     required this.permissionRequired,
+    required this.statusCode,
     required this.callSession,
     required this.metaError,
     required this.raw,
@@ -14,7 +16,9 @@ class OmnichannelCallActionResult {
   final bool success;
   final String message;
   final String? callAction;
+  final String? permissionStatus;
   final bool permissionRequired;
+  final int? statusCode;
   final OmnichannelCallSessionModel? callSession;
   final Map<String, dynamic>? metaError;
   final Map<String, dynamic>? raw;
@@ -31,7 +35,9 @@ class OmnichannelCallActionResult {
       success: _resultBool(payload['success']) ?? defaultSuccess,
       message: _resultString(payload['message']) ?? fallbackMessage,
       callAction: _resultString(payload['call_action']),
+      permissionStatus: _resultString(payload['permission_status']),
       permissionRequired: _resultBool(payload['permission_required']) ?? false,
+      statusCode: _resultInt(payload['status_code']),
       callSession: callSessionJson is Map<String, dynamic>
           ? OmnichannelCallSessionModel.fromJson(callSessionJson)
           : (callSessionJson is Map
@@ -77,4 +83,21 @@ bool? _resultBool(Object? value) {
   }
 
   return null;
+}
+
+int? _resultInt(Object? value) {
+  if (value is int) {
+    return value;
+  }
+
+  if (value is num) {
+    return value.toInt();
+  }
+
+  final normalized = value?.toString().trim();
+  if (normalized == null || normalized.isEmpty) {
+    return null;
+  }
+
+  return int.tryParse(normalized);
 }
