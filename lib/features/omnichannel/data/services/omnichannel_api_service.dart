@@ -54,6 +54,73 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> startConversationCall({
+    required String accessToken,
+    required String conversationId,
+    String callType = 'audio',
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationCallStart(conversationId),
+      headers: _headers(accessToken),
+      body: <String, Object?>{'call_type': callType},
+    );
+  }
+
+  Future<Map<String, dynamic>> acceptConversationCall({
+    required String accessToken,
+    required String conversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationCallAccept(conversationId),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
+
+  Future<Map<String, dynamic>> rejectConversationCall({
+    required String accessToken,
+    required String conversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationCallReject(conversationId),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
+
+  Future<Map<String, dynamic>> endConversationCall({
+    required String accessToken,
+    required String conversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationCallEnd(conversationId),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
+
+  Future<Map<String, dynamic>> fetchConversationCallStatus({
+    required String accessToken,
+    required String conversationId,
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminConversationCallStatus(conversationId),
+      headers: _headers(accessToken),
+    );
+  }
+
+  Future<Map<String, dynamic>> requestConversationCallPermission({
+    required String accessToken,
+    required String conversationId,
+    String callType = 'audio',
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationCallRequestPermission(conversationId),
+      headers: _headers(accessToken),
+      body: <String, Object?>{'call_type': callType},
+    );
+  }
+
   Future<Map<String, dynamic>> sendAdminReply({
     required String accessToken,
     required int conversationId,
@@ -197,6 +264,40 @@ class OmnichannelApiService {
     return _apiClient.get(
       ApiEndpoints.adminDashboardSummary(),
       headers: _headers(accessToken),
+    );
+  }
+
+  Future<Map<String, dynamic>> fetchCallAnalyticsSummary({
+    required String accessToken,
+    Map<String, Object?> queryParameters = const <String, Object?>{},
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminCallAnalyticsSummary(),
+      headers: _headers(accessToken),
+      queryParameters: queryParameters,
+    );
+  }
+
+  Future<Map<String, dynamic>> fetchRecentCalls({
+    required String accessToken,
+    Map<String, Object?> queryParameters = const <String, Object?>{},
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminCallAnalyticsRecent(),
+      headers: _headers(accessToken),
+      queryParameters: queryParameters,
+    );
+  }
+
+  Future<Map<String, dynamic>> fetchConversationCallHistory({
+    required String accessToken,
+    required int conversationId,
+    Map<String, Object?> queryParameters = const <String, Object?>{},
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminConversationCallHistory(conversationId),
+      headers: _headers(accessToken),
+      queryParameters: queryParameters,
     );
   }
 

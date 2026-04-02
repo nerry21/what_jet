@@ -12,10 +12,20 @@ import '../../../../core/network/api_client.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../admin_auth/data/models/admin_user_model.dart';
 import '../../../admin_auth/data/repositories/admin_auth_repository.dart';
+import '../../data/models/omnichannel_call_action_result.dart';
+import '../../data/models/omnichannel_call_session_model.dart';
+import '../../data/models/omnichannel_call_timeline_item_model.dart';
+import '../../data/models/omnichannel_conversation_detail_model.dart';
 import '../../data/models/omnichannel_conversation_list_model.dart';
 import '../../data/models/omnichannel_workspace_model.dart';
 import '../../data/repositories/omnichannel_repository.dart';
+import '../../data/services/omnichannel_call_media_service.dart';
+import '../controllers/omnichannel_call_analytics_controller.dart';
+import '../controllers/omnichannel_call_controller.dart';
 import '../controllers/omnichannel_shell_controller.dart';
+import '../pages/omnichannel_call_page.dart';
+import '../pages/omnichannel_call_history_page.dart';
+import '../utils/omnichannel_call_status_ui.dart';
 import '../widgets/omnichannel_center_pane.dart';
 import '../widgets/omnichannel_left_pane.dart';
 import '../widgets/omnichannel_right_pane.dart';
@@ -44,6 +54,9 @@ class OmnichannelDashboardPage extends StatefulWidget {
 class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     with WidgetsBindingObserver {
   late final OmnichannelShellController _controller;
+  late final OmnichannelCallController _callController;
+  late final OmnichannelCallAnalyticsController _callAnalyticsController;
+  late final OmnichannelCallMediaService _callMediaService;
   final ImagePicker _imagePicker = ImagePicker();
   final AudioRecorder _audioRecorder = AudioRecorder();
   final TextEditingController _searchController = TextEditingController();
@@ -55,6 +68,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   bool _isTogglingBot = false;
   bool _isRecordingVoiceNote = false;
   _OmnichannelMobilePane _mobilePane = _OmnichannelMobilePane.inbox;
+  OmnichannelCallSessionModel? _lastObservedCallSession;
 
   @override
   void initState() {
@@ -65,11 +79,20 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       repository: widget.repository,
       adminAuthRepository: widget.adminAuthRepository,
     )..addListener(_handleControllerChanged);
+    _callMediaService = OmnichannelCallMediaService();
+    _callController = OmnichannelCallController(
+      repository: widget.repository,
+      mediaService: _callMediaService,
+    )..addListener(_handleCallControllerChanged);
+    _callAnalyticsController = OmnichannelCallAnalyticsController(
+      repository: widget.repository,
+    );
 
     _searchController.addListener(_handleSearchChanged);
     _conversationListScrollController.addListener(_handleListScroll);
 
     unawaited(_controller.initialize(initialUser: widget.initialUser));
+    unawaited(_callAnalyticsController.initialize());
   }
 
   @override
@@ -79,6 +102,9 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     _controller
       ..removeListener(_handleControllerChanged)
       ..dispose();
+    _callController.removeListener(_handleCallControllerChanged);
+    _callController.dispose();
+    _callAnalyticsController.dispose();
 
     _searchController.removeListener(_handleSearchChanged);
     _conversationListScrollController.removeListener(_handleListScroll);
@@ -94,6 +120,17 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final isActive = state == AppLifecycleState.resumed;
     _controller.setPageActive(isActive);
+    if (isActive && _callController.boundConversationId != null) {
+      unawaited(
+        _callController.refreshStatus(
+          conversationId: _callController.boundConversationId!,
+          silent: true,
+        ),
+      );
+    }
+    if (isActive) {
+      unawaited(_callAnalyticsController.refresh(silent: true));
+    }
   }
 
   void _handleSearchChanged() {
@@ -112,6 +149,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   }
 
   void _handleControllerChanged() {
+    _syncCallBinding();
+
     if (!_controller.requiresLogin || _hasRedirected || !mounted) {
       return;
     }
@@ -127,9 +166,308 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     });
   }
 
+  void _syncCallBinding({bool forceStartPolling = false}) {
+    final conversation = _controller.selectedConversation;
+    final conversationId = conversation?.id;
+
+    _callController.bindConversation(
+      conversationId: conversationId?.toString(),
+      initialSession: _effectiveCallSession(conversation),
+      initialTimeline: conversation?.callTimeline ?? const [],
+      forceStartPolling: forceStartPolling,
+    );
+  }
+
+  List<OmnichannelCallTimelineItemModel> _effectiveCallTimeline(
+    OmnichannelConversationDetailModel? conversation,
+  ) {
+    final controllerTimeline = _callController.timeline;
+    if (controllerTimeline.isNotEmpty) {
+      return controllerTimeline;
+    }
+
+    return conversation?.callTimeline ?? const [];
+  }
+
+  OmnichannelCallSessionModel? _effectiveCallSession(
+    OmnichannelConversationDetailModel? conversation,
+  ) {
+    if (conversation == null) {
+      return _callController.currentCall;
+    }
+
+    final conversationSession = conversation.callSession;
+    final controllerSession = _callController.currentCall;
+    final conversationId = conversation.id.toString();
+
+    if (controllerSession == null ||
+        _callController.boundConversationId != conversationId) {
+      return conversationSession;
+    }
+
+    if (conversationSession == null) {
+      return controllerSession;
+    }
+
+    return controllerSession.isNewerThan(conversationSession)
+        ? controllerSession
+        : conversationSession;
+  }
+
+  Future<void> _startConversationCall() async {
+    final conversation = _controller.selectedConversation;
+    final conversationId = conversation?.id;
+
+    if (conversationId == null || conversationId <= 0) {
+      _showSnackBar('Conversation belum dipilih.');
+      return;
+    }
+
+    if (conversation?.channel != 'whatsapp') {
+      _showSnackBar(
+        'Panggilan WhatsApp hanya tersedia untuk conversation channel WhatsApp.',
+      );
+      return;
+    }
+
+    if (_callController.isLoading) {
+      return;
+    }
+
+    await _callController.startCall(conversationId: conversationId.toString());
+    await _controller.softRefreshAfterExternalAction();
+    await _callAnalyticsController.refresh(silent: true);
+    _syncCallBinding(forceStartPolling: true);
+
+    if (!mounted) {
+      return;
+    }
+
+    final result = _callController.lastActionResult;
+    if (result == null) {
+      _showSnackBar('Respons panggilan dari backend belum tersedia.');
+      return;
+    }
+
+    if (result.success) {
+      _showSnackBar(_callSuccessMessage(result));
+      await _openCurrentCallPage();
+      return;
+    }
+
+    if (_shouldOpenCallPageForFailure(result)) {
+      await _openCurrentCallPage();
+      if (mounted) {
+        _showSnackBar(_callErrorMessage(result));
+      }
+      return;
+    }
+
+    _showSnackBar(_callErrorMessage(result));
+  }
+
+  Future<void> _openCurrentCallPage() async {
+    final conversation = _controller.selectedConversation;
+    final conversationId = conversation?.id;
+
+    if (conversation == null || conversationId == null || conversationId <= 0) {
+      _showSnackBar('Conversation belum dipilih.');
+      return;
+    }
+
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => OmnichannelCallPage(
+          controller: _callController,
+          conversationId: conversationId.toString(),
+          customerName: conversation.customerName,
+          customerContact: conversation.customerContact,
+          initialSession: _effectiveCallSession(conversation),
+        ),
+      ),
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    await _controller.softRefreshAfterExternalAction();
+    _syncCallBinding(forceStartPolling: true);
+  }
+
+  Future<void> _endConversationCall() async {
+    final conversationId = _controller.selectedConversation?.id;
+    if (conversationId == null || conversationId <= 0) {
+      _showSnackBar('Conversation belum dipilih.');
+      return;
+    }
+
+    await _callController.endCall(conversationId: conversationId.toString());
+    await _controller.softRefreshAfterExternalAction();
+    await _callAnalyticsController.refresh(silent: true);
+    _syncCallBinding(forceStartPolling: true);
+
+    if (!mounted) {
+      return;
+    }
+
+    final result = _callController.lastActionResult;
+    if (result == null) {
+      _showSnackBar('Status akhir panggilan belum tersedia.');
+      return;
+    }
+
+    _showSnackBar(result.success ? result.message : _callErrorMessage(result));
+  }
+
+  Future<void> _showVideoCallUnavailable() async {
+    _showSnackBar('Video call belum diimplementasikan pada tahap ini.');
+  }
+
+  String _callSuccessMessage(OmnichannelCallActionResult result) {
+    return switch (result.callAction) {
+      'permission_requested' => 'Permintaan izin panggilan berhasil dikirim.',
+      'permission_still_pending' => 'Permission masih menunggu persetujuan.',
+      'call_started' => 'Panggilan sedang diproses.',
+      'call_already_processing' => 'Permintaan panggilan masih diproses.',
+      _ =>
+        result.message.trim().isNotEmpty
+            ? result.message.trim()
+            : 'Panggilan WhatsApp sedang diproses.',
+    };
+  }
+
+  String _callErrorMessage(OmnichannelCallActionResult result) {
+    return switch (result.callAction) {
+      'permission_rate_limited' =>
+        'Permintaan izin terlalu sering, coba lagi nanti.',
+      'permission_denied' => 'Izin panggilan ditolak oleh pengguna.',
+      'permission_expired' =>
+        'Izin panggilan sudah kedaluwarsa dan perlu diminta ulang.',
+      'call_blocked_configuration_error' =>
+        'Konfigurasi panggilan belum lengkap.',
+      'call_rate_limited' =>
+        'Layanan panggilan sedang dibatasi sementara.',
+      'duplicate_action' =>
+        'Permintaan aksi panggilan yang sama masih diproses.',
+      _ => _defaultCallErrorMessage(result),
+    };
+  }
+
+  String _defaultCallErrorMessage(OmnichannelCallActionResult result) {
+    final metaError = result.metaError ?? const <String, dynamic>{};
+    final metaMessage = metaError['message']?.toString().trim();
+    if (metaMessage != null && metaMessage.isNotEmpty) {
+      return metaMessage;
+    }
+
+    final message = result.message.trim();
+    if (message.isNotEmpty) {
+      return message;
+    }
+
+    return 'Gagal memproses panggilan WhatsApp.';
+  }
+
+  bool _shouldOpenCallPageForFailure(OmnichannelCallActionResult result) {
+    final callSession = result.callSession;
+    if (callSession == null) {
+      return false;
+    }
+
+    final metaCode = result.metaError?['code']?.toString().trim();
+    if (metaCode == 'signaling_session_required') {
+      return true;
+    }
+
+    if (<String?>{
+      'permission_rate_limited',
+      'permission_still_pending',
+      'duplicate_action',
+      'call_already_processing',
+    }.contains(result.callAction)) {
+      return true;
+    }
+
+    return callSession.isPermissionRequested ||
+        (callSession.permissionStatus == 'granted' && !callSession.isFinished);
+  }
+
+  void _handleCallControllerChanged() {
+    final previous = _lastObservedCallSession;
+    final current = _callController.currentCall;
+    _lastObservedCallSession = current;
+
+    if (!mounted || previous == null || current == null) {
+      return;
+    }
+
+    if ((previous.id ?? -1) != (current.id ?? -1)) {
+      return;
+    }
+
+    if ((previous.status ?? '').trim() == (current.status ?? '').trim()) {
+      return;
+    }
+
+    unawaited(_callAnalyticsController.refresh(silent: true));
+
+    if (current.isRejected) {
+      _showSnackBar('Panggilan ditolak pengguna.');
+      return;
+    }
+
+    if (current.isMissed) {
+      _showSnackBar('Panggilan tidak dijawab.');
+      return;
+    }
+
+    if (current.isEnded) {
+      _showSnackBar('Panggilan berakhir.');
+      return;
+    }
+
+    if (current.isFailed) {
+      _showSnackBar(
+        current.endReason?.trim().isNotEmpty == true
+            ? 'Panggilan gagal: ${omnichannelCallEndReasonLabel(current.endReason)}'
+            : 'Panggilan gagal.',
+      );
+    }
+  }
+
   Future<void> _retryBootstrap() {
     _hasRedirected = false;
     return _controller.initialize(initialUser: widget.initialUser);
+  }
+
+  Future<void> _openConversationCallHistory() async {
+    final conversation = _controller.selectedConversation;
+    final conversationId = conversation?.id;
+
+    if (conversation == null || conversationId == null || conversationId <= 0) {
+      _showSnackBar('Conversation belum dipilih.');
+      return;
+    }
+
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => OmnichannelCallHistoryPage(
+          repository: widget.repository,
+          conversationId: conversationId,
+          conversationTitle: conversation.title,
+          initialSummary: conversation.callHistorySummary,
+          initialItems: conversation.callHistory,
+        ),
+      ),
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    await _controller.softRefreshAfterExternalAction();
+    _syncCallBinding(forceStartPolling: true);
   }
 
   Future<bool> _sendAdminReply(String message) async {
@@ -629,14 +967,14 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(
-          content: Text(text),
-          duration: const Duration(seconds: 6),
-        ),
+        SnackBar(content: Text(text), duration: const Duration(seconds: 6)),
       );
   }
 
-  String _buildApiErrorDetails(ApiException error, {String title = 'API ERROR'}) {
+  String _buildApiErrorDetails(
+    ApiException error, {
+    String title = 'API ERROR',
+  }) {
     final lines = <String>[
       title,
       if (error.statusCode != null) 'Status: ${error.statusCode}',
@@ -757,6 +1095,18 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
             Expanded(
               child: OmnichannelCenterPane(
                 conversation: _controller.selectedConversation,
+                callSession: _effectiveCallSession(
+                  _controller.selectedConversation,
+                ),
+                callTimeline: _effectiveCallTimeline(
+                  _controller.selectedConversation,
+                ),
+                callHistorySummary:
+                    _controller.selectedConversation?.callHistorySummary,
+                callHistory:
+                    _controller.selectedConversation?.callHistory ?? const [],
+                isCallFallbackMode: _callController.isFallbackMode,
+                callFallbackMessage: _callController.fallbackMessage,
                 threadGroups: _controller.threadGroups,
                 isShellLoading: shellLoading,
                 isConversationLoading: _controller.isConversationLoading,
@@ -771,6 +1121,13 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 onSendContact: _sendAdminContact,
                 isTogglingBot: _isTogglingBot,
                 onToggleBot: _toggleBot,
+                isCallLoading: _callController.isLoading,
+                onCallTap: _startConversationCall,
+                onVideoTap: _showVideoCallUnavailable,
+                onOpenCallPage: () => unawaited(_openCurrentCallPage()),
+                onOpenCallHistory: () =>
+                    unawaited(_openConversationCallHistory()),
+                onEndCall: _endConversationCall,
                 onOpenInbox: null,
               ),
             ),
@@ -781,6 +1138,19 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 conversation: _controller.selectedConversation,
                 insight: _controller.insight,
                 isLoading: shellLoading,
+                callAnalyticsSnapshot: _callAnalyticsController.snapshot,
+                isCallAnalyticsLoading:
+                    _callAnalyticsController.isLoading ||
+                    _callAnalyticsController.isRefreshing,
+                callAnalyticsErrorMessage:
+                    _callAnalyticsController.errorMessage,
+                onRetryCallAnalytics: () => _callAnalyticsController.refresh(),
+                onOpenConversationFromCall: (conversationId) =>
+                    _handleConversationTap(
+                      conversationId,
+                      showConversationOnMobile:
+                          kIsWeb || MediaQuery.sizeOf(context).width < 960,
+                    ),
               ),
             ),
           ],
@@ -835,6 +1205,18 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 ),
                 _OmnichannelMobilePane.conversation => OmnichannelCenterPane(
                   conversation: _controller.selectedConversation,
+                  callSession: _effectiveCallSession(
+                    _controller.selectedConversation,
+                  ),
+                  callTimeline: _effectiveCallTimeline(
+                    _controller.selectedConversation,
+                  ),
+                  callHistorySummary:
+                      _controller.selectedConversation?.callHistorySummary,
+                  callHistory:
+                      _controller.selectedConversation?.callHistory ?? const [],
+                  isCallFallbackMode: _callController.isFallbackMode,
+                  callFallbackMessage: _callController.fallbackMessage,
                   threadGroups: _controller.threadGroups,
                   isShellLoading: shellLoading,
                   isConversationLoading: _controller.isConversationLoading,
@@ -849,6 +1231,13 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   onSendContact: _sendAdminContact,
                   isTogglingBot: _isTogglingBot,
                   onToggleBot: _toggleBot,
+                  isCallLoading: _callController.isLoading,
+                  onCallTap: _startConversationCall,
+                  onVideoTap: _showVideoCallUnavailable,
+                  onOpenCallPage: () => unawaited(_openCurrentCallPage()),
+                  onOpenCallHistory: () =>
+                      unawaited(_openConversationCallHistory()),
+                  onEndCall: _endConversationCall,
                   onOpenInbox: () =>
                       _setMobilePane(_OmnichannelMobilePane.inbox),
                 ),
@@ -856,6 +1245,19 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   conversation: _controller.selectedConversation,
                   insight: _controller.insight,
                   isLoading: shellLoading,
+                  callAnalyticsSnapshot: _callAnalyticsController.snapshot,
+                  isCallAnalyticsLoading:
+                      _callAnalyticsController.isLoading ||
+                      _callAnalyticsController.isRefreshing,
+                  callAnalyticsErrorMessage:
+                      _callAnalyticsController.errorMessage,
+                  onRetryCallAnalytics: () =>
+                      _callAnalyticsController.refresh(),
+                  onOpenConversationFromCall: (conversationId) =>
+                      _handleConversationTap(
+                        conversationId,
+                        showConversationOnMobile: true,
+                      ),
                 ),
               },
             ),
@@ -872,7 +1274,11 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       body: SafeArea(
         bottom: false,
         child: AnimatedBuilder(
-          animation: _controller,
+          animation: Listenable.merge(<Listenable>[
+            _controller,
+            _callController,
+            _callAnalyticsController,
+          ]),
           builder: (context, _) {
             final screenWidth = MediaQuery.sizeOf(context).width;
             final isMobileShell = kIsWeb || screenWidth < 960;
@@ -951,7 +1357,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                     _controller.isConversationLoading ||
                     _isSendingReply ||
                     _isSendingContact ||
-                    _isTogglingBot)
+                    _isTogglingBot ||
+                    _callController.isLoading)
                   const LinearProgressIndicator(
                     minHeight: 2,
                     color: AppConfig.green,

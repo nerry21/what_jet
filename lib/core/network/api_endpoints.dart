@@ -48,10 +48,37 @@ class ApiEndpoints {
   static String adminConversationBotOff(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/bot-control/off';
 
+  static String adminConversationCallStart(String conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/call/start';
+
+  static String adminConversationCallAccept(String conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/call/accept';
+
+  static String adminConversationCallReject(String conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/call/reject';
+
+  static String adminConversationCallEnd(String conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/call/end';
+
+  static String adminConversationCallStatus(String conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/call/status';
+
+  static String adminConversationCallRequestPermission(String conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/call/request-permission';
+
+  static String adminConversationCallHistory(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/call-history';
+
   static String adminPollList() => '$_adminMobileBase/poll/list';
 
   static String adminDashboardSummary() =>
       '$_adminMobileBase/dashboard/summary';
+
+  static String adminCallAnalyticsSummary() =>
+      '$_adminMobileBase/call-analytics/summary';
+
+  static String adminCallAnalyticsRecent() =>
+      '$_adminMobileBase/call-analytics/recent';
 
   static String adminMetaFilters() => '$_adminMobileBase/meta/filters';
 

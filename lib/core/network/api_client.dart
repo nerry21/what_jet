@@ -251,10 +251,22 @@ class ApiClient {
         if (payload['success'] == true) {
           final data = payload['data'];
           if (data is Map<String, dynamic>) {
-            return data;
+            return <String, dynamic>{
+              ...data,
+              'success': true,
+              if (payload['message'] is String &&
+                  (payload['message'] as String).trim().isNotEmpty &&
+                  !data.containsKey('message'))
+                'message': (payload['message'] as String).trim(),
+            };
           }
 
-          return <String, dynamic>{};
+          return <String, dynamic>{
+            'success': true,
+            if (payload['message'] is String &&
+                (payload['message'] as String).trim().isNotEmpty)
+              'message': (payload['message'] as String).trim(),
+          };
         }
 
         return payload;

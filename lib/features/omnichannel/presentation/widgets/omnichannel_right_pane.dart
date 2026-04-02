@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/config/app_config.dart';
+import '../../data/models/omnichannel_call_analytics_summary_model.dart';
 import '../../data/models/omnichannel_conversation_detail_model.dart';
 import '../../data/models/omnichannel_insight_model.dart';
+import 'omnichannel_call_analytics_panel.dart';
 import 'omnichannel_surface.dart';
 
 class OmnichannelRightPane extends StatelessWidget {
@@ -11,11 +13,21 @@ class OmnichannelRightPane extends StatelessWidget {
     required this.conversation,
     required this.insight,
     required this.isLoading,
+    this.callAnalyticsSnapshot,
+    this.isCallAnalyticsLoading = false,
+    this.callAnalyticsErrorMessage,
+    this.onRetryCallAnalytics,
+    this.onOpenConversationFromCall,
   });
 
   final OmnichannelConversationDetailModel? conversation;
   final OmnichannelInsightModel insight;
   final bool isLoading;
+  final OmnichannelCallAnalyticsSnapshotModel? callAnalyticsSnapshot;
+  final bool isCallAnalyticsLoading;
+  final String? callAnalyticsErrorMessage;
+  final Future<void> Function()? onRetryCallAnalytics;
+  final ValueChanged<int>? onOpenConversationFromCall;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +36,7 @@ class OmnichannelRightPane extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           const Text(
-            'Customer & Insight',
+            'Insight & Analytics',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,
@@ -33,38 +45,53 @@ class OmnichannelRightPane extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: isLoading
-                ? const _RightPaneSkeleton()
-                : conversation == null
-                ? const OmnichannelEmptyState(
-                    icon: Icons.account_circle_outlined,
-                    title: 'Belum ada profil aktif',
-                    message:
-                        'Pane kanan akan menampilkan profil customer, tags, dan insight ketika conversation dipilih.',
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: <Widget>[
+                OmnichannelCallAnalyticsPanel(
+                  snapshot: callAnalyticsSnapshot,
+                  isLoading: isCallAnalyticsLoading,
+                  errorMessage: callAnalyticsErrorMessage,
+                  onRetry: onRetryCallAnalytics,
+                  onOpenConversation: onOpenConversationFromCall,
+                ),
+                const SizedBox(height: 16),
+                if (isLoading)
+                  const _RightPaneSkeleton()
+                else if (conversation == null)
+                  const OmnichannelSectionCard(
+                    title: 'Customer & Insight',
+                    child: Text(
+                      'Pilih conversation untuk melihat profil customer, tag, dan context thread. Ringkasan panggilan global tetap tampil di atas.',
+                      style: TextStyle(
+                        fontSize: 13,
+                        height: 1.45,
+                        color: AppConfig.subtleText,
+                      ),
+                    ),
                   )
-                : ListView(
-                    padding: EdgeInsets.zero,
-                    children: <Widget>[
-                      _ProfileCard(
-                        customerName: insight.customerName,
-                        customerContact: insight.customerContact,
-                      ),
-                      const SizedBox(height: 16),
-                      _TagSection(
-                        title: 'Conversation Tags',
-                        tags: insight.conversationTags,
-                      ),
-                      const SizedBox(height: 16),
-                      _TagSection(
-                        title: 'Customer Tags',
-                        tags: insight.customerTags,
-                      ),
-                      const SizedBox(height: 16),
-                      _QuickDetailsCard(details: insight.quickDetails),
-                      const SizedBox(height: 16),
-                      _InsightNotesCard(noteLines: insight.noteLines),
-                    ],
+                else ...<Widget>[
+                  _ProfileCard(
+                    customerName: insight.customerName,
+                    customerContact: insight.customerContact,
                   ),
+                  const SizedBox(height: 16),
+                  _TagSection(
+                    title: 'Conversation Tags',
+                    tags: insight.conversationTags,
+                  ),
+                  const SizedBox(height: 16),
+                  _TagSection(
+                    title: 'Customer Tags',
+                    tags: insight.customerTags,
+                  ),
+                  const SizedBox(height: 16),
+                  _QuickDetailsCard(details: insight.quickDetails),
+                  const SizedBox(height: 16),
+                  _InsightNotesCard(noteLines: insight.noteLines),
+                ],
+              ],
+            ),
           ),
         ],
       ),
@@ -314,6 +341,8 @@ class _RightPaneSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       padding: EdgeInsets.zero,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       children: <Widget>[
         Container(
           padding: const EdgeInsets.all(16),

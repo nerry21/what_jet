@@ -4,9 +4,16 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/config/app_config.dart';
+import '../../data/models/omnichannel_call_history_item_model.dart';
 import '../../../live_chat/presentation/widgets/channel_badge.dart';
+import '../../data/models/omnichannel_call_session_model.dart';
+import '../../data/models/omnichannel_call_timeline_item_model.dart';
 import '../../data/models/omnichannel_conversation_detail_model.dart';
 import '../../data/models/omnichannel_thread_model.dart';
+import '../utils/omnichannel_call_status_ui.dart';
+import 'omnichannel_call_banner.dart';
+import 'omnichannel_call_history_section.dart';
+import 'omnichannel_call_timeline_section.dart';
 import 'omnichannel_surface.dart';
 import 'whatsapp_attachment_sheet.dart';
 import 'whatsapp_emoji_picker.dart';
@@ -31,6 +38,18 @@ class OmnichannelCenterPane extends StatefulWidget {
     required this.isRecordingVoiceNote,
     required this.isTogglingBot,
     required this.onToggleBot,
+    required this.callSession,
+    required this.callTimeline,
+    required this.callHistorySummary,
+    required this.callHistory,
+    required this.isCallFallbackMode,
+    required this.callFallbackMessage,
+    required this.isCallLoading,
+    required this.onCallTap,
+    required this.onVideoTap,
+    required this.onOpenCallPage,
+    this.onOpenCallHistory,
+    this.onEndCall,
     this.onOpenInbox,
   });
 
@@ -55,6 +74,18 @@ class OmnichannelCenterPane extends StatefulWidget {
   final bool isRecordingVoiceNote;
   final bool isTogglingBot;
   final Future<bool> Function(bool turnOn) onToggleBot;
+  final OmnichannelCallSessionModel? callSession;
+  final List<OmnichannelCallTimelineItemModel> callTimeline;
+  final OmnichannelConversationCallHistorySummaryModel? callHistorySummary;
+  final List<OmnichannelCallHistoryItemModel> callHistory;
+  final bool isCallFallbackMode;
+  final String? callFallbackMessage;
+  final bool isCallLoading;
+  final Future<void> Function() onCallTap;
+  final Future<void> Function() onVideoTap;
+  final VoidCallback? onOpenCallPage;
+  final VoidCallback? onOpenCallHistory;
+  final Future<void> Function()? onEndCall;
   final VoidCallback? onOpenInbox;
 
   @override
@@ -301,12 +332,65 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
     }
   }
 
+  Widget? _buildCallBanner() {
+    final session = widget.callSession;
+    if (!omnichannelShouldShowCallBanner(session)) {
+      return null;
+    }
+
+    return OmnichannelCallBanner(
+      session: session,
+      isBusy: widget.isCallLoading,
+      isFallbackMode: widget.isCallFallbackMode,
+      fallbackNote: widget.callFallbackMessage,
+      onOpenCall: widget.onOpenCallPage ?? () => unawaited(widget.onCallTap()),
+      onEndCall: widget.onEndCall,
+    );
+  }
+
+  Widget? _buildCallTimelineSection({required bool compact}) {
+    final session = widget.callSession;
+    final items = widget.callTimeline;
+    if (session == null && items.isEmpty) {
+      return null;
+    }
+
+    return OmnichannelCallTimelineSection(
+      items: items,
+      session: session,
+      dark: false,
+      maxItems: compact ? 4 : 6,
+      title: 'Riwayat panggilan',
+      subtitle: widget.isCallFallbackMode
+          ? 'Event panggilan tetap tersimpan di thread, sementara audio live belum tersedia pada build admin ini.'
+          : 'Perubahan status panggilan ditampilkan sebagai event sistem di thread ini.',
+      emptyMessage:
+          'Histori panggilan belum tersedia. Status aktif akan muncul di sini saat backend mengirim pembaruan.',
+    );
+  }
+
+  Widget? _buildCallHistorySection({required bool compact}) {
+    if (widget.callHistorySummary == null && widget.callHistory.isEmpty) {
+      return null;
+    }
+
+    return OmnichannelCallHistorySection(
+      summary: widget.callHistorySummary,
+      items: widget.callHistory,
+      maxItems: compact ? 3 : 4,
+      onOpenAll: widget.onOpenCallHistory,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final conversation = widget.conversation;
     final threadGroups = widget.threadGroups;
     final isShellLoading = widget.isShellLoading;
     final isConversationLoading = widget.isConversationLoading;
+    final callBanner = _buildCallBanner();
+    final callHistorySection = _buildCallHistorySection(compact: false);
+    final callTimelineSection = _buildCallTimelineSection(compact: false);
 
     if (_isMobileConversationLayout) {
       return _MobileConversationScaffold(
@@ -325,12 +409,15 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         onSubmit: _submitReply,
         onOpenAttachmentSheet: _openAttachmentSheet,
         onEmojiTap: _openEmojiPicker,
-        onVideoTap: () => _showComingSoon('Video call'),
-        onCallTap: () => _showComingSoon('Panggilan telepon'),
+        onVideoTap: () => unawaited(widget.onVideoTap()),
+        onCallTap: () => unawaited(widget.onCallTap()),
         onCameraTap: _handleDirectCameraTap,
         onVoiceNoteTap: _handleVoiceNoteTap,
         onCancelVoiceNoteTap: _handleCancelVoiceNoteTap,
         onMenuSelected: _handleMobileMenuAction,
+        callBanner: callBanner,
+        callHistorySection: _buildCallHistorySection(compact: true),
+        callTimelineSection: _buildCallTimelineSection(compact: true),
       );
     }
 
@@ -358,8 +445,15 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
               onOpenInbox: widget.onOpenInbox,
             ),
             const SizedBox(height: 14),
+            if (callBanner != null) ...<Widget>[
+              callBanner,
+              const SizedBox(height: 12),
+            ],
             Expanded(
-              child: threadGroups.isEmpty
+              child:
+                  threadGroups.isEmpty &&
+                      callHistorySection == null &&
+                      callTimelineSection == null
                   ? const OmnichannelEmptyState(
                       icon: Icons.chat_bubble_outline_rounded,
                       title: 'Belum ada thread',
@@ -370,7 +464,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
                       builder: (context, constraints) {
                         final bubbleMaxWidth = constraints.maxWidth * 0.78;
 
-                        return ListView.builder(
+                        return ListView(
                           controller: _threadScrollController,
                           physics: const BouncingScrollPhysics(
                             parent: AlwaysScrollableScrollPhysics(),
@@ -378,29 +472,51 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
                           keyboardDismissBehavior:
                               ScrollViewKeyboardDismissBehavior.onDrag,
                           padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
-                          itemCount: threadGroups.length,
-                          itemBuilder: (context, index) {
-                            final group = threadGroups[index];
-                            return Padding(
-                              padding: EdgeInsets.only(
-                                bottom: index == threadGroups.length - 1
-                                    ? 0
-                                    : 16,
-                              ),
-                              child: Column(
-                                children: <Widget>[
-                                  _DateSeparator(label: group.label),
-                                  const SizedBox(height: 12),
-                                  ...group.messages.map(
-                                    (message) => _ThreadBubble(
-                                      message: message,
-                                      maxWidth: bubbleMaxWidth,
-                                    ),
+                          children: <Widget>[
+                            if (callHistorySection != null) ...<Widget>[
+                              callHistorySection,
+                              const SizedBox(height: 16),
+                            ],
+                            if (callTimelineSection != null) ...<Widget>[
+                              callTimelineSection,
+                              const SizedBox(height: 16),
+                            ],
+                            if (threadGroups.isEmpty)
+                              const OmnichannelEmptyState(
+                                icon: Icons.chat_bubble_outline_rounded,
+                                title: 'Belum ada pesan chat',
+                                message:
+                                    'Riwayat panggilan tetap ditampilkan di atas. Pesan chat akan muncul di sini saat percakapan berjalan.',
+                              )
+                            else
+                              for (
+                                var index = 0;
+                                index < threadGroups.length;
+                                index++
+                              ) ...<Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    bottom: index == threadGroups.length - 1
+                                        ? 0
+                                        : 16,
                                   ),
-                                ],
-                              ),
-                            );
-                          },
+                                  child: Column(
+                                    children: <Widget>[
+                                      _DateSeparator(
+                                        label: threadGroups[index].label,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      ...threadGroups[index].messages.map(
+                                        (message) => _ThreadBubble(
+                                          message: message,
+                                          maxWidth: bubbleMaxWidth,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                          ],
                         );
                       },
                     ),
@@ -419,7 +535,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
                 onEmojiTap: _openEmojiPicker,
                 onVoiceNoteTap: _handleVoiceNoteTap,
                 isRecordingVoiceNote: widget.isRecordingVoiceNote,
-                onCallTap: () => _showComingSoon('Panggilan telepon'),
+                onCallTap: () => unawaited(widget.onCallTap()),
               ),
             ),
           ],
@@ -452,6 +568,9 @@ class _MobileConversationScaffold extends StatelessWidget {
     required this.onVoiceNoteTap,
     required this.onCancelVoiceNoteTap,
     required this.onMenuSelected,
+    this.callBanner,
+    this.callHistorySection,
+    this.callTimelineSection,
   });
 
   final OmnichannelConversationDetailModel? conversation;
@@ -476,9 +595,90 @@ class _MobileConversationScaffold extends StatelessWidget {
   final Future<void> Function() onCancelVoiceNoteTap;
   final Future<void> Function(_MobileConversationMenuAction action)
   onMenuSelected;
+  final Widget? callBanner;
+  final Widget? callHistorySection;
+  final Widget? callTimelineSection;
 
   @override
   Widget build(BuildContext context) {
+    final threadBody = isShellLoading
+        ? const _MobileConversationLoadingBody()
+        : conversation == null
+        ? const Padding(
+            padding: EdgeInsets.all(24),
+            child: OmnichannelEmptyState(
+              icon: Icons.forum_outlined,
+              title: 'Pilih conversation',
+              message:
+                  'Klik salah satu chat untuk membuka percakapan seperti tampilan WhatsApp.',
+            ),
+          )
+        : threadGroups.isEmpty &&
+              callHistorySection == null &&
+              callTimelineSection == null
+        ? const Padding(
+            padding: EdgeInsets.all(24),
+            child: OmnichannelEmptyState(
+              icon: Icons.chat_bubble_outline_rounded,
+              title: 'Belum ada chat',
+              message:
+                  'Thread conversation ini masih kosong atau backend belum mengirim pesan.',
+            ),
+          )
+        : LayoutBuilder(
+            builder: (context, constraints) {
+              final bubbleMaxWidth = constraints.maxWidth * 0.78;
+
+              return ListView(
+                controller: threadScrollController,
+                physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
+                ),
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 18),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                children: <Widget>[
+                  if (callHistorySection != null) ...<Widget>[
+                    callHistorySection!,
+                    const SizedBox(height: 14),
+                  ],
+                  if (callTimelineSection != null) ...<Widget>[
+                    callTimelineSection!,
+                    const SizedBox(height: 14),
+                  ],
+                  if (threadGroups.isEmpty)
+                    const OmnichannelEmptyState(
+                      icon: Icons.chat_bubble_outline_rounded,
+                      title: 'Belum ada chat',
+                      message:
+                          'Riwayat panggilan tetap tampil di atas. Pesan chat akan muncul di sini saat conversation bergerak.',
+                    )
+                  else
+                    for (var index = 0; index < threadGroups.length; index++)
+                      Padding(
+                        padding: EdgeInsets.only(
+                          bottom: index == threadGroups.length - 1 ? 0 : 14,
+                        ),
+                        child: Column(
+                          children: <Widget>[
+                            _MobileDateSeparator(
+                              label: threadGroups[index].label,
+                            ),
+                            const SizedBox(height: 10),
+                            ...threadGroups[index].messages.map(
+                              (message) => _MobileConversationBubble(
+                                message: message,
+                                maxWidth: bubbleMaxWidth,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                ],
+              );
+            },
+          );
+
     return ColoredBox(
       color: const Color(0xFFF0E7DD),
       child: Column(
@@ -497,71 +697,16 @@ class _MobileConversationScaffold extends StatelessWidget {
               children: <Widget>[
                 const Positioned.fill(child: _WhatsAppWallpaper()),
                 Positioned.fill(
-                  child: isShellLoading
-                      ? const _MobileConversationLoadingBody()
-                      : conversation == null
-                      ? const Padding(
-                          padding: EdgeInsets.all(24),
-                          child: OmnichannelEmptyState(
-                            icon: Icons.forum_outlined,
-                            title: 'Pilih conversation',
-                            message:
-                                'Klik salah satu chat untuk membuka percakapan seperti tampilan WhatsApp.',
-                          ),
-                        )
-                      : threadGroups.isEmpty
-                      ? const Padding(
-                          padding: EdgeInsets.all(24),
-                          child: OmnichannelEmptyState(
-                            icon: Icons.chat_bubble_outline_rounded,
-                            title: 'Belum ada chat',
-                            message:
-                                'Thread conversation ini masih kosong atau backend belum mengirim pesan.',
-                          ),
-                        )
-                      : LayoutBuilder(
-                          builder: (context, constraints) {
-                            final bubbleMaxWidth = constraints.maxWidth * 0.78;
-
-                            return ListView.builder(
-                              controller: threadScrollController,
-                              physics: const BouncingScrollPhysics(
-                                parent: AlwaysScrollableScrollPhysics(),
-                              ),
-                              padding: const EdgeInsets.fromLTRB(
-                                12,
-                                12,
-                                12,
-                                18,
-                              ),
-                              keyboardDismissBehavior:
-                                  ScrollViewKeyboardDismissBehavior.onDrag,
-                              itemCount: threadGroups.length,
-                              itemBuilder: (context, index) {
-                                final group = threadGroups[index];
-                                return Padding(
-                                  padding: EdgeInsets.only(
-                                    bottom: index == threadGroups.length - 1
-                                        ? 0
-                                        : 14,
-                                  ),
-                                  child: Column(
-                                    children: <Widget>[
-                                      _MobileDateSeparator(label: group.label),
-                                      const SizedBox(height: 10),
-                                      ...group.messages.map(
-                                        (message) => _MobileConversationBubble(
-                                          message: message,
-                                          maxWidth: bubbleMaxWidth,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
-                          },
+                  child: Column(
+                    children: <Widget>[
+                      if (callBanner != null)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                          child: callBanner!,
                         ),
+                      Expanded(child: threadBody),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -969,10 +1114,7 @@ class _MobileConversationBubble extends StatelessWidget {
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
               if (message.hasAudio) ...<Widget>[
-                _ConversationAudioBubble(
-                  message: message,
-                  compact: true,
-                ),
+                _ConversationAudioBubble(message: message, compact: true),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
               if (message.displayText.isNotEmpty)
@@ -1316,8 +1458,8 @@ class _MobileConversationComposerState
                     onTap: widget.isSending
                         ? null
                         : hasText
-                            ? () => widget.onSubmit()
-                            : widget.onVoiceNoteTap,
+                        ? () => widget.onSubmit()
+                        : widget.onVoiceNoteTap,
                     borderRadius: BorderRadius.circular(999),
                     child: SizedBox(
                       width: 54,
@@ -1358,9 +1500,34 @@ class _VoiceNoteWaveform extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const bars = <double>[
-      10, 14, 18, 12, 20, 26, 16, 22, 28, 14,
-      18, 24, 30, 16, 22, 12, 26, 18, 14, 20,
-      24, 16, 28, 18, 12, 22, 26, 14,
+      10,
+      14,
+      18,
+      12,
+      20,
+      26,
+      16,
+      22,
+      28,
+      14,
+      18,
+      24,
+      30,
+      16,
+      22,
+      12,
+      26,
+      18,
+      14,
+      20,
+      24,
+      16,
+      28,
+      18,
+      12,
+      22,
+      26,
+      14,
     ];
 
     return Row(
@@ -1914,10 +2081,7 @@ class _ConversationImagePreview extends StatelessWidget {
 }
 
 class _ConversationAudioBubble extends StatefulWidget {
-  const _ConversationAudioBubble({
-    required this.message,
-    this.compact = false,
-  });
+  const _ConversationAudioBubble({required this.message, this.compact = false});
 
   final OmnichannelThreadMessageModel message;
   final bool compact;
@@ -2008,8 +2172,9 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
     final progressMax = _duration.inMilliseconds <= 0
         ? 1.0
         : _duration.inMilliseconds.toDouble();
-    final progressValue =
-        _position.inMilliseconds.clamp(0, progressMax.toInt()).toDouble();
+    final progressValue = _position.inMilliseconds
+        .clamp(0, progressMax.toInt())
+        .toDouble();
 
     return Container(
       width: compact ? 220 : 280,
@@ -2048,10 +2213,12 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
                 SliderTheme(
                   data: SliderTheme.of(context).copyWith(
                     trackHeight: 3,
-                    thumbShape:
-                        const RoundSliderThumbShape(enabledThumbRadius: 5),
-                    overlayShape:
-                        const RoundSliderOverlayShape(overlayRadius: 10),
+                    thumbShape: const RoundSliderThumbShape(
+                      enabledThumbRadius: 5,
+                    ),
+                    overlayShape: const RoundSliderOverlayShape(
+                      overlayRadius: 10,
+                    ),
                   ),
                   child: Slider(
                     min: 0,
@@ -2060,8 +2227,9 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
                     onChanged: (_duration.inMilliseconds <= 0)
                         ? null
                         : (value) async {
-                            final target =
-                                Duration(milliseconds: value.round());
+                            final target = Duration(
+                              milliseconds: value.round(),
+                            );
                             await _player.seek(target);
                           },
                   ),

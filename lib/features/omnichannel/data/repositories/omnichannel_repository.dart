@@ -2,6 +2,9 @@ import 'dart:async';
 
 import '../../../../core/network/api_client.dart';
 import '../../../admin_auth/data/repositories/admin_auth_repository.dart';
+import '../models/omnichannel_call_action_result.dart';
+import '../models/omnichannel_call_analytics_summary_model.dart';
+import '../models/omnichannel_call_history_item_model.dart';
 import '../models/omnichannel_conversation_detail_model.dart';
 import '../models/omnichannel_conversation_list_model.dart';
 import '../models/omnichannel_insight_model.dart';
@@ -360,6 +363,138 @@ class OmnichannelRepository {
     return 'Kontak berhasil diproses.';
   }
 
+  Future<OmnichannelCallActionResult> startConversationCall({
+    required String conversationId,
+    String callType = 'audio',
+  }) async {
+    return _performCallAction(() async {
+      final accessToken = await _ensureAdminSession();
+      return _apiService.startConversationCall(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        callType: callType,
+      );
+    }, fallbackMessage: 'Panggilan WhatsApp berhasil diproses.');
+  }
+
+  Future<OmnichannelCallActionResult> acceptConversationCall({
+    required String conversationId,
+  }) async {
+    return _performCallAction(() async {
+      final accessToken = await _ensureAdminSession();
+      return _apiService.acceptConversationCall(
+        accessToken: accessToken,
+        conversationId: conversationId,
+      );
+    }, fallbackMessage: 'Panggilan WhatsApp diterima.');
+  }
+
+  Future<OmnichannelCallActionResult> rejectConversationCall({
+    required String conversationId,
+  }) async {
+    return _performCallAction(() async {
+      final accessToken = await _ensureAdminSession();
+      return _apiService.rejectConversationCall(
+        accessToken: accessToken,
+        conversationId: conversationId,
+      );
+    }, fallbackMessage: 'Panggilan WhatsApp ditolak.');
+  }
+
+  Future<OmnichannelCallActionResult> endConversationCall({
+    required String conversationId,
+  }) async {
+    return _performCallAction(() async {
+      final accessToken = await _ensureAdminSession();
+      return _apiService.endConversationCall(
+        accessToken: accessToken,
+        conversationId: conversationId,
+      );
+    }, fallbackMessage: 'Panggilan WhatsApp diakhiri.');
+  }
+
+  Future<OmnichannelCallActionResult> fetchConversationCallStatus({
+    required String conversationId,
+  }) async {
+    return _performCallAction(() async {
+      final accessToken = await _ensureAdminSession();
+      return _apiService.fetchConversationCallStatus(
+        accessToken: accessToken,
+        conversationId: conversationId,
+      );
+    }, fallbackMessage: 'Status panggilan berhasil diperbarui.');
+  }
+
+  Future<OmnichannelCallActionResult> requestConversationCallPermission({
+    required String conversationId,
+    String callType = 'audio',
+  }) async {
+    return _performCallAction(() async {
+      final accessToken = await _ensureAdminSession();
+      return _apiService.requestConversationCallPermission(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        callType: callType,
+      );
+    }, fallbackMessage: 'Permintaan izin panggilan berhasil diproses.');
+  }
+
+  Future<OmnichannelCallAnalyticsSnapshotModel> loadCallAnalytics({
+    int recentLimit = 8,
+    String? finalStatus,
+    String? callType,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final queryParameters = _buildCallAnalyticsQueryParameters(
+      limit: recentLimit,
+      finalStatus: finalStatus,
+      callType: callType,
+    );
+    final results = await Future.wait<Object>(<Future<Object>>[
+      _safeOptionalRead(
+        () => _apiService.fetchCallAnalyticsSummary(
+          accessToken: accessToken,
+          queryParameters: queryParameters,
+        ),
+      ),
+      _safeOptionalRead(
+        () => _apiService.fetchRecentCalls(
+          accessToken: accessToken,
+          queryParameters: queryParameters,
+        ),
+      ),
+    ]);
+
+    return OmnichannelCallAnalyticsSnapshotModel.fromPayload(
+      summaryPayload: _extractPayloadData(results[0] as Map<String, dynamic>),
+      recentPayload: _extractPayloadData(results[1] as Map<String, dynamic>),
+    );
+  }
+
+  Future<OmnichannelConversationCallHistoryModel> loadConversationCallHistory({
+    required int conversationId,
+    int limit = 20,
+    String? finalStatus,
+    String? callType,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.fetchConversationCallHistory(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        queryParameters: _buildCallAnalyticsQueryParameters(
+          limit: limit,
+          finalStatus: finalStatus,
+          callType: callType,
+        ),
+      ),
+    );
+
+    return OmnichannelConversationCallHistoryModel.fromPayload(
+      _extractPayloadData(payload),
+    );
+  }
+
   Future<OmnichannelConversationSnapshotModel> _loadConversationSnapshot(
     int conversationId, {
     required String accessToken,
@@ -415,6 +550,25 @@ class OmnichannelRepository {
     return _adminAuthRepository.requireAccessToken();
   }
 
+  Future<OmnichannelCallActionResult> _performCallAction(
+    Future<Map<String, dynamic>> Function() action, {
+    required String fallbackMessage,
+  }) async {
+    try {
+      final payload = await _readWithRetry(action);
+      return OmnichannelCallActionResult.fromPayload(
+        _normalizeCallPayload(payload),
+        fallbackMessage: fallbackMessage,
+      );
+    } on ApiException catch (error) {
+      return OmnichannelCallActionResult.fromPayload(
+        _normalizeFailedCallPayload(error),
+        defaultSuccess: false,
+        fallbackMessage: error.message,
+      );
+    }
+  }
+
   Future<Map<String, dynamic>> _safeOptionalRead(
     Future<Map<String, dynamic>> Function() action,
   ) async {
@@ -455,4 +609,79 @@ class OmnichannelRepository {
       }
     }
   }
+}
+
+Map<String, Object?> _buildCallAnalyticsQueryParameters({
+  int? limit,
+  String? finalStatus,
+  String? callType,
+}) {
+  return <String, Object?>{
+    if (limit != null && limit > 0) 'limit': limit,
+    if (finalStatus != null && finalStatus.trim().isNotEmpty)
+      'final_status': finalStatus.trim(),
+    if (callType != null && callType.trim().isNotEmpty)
+      'call_type': callType.trim(),
+  };
+}
+
+Map<String, dynamic> _extractPayloadData(Map<String, dynamic> payload) {
+  final data = _asStringMap(payload['data']);
+  return data.isNotEmpty ? data : payload;
+}
+
+Map<String, dynamic> _normalizeCallPayload(Map<String, dynamic> payload) {
+  final data = _extractPayloadData(payload);
+  if (data.isEmpty) {
+    return payload;
+  }
+
+  return <String, dynamic>{
+    ...data,
+    if (!data.containsKey('success') && payload['success'] != null)
+      'success': payload['success'],
+    if (!data.containsKey('message') && payload['message'] != null)
+      'message': payload['message'],
+    if (!data.containsKey('meta_error') && payload['meta_error'] != null)
+      'meta_error': payload['meta_error'],
+    if (!data.containsKey('call_action') && payload['call_action'] != null)
+      'call_action': payload['call_action'],
+    if (!data.containsKey('permission_required') &&
+        payload['permission_required'] != null)
+      'permission_required': payload['permission_required'],
+  };
+}
+
+Map<String, dynamic> _normalizeFailedCallPayload(ApiException error) {
+  final payload = _asStringMap(error.payload);
+  final normalized = _normalizeCallPayload(payload);
+
+  if (normalized.isNotEmpty) {
+    return <String, dynamic>{
+      ...normalized,
+      'success': false,
+      'message': error.message,
+    };
+  }
+
+  return <String, dynamic>{
+    'success': false,
+    'message': error.message,
+    if (payload['call_action'] != null) 'call_action': payload['call_action'],
+    if (payload['permission_required'] != null)
+      'permission_required': payload['permission_required'],
+    if (payload['meta_error'] != null) 'meta_error': payload['meta_error'],
+  };
+}
+
+Map<String, dynamic> _asStringMap(Object? value) {
+  if (value is Map<String, dynamic>) {
+    return value;
+  }
+
+  if (value is Map) {
+    return value.map((key, entry) => MapEntry(key.toString(), entry));
+  }
+
+  return <String, dynamic>{};
 }

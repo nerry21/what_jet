@@ -1,3 +1,6 @@
+import 'omnichannel_call_history_item_model.dart';
+import 'omnichannel_call_session_model.dart';
+import 'omnichannel_call_timeline_item_model.dart';
 import 'omnichannel_payload_parser.dart';
 
 class OmnichannelConversationDetailModel {
@@ -16,6 +19,10 @@ class OmnichannelConversationDetailModel {
     required this.botAutoResumeAt,
     required this.botAutoResumeEnabled,
     required this.botAutoResumeAfterMinutes,
+    required this.callSession,
+    required this.callTimeline,
+    required this.callHistorySummary,
+    required this.callHistory,
   });
 
   final int id;
@@ -32,6 +39,10 @@ class OmnichannelConversationDetailModel {
   final String? botAutoResumeAt;
   final bool botAutoResumeEnabled;
   final int botAutoResumeAfterMinutes;
+  final OmnichannelCallSessionModel? callSession;
+  final List<OmnichannelCallTimelineItemModel> callTimeline;
+  final OmnichannelConversationCallHistorySummaryModel? callHistorySummary;
+  final List<OmnichannelCallHistoryItemModel> callHistory;
 
   factory OmnichannelConversationDetailModel.fromSources({
     required Map<String, dynamic> detailPayload,
@@ -68,6 +79,10 @@ class OmnichannelConversationDetailModel {
         botAutoResumeAt: null,
         botAutoResumeEnabled: false,
         botAutoResumeAfterMinutes: 15,
+        callSession: null,
+        callTimeline: <OmnichannelCallTimelineItemModel>[],
+        callHistorySummary: null,
+        callHistory: <OmnichannelCallHistoryItemModel>[],
       );
     }
 
@@ -180,6 +195,32 @@ class OmnichannelConversationDetailModel {
           'bot_auto_resume_after_minutes',
         ], omnichannelInt) ??
         15;
+    final callSessionJson =
+        omnichannelFirstMappedFromSources<Map<String, dynamic>>(
+          candidates,
+          const <String>['call_session'],
+          asOmnichannelMap,
+        );
+    final callTimelineJson =
+        omnichannelFirstMapListFromSources(candidates, const <String>[
+          'call_timeline',
+          'conversation.call_timeline',
+          'selected_conversation.call_timeline',
+          'detail.call_timeline',
+        ]);
+    final callHistorySummaryJson =
+        omnichannelFirstMappedFromSources<Map<String, dynamic>>(
+          candidates,
+          const <String>[
+            'call_history_summary',
+            'conversation.call_history_summary',
+          ],
+          asOmnichannelMap,
+        );
+    final callHistoryJson = omnichannelFirstMapListFromSources(
+      candidates,
+      const <String>['call_history', 'conversation.call_history'],
+    );
 
     return OmnichannelConversationDetailModel(
       id:
@@ -239,6 +280,20 @@ class OmnichannelConversationDetailModel {
       botAutoResumeAt: botAutoResumeAt,
       botAutoResumeEnabled: botAutoResumeEnabled,
       botAutoResumeAfterMinutes: botAutoResumeAfterMinutes,
+      callSession: callSessionJson == null
+          ? null
+          : OmnichannelCallSessionModel.fromJson(callSessionJson),
+      callTimeline: callTimelineJson
+          .map(OmnichannelCallTimelineItemModel.fromJson)
+          .toList(),
+      callHistorySummary: callHistorySummaryJson == null
+          ? null
+          : OmnichannelConversationCallHistorySummaryModel.fromJson(
+              callHistorySummaryJson,
+            ),
+      callHistory: callHistoryJson
+          .map(OmnichannelCallHistoryItemModel.fromJson)
+          .toList(),
     );
   }
 
@@ -278,8 +333,122 @@ class OmnichannelConversationDetailModel {
       botAutoResumeAfterMinutes: other.id > 0
           ? other.botAutoResumeAfterMinutes
           : botAutoResumeAfterMinutes,
+      callSession: _mergeCallSession(callSession, other.callSession),
+      callTimeline: _mergeCallTimeline(callTimeline, other.callTimeline),
+      callHistorySummary: other.callHistorySummary ?? callHistorySummary,
+      callHistory: _mergeCallHistory(callHistory, other.callHistory),
     );
   }
+}
+
+OmnichannelCallSessionModel? _mergeCallSession(
+  OmnichannelCallSessionModel? current,
+  OmnichannelCallSessionModel? incoming,
+) {
+  if (incoming == null) {
+    return current;
+  }
+
+  if (current == null) {
+    return incoming;
+  }
+
+  return incoming.isNewerThan(current) ? incoming : current;
+}
+
+List<OmnichannelCallTimelineItemModel> _mergeCallTimeline(
+  List<OmnichannelCallTimelineItemModel> current,
+  List<OmnichannelCallTimelineItemModel> incoming,
+) {
+  if (current.isEmpty) {
+    return incoming;
+  }
+
+  if (incoming.isEmpty) {
+    return current;
+  }
+
+  final itemsByKey = <String, OmnichannelCallTimelineItemModel>{};
+
+  for (final item in <OmnichannelCallTimelineItemModel>[
+    ...current,
+    ...incoming,
+  ]) {
+    final existing = itemsByKey[item.stableKey];
+    if (existing == null || item.isNewerThan(existing)) {
+      itemsByKey[item.stableKey] = item;
+    }
+  }
+
+  final merged = itemsByKey.values.toList()
+    ..sort((left, right) {
+      final leftTimestamp = left.timestampDateTime;
+      final rightTimestamp = right.timestampDateTime;
+
+      if (leftTimestamp != null && rightTimestamp != null) {
+        final comparison = leftTimestamp.compareTo(rightTimestamp);
+        if (comparison != 0) {
+          return comparison;
+        }
+      } else if (leftTimestamp != null) {
+        return 1;
+      } else if (rightTimestamp != null) {
+        return -1;
+      }
+
+      final leftSessionId = left.callSessionId ?? -1;
+      final rightSessionId = right.callSessionId ?? -1;
+      if (leftSessionId != rightSessionId) {
+        return leftSessionId.compareTo(rightSessionId);
+      }
+
+      return left.stableKey.compareTo(right.stableKey);
+    });
+
+  return merged;
+}
+
+List<OmnichannelCallHistoryItemModel> _mergeCallHistory(
+  List<OmnichannelCallHistoryItemModel> current,
+  List<OmnichannelCallHistoryItemModel> incoming,
+) {
+  if (current.isEmpty) {
+    return incoming;
+  }
+
+  if (incoming.isEmpty) {
+    return current;
+  }
+
+  final itemsById = <int, OmnichannelCallHistoryItemModel>{};
+
+  for (final item in <OmnichannelCallHistoryItemModel>[
+    ...current,
+    ...incoming,
+  ]) {
+    itemsById[item.id] = item;
+  }
+
+  final merged = itemsById.values.toList()
+    ..sort((left, right) {
+      final leftTime = left.startedAtDateTime ?? left.endedAtDateTime;
+      final rightTime = right.startedAtDateTime ?? right.endedAtDateTime;
+
+      if (leftTime != null && rightTime != null) {
+        final comparison = rightTime.compareTo(leftTime);
+        if (comparison != 0) {
+          return comparison;
+        }
+      } else if (leftTime != null) {
+        return -1;
+      } else if (rightTime != null) {
+        return 1;
+      }
+
+      return right.id.compareTo(left.id);
+    });
+
+  return merged;
 }
 
 List<String> _parseBadges(
