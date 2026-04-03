@@ -40,7 +40,7 @@ class AppCallCapabilities {
     supportsAgentPickup: false,
     supportsWebrtcSignaling: false,
     reason:
-        'Backend calling sudah menyiapkan status dan permission, tetapi media WebRTC belum diintegrasikan end-to-end pada build admin ini.',
+        'Build admin ini baru menampilkan status, permission, dan timeline panggilan dari backend. Audio call real-time di dalam aplikasi belum diintegrasikan end-to-end.',
   );
 }
 

@@ -12,6 +12,7 @@ import '../../../../core/network/api_client.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../admin_auth/data/models/admin_user_model.dart';
 import '../../../admin_auth/data/repositories/admin_auth_repository.dart';
+import '../../domain/models/omnichannel_call_readiness_model.dart';
 import '../../data/models/omnichannel_call_action_result.dart';
 import '../../data/models/omnichannel_call_session_model.dart';
 import '../../data/models/omnichannel_call_timeline_item_model.dart';
@@ -27,6 +28,7 @@ import '../pages/omnichannel_call_page.dart';
 import '../pages/omnichannel_call_history_page.dart';
 import '../utils/omnichannel_call_status_ui.dart';
 import '../widgets/omnichannel_center_pane.dart';
+import '../widgets/omnichannel_call_settings_checklist_sheet.dart';
 import '../widgets/omnichannel_left_pane.dart';
 import '../widgets/omnichannel_right_pane.dart';
 import '../widgets/omnichannel_shell_header.dart';
@@ -69,6 +71,9 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   bool _isRecordingVoiceNote = false;
   _OmnichannelMobilePane _mobilePane = _OmnichannelMobilePane.inbox;
   OmnichannelCallSessionModel? _lastObservedCallSession;
+  OmnichannelCallReadinessModel? _callReadiness;
+  bool _isLoadingCallReadiness = false;
+  bool _isCallReadinessExpanded = false;
 
   @override
   void initState() {
@@ -93,6 +98,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
 
     unawaited(_controller.initialize(initialUser: widget.initialUser));
     unawaited(_callAnalyticsController.initialize());
+    unawaited(_loadCallReadiness());
   }
 
   @override
@@ -234,7 +240,13 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       return;
     }
 
+    final ready = await _ensureCallingReady();
+    if (!ready || !mounted) {
+      return;
+    }
+
     await _callController.startCall(conversationId: conversationId.toString());
+    await _loadCallReadiness(silent: true);
     await _controller.softRefreshAfterExternalAction();
     await _callAnalyticsController.refresh(silent: true);
     _syncCallBinding(forceStartPolling: true);
@@ -324,6 +336,518 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     _showSnackBar('Video call belum diimplementasikan pada tahap ini.');
   }
 
+  Future<bool> _ensureCallingReady() async {
+    try {
+      final readiness = await widget.repository.loadCallReadiness();
+      if (mounted) {
+        setState(() {
+          _callReadiness = readiness;
+        });
+      }
+
+      if (!readiness.callingEnabled) {
+        _showSnackBar(
+          'Calling dimatikan di backend. Aktifkan WHATSAPP_CALLING_ENABLED=true.',
+        );
+        return false;
+      }
+
+      if (!readiness.configComplete) {
+        _showSnackBar(
+          'Konfigurasi calling backend belum lengkap: ${readiness.missing.join(', ')}',
+        );
+        return false;
+      }
+
+      if (readiness.remoteCallingEnabled == false) {
+        _showSnackBar(
+          'Calling API belum aktif pada nomor WhatsApp ini. Aktifkan Call Settings nomor di Meta terlebih dahulu.',
+        );
+        return false;
+      }
+
+      if ((readiness.remoteSettingsError?.trim().isNotEmpty ?? false) &&
+          readiness.remoteCallingEnabled != true) {
+        _showSnackBar(
+          'Readiness calling gagal dicek: ${readiness.remoteSettingsError}',
+        );
+        return false;
+      }
+
+      return true;
+    } on ApiException catch (error) {
+      _showSnackBar('Gagal mengecek readiness calling: ${error.message}');
+      return false;
+    } catch (error) {
+      _showSnackBar('Gagal mengecek readiness calling: $error');
+      return false;
+    }
+  }
+
+  Future<void> _loadCallReadiness({bool silent = false}) async {
+    if (!silent) {
+      setState(() {
+        _isLoadingCallReadiness = true;
+      });
+    }
+
+    try {
+      final readiness = await widget.repository.loadCallReadiness();
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _callReadiness = readiness;
+        if (!silent) {
+          _isCallReadinessExpanded = false;
+        }
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isLoadingCallReadiness = false;
+    });
+  }
+
+  void _toggleCallReadinessExpanded() {
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isCallReadinessExpanded = !_isCallReadinessExpanded;
+    });
+  }
+
+  Future<void> _openMetaCallSettingsChecklist() async {
+    if (!mounted) {
+      return;
+    }
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.84,
+          child: OmnichannelCallSettingsChecklistSheet(onClose: () {}),
+        );
+      },
+    );
+
+    if (!mounted) {
+      return;
+    }
+    await _loadCallReadiness(silent: true);
+  }
+
+  Widget _buildCallReadinessPanel() {
+    final readiness = _callReadiness;
+    final statusText = readiness?.statusLabel ?? 'Checking...';
+    final isReady = readiness?.ok == true;
+    final statusBg = isReady
+        ? const Color(0xFFEAFBF1)
+        : const Color(0xFFFFEEEE);
+    final statusFg = isReady
+        ? const Color(0xFF157F3D)
+        : const Color(0xFFD92D20);
+    final statusBorder = isReady
+        ? const Color(0xFFC7EFD6)
+        : const Color(0xFFF4C7C3);
+    final cardTopColor = isReady
+        ? const Color(0xFFF3FCF6)
+        : const Color(0xFFFFF7F7);
+    final checksCount = readiness?.checks.length ?? 0;
+    final hasMissingConfig = readiness?.missing.isNotEmpty == true;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [cardTopColor, Colors.white],
+        ),
+        border: Border.all(color: statusBorder),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x14000000),
+            blurRadius: 22,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: statusBg,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(
+                    isReady
+                        ? Icons.verified_rounded
+                        : Icons.error_outline_rounded,
+                    color: statusFg,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Call Readiness',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF101828),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        isReady
+                            ? 'Sistem calling siap dipakai.'
+                            : 'Masih ada hal yang perlu dibereskan sebelum mulai call.',
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          height: 1.4,
+                          color: Color(0xFF667085),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                InkWell(
+                  onTap: _isLoadingCallReadiness
+                      ? null
+                      : () => unawaited(_loadCallReadiness()),
+                  borderRadius: BorderRadius.circular(999),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 9,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF2F4F7),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      _isLoadingCallReadiness ? 'Checking...' : 'Refresh',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF344054),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusBg,
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: statusBorder),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: statusFg,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        statusText,
+                        style: TextStyle(
+                          color: statusFg,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                InkWell(
+                  onTap: _toggleCallReadinessExpanded,
+                  borderRadius: BorderRadius.circular(999),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF2F4F7),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _isCallReadinessExpanded ? 'Ringkas' : 'Detail',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF344054),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        AnimatedRotation(
+                          turns: _isCallReadinessExpanded ? 0.5 : 0.0,
+                          duration: const Duration(milliseconds: 220),
+                          child: const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: Color(0xFF344054),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (readiness == null && _isLoadingCallReadiness)
+              const Text(
+                'Sedang memeriksa backend dan pengaturan Meta...',
+                style: TextStyle(fontSize: 13, color: Color(0xFF667085)),
+              ),
+            if (readiness != null && !_isCallReadinessExpanded)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(13),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFFFFF),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: const Color(0xFFE5E7EB)),
+                          ),
+                          child: Text(
+                            '$checksCount checks',
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF344054),
+                            ),
+                          ),
+                        ),
+                        if (hasMissingConfig)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFFAEB),
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(
+                                color: const Color(0xFFF7D79B),
+                              ),
+                            ),
+                            child: Text(
+                              '${readiness.missing.length} missing config',
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFFB54708),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      hasMissingConfig
+                          ? 'Terdapat ${readiness.missing.length} konfigurasi yang belum lengkap dan $checksCount pemeriksaan readiness.'
+                          : 'Tersedia $checksCount pemeriksaan readiness. Buka detail untuk melihat status lengkap.',
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        height: 1.45,
+                        color: Color(0xFF667085),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            AnimatedCrossFade(
+              firstChild: const SizedBox.shrink(),
+              secondChild: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (readiness != null && readiness.missing.isNotEmpty) ...[
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFFAEB),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFF7D79B)),
+                      ),
+                      child: Text(
+                        'Konfigurasi yang masih kurang: ${readiness.missing.join(', ')}',
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          height: 1.4,
+                          color: Color(0xFFB54708),
+                        ),
+                      ),
+                    ),
+                  ],
+                  if (readiness != null)
+                    ...readiness.checks.map((check) {
+                      final itemBg = check.ok
+                          ? const Color(0xFFF6FBF7)
+                          : const Color(0xFFFFF7F7);
+                      final itemBorder = check.ok
+                          ? const Color(0xFFD6F0DE)
+                          : const Color(0xFFF4CCCC);
+                      final dotColor = check.ok
+                          ? const Color(0xFF157F3D)
+                          : const Color(0xFFD92D20);
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.all(13),
+                        decoration: BoxDecoration(
+                          color: itemBg,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: itemBorder),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              margin: const EdgeInsets.only(top: 4),
+                              decoration: BoxDecoration(
+                                color: dotColor,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    check.label,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF101828),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    check.message,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      height: 1.4,
+                                      color: Color(0xFF667085),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                ],
+              ),
+              crossFadeState: _isCallReadinessExpanded
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              duration: const Duration(milliseconds: 220),
+              sizeCurve: Curves.easeInOut,
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _isLoadingCallReadiness
+                        ? null
+                        : () => unawaited(_openMetaCallSettingsChecklist()),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      side: BorderSide(color: statusBorder),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      foregroundColor: const Color(0xFF101828),
+                    ),
+                    icon: const Icon(Icons.checklist_rounded),
+                    label: const Text(
+                      'Open Meta Call Settings Checklist',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _callSuccessMessage(OmnichannelCallActionResult result) {
     return switch (result.callAction) {
       'permission_requested' => 'Permintaan izin panggilan berhasil dikirim.',
@@ -346,8 +870,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
         'Izin panggilan sudah kedaluwarsa dan perlu diminta ulang.',
       'call_blocked_configuration_error' =>
         'Konfigurasi panggilan belum lengkap.',
-      'call_rate_limited' =>
-        'Layanan panggilan sedang dibatasi sementara.',
+      'call_rate_limited' => 'Layanan panggilan sedang dibatasi sementara.',
       'duplicate_action' =>
         'Permintaan aksi panggilan yang sama masih diproses.',
       _ => _defaultCallErrorMessage(result),
@@ -357,7 +880,16 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   String _defaultCallErrorMessage(OmnichannelCallActionResult result) {
     final metaError = result.metaError ?? const <String, dynamic>{};
     final metaMessage = metaError['message']?.toString().trim();
+
     if (metaMessage != null && metaMessage.isNotEmpty) {
+      final normalized = metaMessage.toLowerCase();
+
+      if (normalized.contains('calling api not enabled') ||
+          normalized.contains('calling is not enabled') ||
+          normalized.contains('not enabled for this phone number')) {
+        return 'Calling API belum aktif pada nomor ini. Aktifkan Call Settings nomor WhatsApp di Meta terlebih dahulu.';
+      }
+
       return metaMessage;
     }
 
@@ -1364,6 +1896,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                     color: AppConfig.green,
                     backgroundColor: Colors.transparent,
                   ),
+                _buildCallReadinessPanel(),
                 Expanded(
                   child: contentPadding == 0
                       ? LayoutBuilder(

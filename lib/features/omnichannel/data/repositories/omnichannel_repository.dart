@@ -2,6 +2,7 @@ import 'dart:async';
 
 import '../../../../core/network/api_client.dart';
 import '../../../admin_auth/data/repositories/admin_auth_repository.dart';
+import '../../domain/models/omnichannel_call_readiness_model.dart';
 import '../models/omnichannel_call_action_result.dart';
 import '../models/omnichannel_call_analytics_summary_model.dart';
 import '../models/omnichannel_call_history_item_model.dart';
@@ -440,6 +441,16 @@ class OmnichannelRepository {
         conversationId: conversationId,
       );
     }, fallbackMessage: 'Status panggilan berhasil diperbarui.');
+  }
+
+  Future<OmnichannelCallReadinessModel> loadCallReadiness() async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.fetchCallReadiness(accessToken: accessToken),
+    );
+
+    final data = _extractPayloadData(payload);
+    return OmnichannelCallReadinessModel.fromJson(data);
   }
 
   Future<OmnichannelCallActionResult> requestConversationCallPermission({

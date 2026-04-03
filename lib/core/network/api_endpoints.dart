@@ -69,6 +69,8 @@ class ApiEndpoints {
   static String adminConversationCallHistory(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/call-history';
 
+  static String adminCallReadiness() => '$_adminMobileBase/call/readiness';
+
   static String adminPollList() => '$_adminMobileBase/poll/list';
 
   static String adminDashboardSummary() =>

@@ -113,6 +113,15 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> fetchCallReadiness({
+    required String accessToken,
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminCallReadiness(),
+      headers: _headers(accessToken),
+    );
+  }
+
   Future<Map<String, dynamic>> requestConversationCallPermission({
     required String accessToken,
     required String conversationId,
