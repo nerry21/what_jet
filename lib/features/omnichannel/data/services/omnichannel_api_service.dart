@@ -47,10 +47,14 @@ class OmnichannelApiService {
   Future<Map<String, dynamic>> fetchConversationPoll({
     required String accessToken,
     required int conversationId,
+    int? afterMessageId,
   }) {
     return _apiClient.get(
       ApiEndpoints.adminConversationPoll(conversationId),
       headers: _headers(accessToken),
+      queryParameters: <String, Object?>{
+        if (afterMessageId != null) 'after_message_id': afterMessageId,
+      },
     );
   }
 

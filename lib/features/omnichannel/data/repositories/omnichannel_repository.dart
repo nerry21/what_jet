@@ -152,10 +152,12 @@ class OmnichannelRepository {
     ),
   }) async {
     final accessToken = await _ensureAdminSession();
+    final afterMessageId = _latestThreadMessageId(currentThreadGroups);
     final pollPayload = await _readWithRetry(
       () => _apiService.fetchConversationPoll(
         accessToken: accessToken,
         conversationId: conversationId,
+        afterMessageId: afterMessageId,
       ),
     );
 
@@ -188,6 +190,21 @@ class OmnichannelRepository {
       threadGroups: mergedThreadGroups,
       insight: currentInsight.mergeWith(incomingInsight),
     );
+  }
+
+  int? _latestThreadMessageId(List<OmnichannelThreadGroupModel> groups) {
+    int? latestId;
+
+    for (final group in groups) {
+      for (final message in group.messages) {
+        final id = message.id;
+        if (latestId == null || id > latestId) {
+          latestId = id;
+        }
+      }
+    }
+
+    return latestId;
   }
 
   Future<OmnichannelWorkspaceModel> loadWorkspace({
