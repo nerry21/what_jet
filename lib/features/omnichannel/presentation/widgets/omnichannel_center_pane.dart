@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../data/models/omnichannel_call_history_item_model.dart';
@@ -2075,7 +2076,7 @@ class _ThreadBubble extends StatelessWidget {
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
               if (message.hasVideo) ...<Widget>[
-                _ConversationVideoCard(message: message, compact: false),
+                _ConversationVideoCard(message: message),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
               if (message.hasDocument) ...<Widget>[
@@ -2234,6 +2235,16 @@ class _ConversationImagePreview extends StatelessWidget {
 }
 
 Future<void> _downloadMediaUrl(String? rawUrl) async {
+  final value = rawUrl?.trim() ?? '';
+  if (value.isEmpty) return;
+
+  final uri = Uri.tryParse(value);
+  if (uri == null) return;
+
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
+}
+
+Future<void> _openMediaUrl(String? rawUrl) async {
   final value = rawUrl?.trim() ?? '';
   if (value.isEmpty) return;
 
@@ -2451,14 +2462,100 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
   }
 }
 
-class _ConversationVideoCard extends StatelessWidget {
+class _ConversationVideoCard extends StatefulWidget {
   const _ConversationVideoCard({required this.message, this.compact = false});
 
   final OmnichannelThreadMessageModel message;
   final bool compact;
 
   @override
-  Widget build(BuildContext context) {
+  State<_ConversationVideoCard> createState() => _ConversationVideoCardState();
+
+  Widget buildLegacy(BuildContext context) {
+    final width = compact ? 220.0 : 280.0;
+
+    return Container(
+      width: width,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.40),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            height: compact ? 120 : 160,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: const Color(0xFFEDEDED),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Stack(
+              children: <Widget>[
+                const Center(
+                  child: Icon(
+                    Icons.play_circle_fill_rounded,
+                    size: 54,
+                    color: AppConfig.green,
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Material(
+                    color: Colors.black.withValues(alpha: 0.45),
+                    borderRadius: BorderRadius.circular(999),
+                    child: InkWell(
+                      onTap: () =>
+                          _downloadMediaUrl(message.preferredVideoDownloadUrl),
+                      borderRadius: BorderRadius.circular(999),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Icon(
+                          Icons.download_rounded,
+                          size: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            message.originalName?.trim().isNotEmpty == true
+                ? message.originalName!
+                : 'Video',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: Colors.black,
+            ),
+          ),
+          if ((message.mimeType?.trim().isNotEmpty ?? false) ||
+              message.sizeBytes != null) ...<Widget>[
+            const SizedBox(height: 4),
+            Text(
+              [
+                if (message.mimeType?.trim().isNotEmpty ?? false)
+                  message.mimeType!,
+                if (message.sizeBytes != null)
+                  _formatFileSize(message.sizeBytes!),
+              ].join(' â€¢ '),
+              style: const TextStyle(fontSize: 12, color: AppConfig.mutedText),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget buildPlaceholder(BuildContext context) {
     final width = compact ? 220.0 : 280.0;
 
     return Container(
@@ -2539,6 +2636,413 @@ class _ConversationVideoCard extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _ConversationVideoCardState extends State<_ConversationVideoCard> {
+  VideoPlayerController? _controller;
+  Future<void>? _initializeFuture;
+  bool _isInitFailed = false;
+
+  String? get _videoUrl {
+    final value = widget.message.videoUrl?.trim() ?? '';
+    if (value.isEmpty) return null;
+    return value;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _setupVideo();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ConversationVideoCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.message.videoUrl != widget.message.videoUrl) {
+      _disposeController();
+      _setupVideo();
+    }
+  }
+
+  void _setupVideo() {
+    final url = _videoUrl;
+    if (url == null) {
+      _isInitFailed = true;
+      return;
+    }
+
+    try {
+      final controller = VideoPlayerController.networkUrl(Uri.parse(url));
+      _controller = controller;
+      _initializeFuture = controller
+          .initialize()
+          .then((_) async {
+            if (!mounted || _controller != controller) return;
+            await controller.setLooping(false);
+            if (!mounted || _controller != controller) return;
+            setState(() {});
+          })
+          .catchError((_) {
+            if (!mounted || _controller != controller) return;
+            setState(() {
+              _isInitFailed = true;
+            });
+          });
+    } catch (_) {
+      _isInitFailed = true;
+    }
+  }
+
+  Future<void> _togglePlayPause() async {
+    final controller = _controller;
+    if (controller == null || !controller.value.isInitialized) {
+      return;
+    }
+
+    if (controller.value.isPlaying) {
+      await controller.pause();
+    } else {
+      if (controller.value.position >= controller.value.duration &&
+          controller.value.duration > Duration.zero) {
+        await controller.seekTo(Duration.zero);
+      }
+      await controller.play();
+    }
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _disposeController() {
+    final controller = _controller;
+    _controller = null;
+    _initializeFuture = null;
+    _isInitFailed = false;
+    controller?.dispose();
+  }
+
+  @override
+  void dispose() {
+    _disposeController();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final width = widget.compact ? 220.0 : 280.0;
+    final height = widget.compact ? 140.0 : 180.0;
+    final controller = _controller;
+
+    return Container(
+      width: width,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.40),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              width: double.infinity,
+              height: height,
+              color: const Color(0xFFEDEDED),
+              child: _buildVideoSurface(controller),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            widget.message.originalName?.trim().isNotEmpty == true
+                ? widget.message.originalName!
+                : 'Video',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: Colors.black,
+            ),
+          ),
+          if ((widget.message.mimeType?.trim().isNotEmpty ?? false) ||
+              widget.message.sizeBytes != null) ...<Widget>[
+            const SizedBox(height: 4),
+            Text(
+              [
+                if (widget.message.mimeType?.trim().isNotEmpty ?? false)
+                  widget.message.mimeType!,
+                if (widget.message.sizeBytes != null)
+                  _formatFileSize(widget.message.sizeBytes!),
+              ].join(' • '),
+              style: const TextStyle(fontSize: 12, color: AppConfig.mutedText),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVideoSurface(VideoPlayerController? controller) {
+    if (_isInitFailed || _videoUrl == null) {
+      return _buildFallbackSurface();
+    }
+
+    if (controller == null || _initializeFuture == null) {
+      return _buildLoadingSurface();
+    }
+
+    return FutureBuilder<void>(
+      future: _initializeFuture,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return _buildFallbackSurface();
+        }
+
+        if (snapshot.connectionState != ConnectionState.done ||
+            !controller.value.isInitialized) {
+          return _buildLoadingSurface();
+        }
+
+        return ValueListenableBuilder<VideoPlayerValue>(
+          valueListenable: controller,
+          builder: (context, value, _) {
+            final videoSize = value.size;
+            final player = videoSize.width > 0 && videoSize.height > 0
+                ? FittedBox(
+                    fit: BoxFit.cover,
+                    child: SizedBox(
+                      width: videoSize.width,
+                      height: videoSize.height,
+                      child: VideoPlayer(controller),
+                    ),
+                  )
+                : const SizedBox.shrink();
+
+            return Stack(
+              fit: StackFit.expand,
+              children: <Widget>[
+                player,
+                Positioned.fill(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: _togglePlayPause,
+                      child: Center(
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 180),
+                          opacity: value.isPlaying ? 0.0 : 1.0,
+                          child: Container(
+                            width: 58,
+                            height: 58,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.45),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.play_arrow_rounded,
+                              size: 34,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Material(
+                    color: Colors.black.withValues(alpha: 0.45),
+                    borderRadius: BorderRadius.circular(999),
+                    child: InkWell(
+                      onTap: () => _downloadMediaUrl(
+                        widget.message.preferredVideoDownloadUrl,
+                      ),
+                      borderRadius: BorderRadius.circular(999),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Icon(
+                          Icons.download_rounded,
+                          size: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 8,
+                  right: 8,
+                  bottom: 8,
+                  child: _VideoProgressBar(controller: controller),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildLoadingSurface() {
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        const Center(
+          child: SizedBox(
+            width: 28,
+            height: 28,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+        Positioned(
+          right: 8,
+          top: 8,
+          child: Material(
+            color: Colors.black.withValues(alpha: 0.45),
+            borderRadius: BorderRadius.circular(999),
+            child: InkWell(
+              onTap: () =>
+                  _downloadMediaUrl(widget.message.preferredVideoDownloadUrl),
+              borderRadius: BorderRadius.circular(999),
+              child: const Padding(
+                padding: EdgeInsets.all(8),
+                child: Icon(
+                  Icons.download_rounded,
+                  size: 18,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFallbackSurface() {
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        const Center(
+          child: Icon(Icons.videocam_rounded, size: 52, color: AppConfig.green),
+        ),
+        Positioned(
+          right: 8,
+          top: 8,
+          child: Material(
+            color: Colors.black.withValues(alpha: 0.45),
+            borderRadius: BorderRadius.circular(999),
+            child: InkWell(
+              onTap: () =>
+                  _downloadMediaUrl(widget.message.preferredVideoDownloadUrl),
+              borderRadius: BorderRadius.circular(999),
+              child: const Padding(
+                padding: EdgeInsets.all(8),
+                child: Icon(
+                  Icons.download_rounded,
+                  size: 18,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          left: 8,
+          right: 8,
+          bottom: 10,
+          child: Center(
+            child: InkWell(
+              onTap: () => _openMediaUrl(
+                widget.message.videoUrl ??
+                    widget.message.preferredVideoDownloadUrl,
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.45),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: const Text(
+                  'Buka video',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _VideoProgressBar extends StatelessWidget {
+  const _VideoProgressBar({required this.controller});
+
+  final VideoPlayerController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<VideoPlayerValue>(
+      valueListenable: controller,
+      builder: (context, value, _) {
+        final totalMs = value.duration.inMilliseconds;
+        final positionMs = value.position.inMilliseconds
+            .clamp(0, totalMs > 0 ? totalMs : 0)
+            .toDouble();
+        final progress = totalMs <= 0 ? 0.0 : positionMs / totalMs;
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: LinearProgressIndicator(
+                value: progress.isNaN ? 0.0 : progress,
+                minHeight: 4,
+                backgroundColor: Colors.white.withValues(alpha: 0.35),
+                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                  _formatDuration(value.position),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  _formatDuration(value.duration),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -2624,6 +3128,22 @@ String _formatFileSize(int bytes) {
     return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
   }
   return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+}
+
+String _formatDuration(Duration duration) {
+  final totalSeconds = duration.inSeconds;
+  final hours = totalSeconds ~/ 3600;
+  final minutes = (totalSeconds % 3600) ~/ 60;
+  final seconds = totalSeconds % 60;
+
+  final twoDigitsSeconds = seconds.toString().padLeft(2, '0');
+  final twoDigitsMinutes = minutes.toString().padLeft(2, '0');
+
+  if (hours > 0) {
+    return '$hours:$twoDigitsMinutes:$twoDigitsSeconds';
+  }
+
+  return '$minutes:$twoDigitsSeconds';
 }
 
 class _ActiveComposer extends StatelessWidget {
