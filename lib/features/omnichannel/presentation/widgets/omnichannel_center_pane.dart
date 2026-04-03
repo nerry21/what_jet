@@ -93,6 +93,8 @@ class OmnichannelCenterPane extends StatefulWidget {
 }
 
 class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
+  static const double _threadBottomThreshold = 120;
+
   final TextEditingController _composerController = TextEditingController();
   final ScrollController _threadScrollController = ScrollController();
   final FocusNode _composerFocusNode = FocusNode();
@@ -100,11 +102,109 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
   bool get _isMobileConversationLayout => widget.onOpenInbox != null;
 
   @override
+  void initState() {
+    super.initState();
+
+    if (_threadMessageCount(widget.threadGroups) > 0) {
+      _scheduleScrollToThreadBottom();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant OmnichannelCenterPane oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final previousConversationId = oldWidget.conversation?.id;
+    final currentConversationId = widget.conversation?.id;
+    final conversationChanged = previousConversationId != currentConversationId;
+    final previousMessageCount = _threadMessageCount(oldWidget.threadGroups);
+    final currentMessageCount = _threadMessageCount(widget.threadGroups);
+    final previousLatestMessageId = _latestThreadMessageId(
+      oldWidget.threadGroups,
+    );
+    final currentLatestMessageId = _latestThreadMessageId(widget.threadGroups);
+    final wasNearBottom = _isNearThreadBottom();
+
+    if (conversationChanged && currentMessageCount > 0) {
+      _scheduleScrollToThreadBottom();
+      return;
+    }
+
+    if (previousMessageCount == 0 && currentMessageCount > 0) {
+      _scheduleScrollToThreadBottom();
+      return;
+    }
+
+    final hasNewLatestMessage =
+        previousLatestMessageId != null &&
+        currentLatestMessageId != null &&
+        currentLatestMessageId > previousLatestMessageId;
+
+    if (hasNewLatestMessage && wasNearBottom) {
+      _scheduleScrollToThreadBottom(animated: true);
+    }
+  }
+
+  @override
   void dispose() {
     _composerController.dispose();
     _threadScrollController.dispose();
     _composerFocusNode.dispose();
     super.dispose();
+  }
+
+  bool _isNearThreadBottom() {
+    if (!_threadScrollController.hasClients) {
+      return true;
+    }
+
+    final position = _threadScrollController.position;
+    return position.maxScrollExtent - position.pixels <= _threadBottomThreshold;
+  }
+
+  void _scheduleScrollToThreadBottom({bool animated = false}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_threadScrollController.hasClients) {
+        return;
+      }
+
+      final targetOffset = _threadScrollController.position.maxScrollExtent;
+      if (animated) {
+        _threadScrollController.animateTo(
+          targetOffset,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
+        return;
+      }
+
+      _threadScrollController.jumpTo(targetOffset);
+    });
+  }
+
+  int _threadMessageCount(List<OmnichannelThreadGroupModel> groups) {
+    var count = 0;
+
+    for (final group in groups) {
+      count += group.messages.length;
+    }
+
+    return count;
+  }
+
+  int? _latestThreadMessageId(List<OmnichannelThreadGroupModel> groups) {
+    int? latestId;
+
+    for (final group in groups) {
+      for (final message in group.messages) {
+        final id = message.id;
+        if (latestId == null || id > latestId) {
+          latestId = id;
+        }
+      }
+    }
+
+    return latestId;
   }
 
   Future<void> _openEmojiPicker() async {
