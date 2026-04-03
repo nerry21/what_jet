@@ -117,6 +117,10 @@ class OmnichannelThreadMessageModel {
     this.imageUrl,
     this.audioUrl,
     this.audioId,
+    this.videoUrl,
+    this.videoId,
+    this.documentUrl,
+    this.documentId,
     this.mediaCaption,
     this.mimeType,
     this.originalName,
@@ -137,6 +141,10 @@ class OmnichannelThreadMessageModel {
   final String? imageUrl;
   final String? audioUrl;
   final String? audioId;
+  final String? videoUrl;
+  final String? videoId;
+  final String? documentUrl;
+  final String? documentId;
   final String? mediaCaption;
   final String? mimeType;
   final String? originalName;
@@ -144,11 +152,23 @@ class OmnichannelThreadMessageModel {
   final bool isVoiceNote;
   final bool isReadByCustomer;
 
-  bool get hasImage => messageType == 'image' && imageUrl != null;
+  bool get hasImage =>
+      messageType == 'image' && (imageUrl?.trim().isNotEmpty ?? false);
+
   bool get hasAudio =>
       messageType == 'audio' &&
       ((audioUrl?.trim().isNotEmpty ?? false) ||
           (audioId?.trim().isNotEmpty ?? false));
+
+  bool get hasVideo =>
+      messageType == 'video' &&
+      ((videoUrl?.trim().isNotEmpty ?? false) ||
+          (videoId?.trim().isNotEmpty ?? false));
+
+  bool get hasDocument =>
+      messageType == 'document' &&
+      ((documentUrl?.trim().isNotEmpty ?? false) ||
+          (documentId?.trim().isNotEmpty ?? false));
 
   String get displayText {
     final caption = mediaCaption?.trim() ?? '';
@@ -156,7 +176,7 @@ class OmnichannelThreadMessageModel {
       return caption;
     }
 
-    if (hasImage || hasAudio) {
+    if (hasImage || hasAudio || hasVideo || hasDocument) {
       return '';
     }
 
@@ -214,7 +234,7 @@ class OmnichannelThreadMessageModel {
           'delivery_status',
           'delivery.status',
         ], omnichannelString) ??
-        (isMine ? 'sent' : 'sent');
+        'sent';
 
     final statusLabel =
         omnichannelFirstMapped<String>(json, const <String>[
@@ -230,22 +250,6 @@ class OmnichannelThreadMessageModel {
           'type',
         ], omnichannelString) ??
         'text';
-
-    final resolvedImageUrl = _normalizeImageUrl(
-      omnichannelFirstMappedFromSources<String>(
-        <Map<String, dynamic>>[media, json],
-        const <String>['image_url', 'media.image_url'],
-        omnichannelString,
-      ),
-    );
-
-    final resolvedAudioUrl = _normalizeAudioUrl(
-      omnichannelFirstMappedFromSources<String>(
-        <Map<String, dynamic>>[media, json],
-        const <String>['audio_url', 'media.audio_url'],
-        omnichannelString,
-      ),
-    );
 
     return OmnichannelThreadMessageModel(
       id:
@@ -278,11 +282,47 @@ class OmnichannelThreadMessageModel {
       deliveryError: omnichannelFirstMapped<String>(json, const <String>[
         'delivery_error',
       ], omnichannelString),
-      imageUrl: resolvedImageUrl,
-      audioUrl: resolvedAudioUrl,
+      imageUrl: _normalizeMediaUrl(
+        omnichannelFirstMappedFromSources<String>(
+          <Map<String, dynamic>>[media, json],
+          const <String>['image_url', 'media.image_url'],
+          omnichannelString,
+        ),
+      ),
+      audioUrl: _normalizeMediaUrl(
+        omnichannelFirstMappedFromSources<String>(
+          <Map<String, dynamic>>[media, json],
+          const <String>['audio_url', 'media.audio_url'],
+          omnichannelString,
+        ),
+      ),
       audioId: omnichannelFirstMappedFromSources<String>(
         <Map<String, dynamic>>[media, json],
         const <String>['audio_id', 'media.audio_id'],
+        omnichannelString,
+      ),
+      videoUrl: _normalizeMediaUrl(
+        omnichannelFirstMappedFromSources<String>(
+          <Map<String, dynamic>>[media, json],
+          const <String>['video_url', 'media.video_url'],
+          omnichannelString,
+        ),
+      ),
+      videoId: omnichannelFirstMappedFromSources<String>(
+        <Map<String, dynamic>>[media, json],
+        const <String>['video_id', 'media.video_id'],
+        omnichannelString,
+      ),
+      documentUrl: _normalizeMediaUrl(
+        omnichannelFirstMappedFromSources<String>(
+          <Map<String, dynamic>>[media, json],
+          const <String>['document_url', 'media.document_url'],
+          omnichannelString,
+        ),
+      ),
+      documentId: omnichannelFirstMappedFromSources<String>(
+        <Map<String, dynamic>>[media, json],
+        const <String>['document_id', 'media.document_id'],
         omnichannelString,
       ),
       mediaCaption: omnichannelFirstMappedFromSources<String>(
@@ -357,50 +397,14 @@ List<OmnichannelThreadGroupModel> _buildGroupsFromMessages(
     });
 }
 
-String? _normalizeImageUrl(String? rawValue) {
+String? _normalizeMediaUrl(String? rawValue) {
   final value = rawValue?.trim() ?? '';
   if (value.isEmpty) {
     return null;
   }
 
   final baseUri = Uri.tryParse(AppConfig.baseUrl);
-  if (value.startsWith('//')) {
-    final scheme = baseUri != null && baseUri.scheme.isNotEmpty
-        ? baseUri.scheme
-        : 'https';
-    return '$scheme:$value';
-  }
 
-  var normalized = value;
-  var parsed = Uri.tryParse(normalized);
-
-  if (parsed == null) {
-    return value;
-  }
-
-  if (!parsed.hasScheme && baseUri != null) {
-    parsed = baseUri.resolve(normalized);
-    normalized = parsed.toString();
-  }
-
-  if (parsed.scheme == 'http' &&
-      baseUri != null &&
-      baseUri.scheme == 'https' &&
-      parsed.host.toLowerCase() == baseUri.host.toLowerCase()) {
-    parsed = parsed.replace(scheme: 'https');
-    normalized = parsed.toString();
-  }
-
-  return normalized;
-}
-
-String? _normalizeAudioUrl(String? rawValue) {
-  final value = rawValue?.trim() ?? '';
-  if (value.isEmpty) {
-    return null;
-  }
-
-  final baseUri = Uri.tryParse(AppConfig.baseUrl);
   if (value.startsWith('//')) {
     final scheme = baseUri != null && baseUri.scheme.isNotEmpty
         ? baseUri.scheme

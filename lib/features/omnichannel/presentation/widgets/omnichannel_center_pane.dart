@@ -1217,6 +1217,14 @@ class _MobileConversationBubble extends StatelessWidget {
                 _ConversationAudioBubble(message: message, compact: true),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
+              if (message.hasVideo) ...<Widget>[
+                _ConversationVideoCard(message: message, compact: true),
+                if (message.displayText.isNotEmpty) const SizedBox(height: 8),
+              ],
+              if (message.hasDocument) ...<Widget>[
+                _ConversationDocumentCard(message: message, compact: true),
+                if (message.displayText.isNotEmpty) const SizedBox(height: 8),
+              ],
               if (message.displayText.isNotEmpty)
                 Text(
                   message.displayText,
@@ -1228,7 +1236,9 @@ class _MobileConversationBubble extends StatelessWidget {
                 ),
               if (message.displayText.isEmpty &&
                   !message.hasImage &&
-                  !message.hasAudio)
+                  !message.hasAudio &&
+                  !message.hasVideo &&
+                  !message.hasDocument)
                 const Text(
                   '-',
                   style: TextStyle(
@@ -2058,7 +2068,15 @@ class _ThreadBubble extends StatelessWidget {
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
               if (message.hasAudio) ...<Widget>[
-                _ConversationAudioBubble(message: message),
+                _ConversationAudioBubble(message: message, compact: false),
+                if (message.displayText.isNotEmpty) const SizedBox(height: 8),
+              ],
+              if (message.hasVideo) ...<Widget>[
+                _ConversationVideoCard(message: message, compact: false),
+                if (message.displayText.isNotEmpty) const SizedBox(height: 8),
+              ],
+              if (message.hasDocument) ...<Widget>[
+                _ConversationDocumentCard(message: message, compact: false),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
               if (message.displayText.isNotEmpty)
@@ -2072,7 +2090,9 @@ class _ThreadBubble extends StatelessWidget {
                 ),
               if (message.displayText.isEmpty &&
                   !message.hasImage &&
-                  !message.hasAudio)
+                  !message.hasAudio &&
+                  !message.hasVideo &&
+                  !message.hasDocument)
                 const Text(
                   '-',
                   style: TextStyle(
@@ -2367,6 +2387,164 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
       ),
     );
   }
+}
+
+class _ConversationVideoCard extends StatelessWidget {
+  const _ConversationVideoCard({required this.message, this.compact = false});
+
+  final OmnichannelThreadMessageModel message;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final url = message.videoUrl;
+    final width = compact ? 220.0 : 280.0;
+
+    return Container(
+      width: width,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.40),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: InkWell(
+        onTap: url == null || url.trim().isEmpty ? null : () {},
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              height: compact ? 120 : 160,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEDEDED),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.play_circle_fill_rounded,
+                  size: 54,
+                  color: AppConfig.green,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              message.originalName?.trim().isNotEmpty == true
+                  ? message.originalName!
+                  : 'Video',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+              ),
+            ),
+            if ((message.mimeType?.trim().isNotEmpty ?? false) ||
+                message.sizeBytes != null) ...<Widget>[
+              const SizedBox(height: 4),
+              Text(
+                [
+                  if (message.mimeType?.trim().isNotEmpty ?? false)
+                    message.mimeType!,
+                  if (message.sizeBytes != null)
+                    _formatFileSize(message.sizeBytes!),
+                ].join(' • '),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppConfig.mutedText,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ConversationDocumentCard extends StatelessWidget {
+  const _ConversationDocumentCard({
+    required this.message,
+    this.compact = false,
+  });
+
+  final OmnichannelThreadMessageModel message;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = compact ? 220.0 : 280.0;
+
+    return Container(
+      width: width,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.40),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        children: <Widget>[
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: const Color(0xFFEDEDED),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.description_outlined,
+              color: AppConfig.green,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  message.originalName?.trim().isNotEmpty == true
+                      ? message.originalName!
+                      : 'Dokumen',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  [
+                    if (message.mimeType?.trim().isNotEmpty ?? false)
+                      message.mimeType!,
+                    if (message.sizeBytes != null)
+                      _formatFileSize(message.sizeBytes!),
+                  ].join(' • '),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppConfig.mutedText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _formatFileSize(int bytes) {
+  if (bytes < 1024) return '$bytes B';
+  if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+  if (bytes < 1024 * 1024 * 1024) {
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+  return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
 }
 
 class _ActiveComposer extends StatelessWidget {
