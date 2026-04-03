@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../data/models/omnichannel_call_history_item_model.dart';
@@ -1209,6 +1210,7 @@ class _MobileConversationBubble extends StatelessWidget {
               if (message.hasImage) ...<Widget>[
                 _ConversationImagePreview(
                   imageUrl: message.imageUrl!,
+                  downloadUrl: message.preferredImageDownloadUrl,
                   maxWidth: maxWidth - 24,
                 ),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
@@ -2063,6 +2065,7 @@ class _ThreadBubble extends StatelessWidget {
               if (message.hasImage) ...<Widget>[
                 _ConversationImagePreview(
                   imageUrl: message.imageUrl!,
+                  downloadUrl: message.preferredImageDownloadUrl,
                   maxWidth: maxWidth - 28,
                 ),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
@@ -2137,67 +2140,107 @@ class _ConversationImagePreview extends StatelessWidget {
   const _ConversationImagePreview({
     required this.imageUrl,
     required this.maxWidth,
+    this.downloadUrl,
   });
 
   final String imageUrl;
   final double maxWidth;
+  final String? downloadUrl;
 
   @override
   Widget build(BuildContext context) {
     final previewWidth = maxWidth.clamp(160.0, 240.0).toDouble();
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: SizedBox(
-        width: previewWidth,
-        height: previewWidth,
-        child: Image.network(
-          imageUrl,
-          fit: BoxFit.cover,
-          webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) {
-              return child;
-            }
+    return SizedBox(
+      width: previewWidth,
+      height: previewWidth,
+      child: Stack(
+        children: <Widget>[
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: SizedBox(
+              width: previewWidth,
+              height: previewWidth,
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  }
 
-            return const DecoratedBox(
-              decoration: BoxDecoration(color: Color(0xFFEDEDED)),
-              child: Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: AppConfig.green,
-                ),
-              ),
-            );
-          },
-          errorBuilder: (_, __, ___) {
-            return const DecoratedBox(
-              decoration: BoxDecoration(color: Color(0xFFEDEDED)),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Icon(
-                      Icons.broken_image_outlined,
-                      color: AppConfig.subtleText,
-                    ),
-                    SizedBox(height: 6),
-                    Text(
-                      'Gambar tidak tersedia',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppConfig.mutedText,
+                  return const DecoratedBox(
+                    decoration: BoxDecoration(color: Color(0xFFEDEDED)),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppConfig.green,
                       ),
                     ),
-                  ],
+                  );
+                },
+                errorBuilder: (_, __, ___) {
+                  return const DecoratedBox(
+                    decoration: BoxDecoration(color: Color(0xFFEDEDED)),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Icon(
+                            Icons.broken_image_outlined,
+                            color: AppConfig.subtleText,
+                          ),
+                          SizedBox(height: 6),
+                          Text(
+                            'Gambar tidak tersedia',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppConfig.mutedText,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Material(
+              color: Colors.black.withValues(alpha: 0.45),
+              borderRadius: BorderRadius.circular(999),
+              child: InkWell(
+                onTap: () => _downloadMediaUrl(downloadUrl ?? imageUrl),
+                borderRadius: BorderRadius.circular(999),
+                child: const Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Icon(
+                    Icons.download_rounded,
+                    size: 18,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
+}
+
+Future<void> _downloadMediaUrl(String? rawUrl) async {
+  final value = rawUrl?.trim() ?? '';
+  if (value.isEmpty) return;
+
+  final uri = Uri.tryParse(value);
+  if (uri == null) return;
+
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
 }
 
 class _ConversationAudioBubble extends StatefulWidget {
@@ -2383,6 +2426,25 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
               ],
             ),
           ),
+          const SizedBox(width: 8),
+          InkWell(
+            onTap: () =>
+                _downloadMediaUrl(widget.message.preferredAudioDownloadUrl),
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              width: compact ? 32 : 36,
+              height: compact ? 32 : 36,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.85),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.download_rounded,
+                color: AppConfig.green,
+                size: 20,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -2397,7 +2459,6 @@ class _ConversationVideoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final url = message.videoUrl;
     final width = compact ? 220.0 : 280.0;
 
     return Container(
@@ -2407,57 +2468,76 @@ class _ConversationVideoCard extends StatelessWidget {
         color: Colors.white.withValues(alpha: 0.40),
         borderRadius: BorderRadius.circular(18),
       ),
-      child: InkWell(
-        onTap: url == null || url.trim().isEmpty ? null : () {},
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              height: compact ? 120 : 160,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: const Color(0xFFEDEDED),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.play_circle_fill_rounded,
-                  size: 54,
-                  color: AppConfig.green,
-                ),
-              ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            height: compact ? 120 : 160,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: const Color(0xFFEDEDED),
+              borderRadius: BorderRadius.circular(14),
             ),
-            const SizedBox(height: 10),
+            child: Stack(
+              children: <Widget>[
+                const Center(
+                  child: Icon(
+                    Icons.play_circle_fill_rounded,
+                    size: 54,
+                    color: AppConfig.green,
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Material(
+                    color: Colors.black.withValues(alpha: 0.45),
+                    borderRadius: BorderRadius.circular(999),
+                    child: InkWell(
+                      onTap: () =>
+                          _downloadMediaUrl(message.preferredVideoDownloadUrl),
+                      borderRadius: BorderRadius.circular(999),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Icon(
+                          Icons.download_rounded,
+                          size: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            message.originalName?.trim().isNotEmpty == true
+                ? message.originalName!
+                : 'Video',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: Colors.black,
+            ),
+          ),
+          if ((message.mimeType?.trim().isNotEmpty ?? false) ||
+              message.sizeBytes != null) ...<Widget>[
+            const SizedBox(height: 4),
             Text(
-              message.originalName?.trim().isNotEmpty == true
-                  ? message.originalName!
-                  : 'Video',
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
-              ),
+              [
+                if (message.mimeType?.trim().isNotEmpty ?? false)
+                  message.mimeType!,
+                if (message.sizeBytes != null)
+                  _formatFileSize(message.sizeBytes!),
+              ].join(' • '),
+              style: const TextStyle(fontSize: 12, color: AppConfig.mutedText),
             ),
-            if ((message.mimeType?.trim().isNotEmpty ?? false) ||
-                message.sizeBytes != null) ...<Widget>[
-              const SizedBox(height: 4),
-              Text(
-                [
-                  if (message.mimeType?.trim().isNotEmpty ?? false)
-                    message.mimeType!,
-                  if (message.sizeBytes != null)
-                    _formatFileSize(message.sizeBytes!),
-                ].join(' • '),
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppConfig.mutedText,
-                ),
-              ),
-            ],
           ],
-        ),
+        ],
       ),
     );
   }
@@ -2499,37 +2579,36 @@ class _ConversationDocumentCard extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  message.originalName?.trim().isNotEmpty == true
-                      ? message.originalName!
-                      : 'Dokumen',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  [
-                    if (message.mimeType?.trim().isNotEmpty ?? false)
-                      message.mimeType!,
-                    if (message.sizeBytes != null)
-                      _formatFileSize(message.sizeBytes!),
-                  ].join(' • '),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppConfig.mutedText,
-                  ),
-                ),
-              ],
+            child: Text(
+              message.originalName?.trim().isNotEmpty == true
+                  ? message.originalName!
+                  : 'Dokumen',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          InkWell(
+            onTap: () =>
+                _downloadMediaUrl(message.preferredDocumentDownloadUrl),
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.85),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.download_rounded,
+                color: AppConfig.green,
+                size: 20,
+              ),
             ),
           ),
         ],

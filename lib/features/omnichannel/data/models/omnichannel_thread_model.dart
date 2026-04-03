@@ -115,11 +115,15 @@ class OmnichannelThreadMessageModel {
     this.deliveryStatus,
     this.deliveryError,
     this.imageUrl,
+    this.imageDownloadUrl,
     this.audioUrl,
+    this.audioDownloadUrl,
     this.audioId,
     this.videoUrl,
+    this.videoDownloadUrl,
     this.videoId,
     this.documentUrl,
+    this.documentDownloadUrl,
     this.documentId,
     this.mediaCaption,
     this.mimeType,
@@ -139,11 +143,15 @@ class OmnichannelThreadMessageModel {
   final String? deliveryStatus;
   final String? deliveryError;
   final String? imageUrl;
+  final String? imageDownloadUrl;
   final String? audioUrl;
+  final String? audioDownloadUrl;
   final String? audioId;
   final String? videoUrl;
+  final String? videoDownloadUrl;
   final String? videoId;
   final String? documentUrl;
+  final String? documentDownloadUrl;
   final String? documentId;
   final String? mediaCaption;
   final String? mimeType;
@@ -169,6 +177,12 @@ class OmnichannelThreadMessageModel {
       messageType == 'document' &&
       ((documentUrl?.trim().isNotEmpty ?? false) ||
           (documentId?.trim().isNotEmpty ?? false));
+
+  String? get preferredImageDownloadUrl => imageDownloadUrl ?? imageUrl;
+  String? get preferredAudioDownloadUrl => audioDownloadUrl ?? audioUrl;
+  String? get preferredVideoDownloadUrl => videoDownloadUrl ?? videoUrl;
+  String? get preferredDocumentDownloadUrl =>
+      documentDownloadUrl ?? documentUrl;
 
   String get displayText {
     final caption = mediaCaption?.trim() ?? '';
@@ -289,10 +303,24 @@ class OmnichannelThreadMessageModel {
           omnichannelString,
         ),
       ),
+      imageDownloadUrl: _normalizeMediaUrl(
+        omnichannelFirstMappedFromSources<String>(
+          <Map<String, dynamic>>[media, json],
+          const <String>['image_download_url', 'media.image_download_url'],
+          omnichannelString,
+        ),
+      ),
       audioUrl: _normalizeMediaUrl(
         omnichannelFirstMappedFromSources<String>(
           <Map<String, dynamic>>[media, json],
           const <String>['audio_url', 'media.audio_url'],
+          omnichannelString,
+        ),
+      ),
+      audioDownloadUrl: _normalizeMediaUrl(
+        omnichannelFirstMappedFromSources<String>(
+          <Map<String, dynamic>>[media, json],
+          const <String>['audio_download_url', 'media.audio_download_url'],
           omnichannelString,
         ),
       ),
@@ -308,6 +336,13 @@ class OmnichannelThreadMessageModel {
           omnichannelString,
         ),
       ),
+      videoDownloadUrl: _normalizeMediaUrl(
+        omnichannelFirstMappedFromSources<String>(
+          <Map<String, dynamic>>[media, json],
+          const <String>['video_download_url', 'media.video_download_url'],
+          omnichannelString,
+        ),
+      ),
       videoId: omnichannelFirstMappedFromSources<String>(
         <Map<String, dynamic>>[media, json],
         const <String>['video_id', 'media.video_id'],
@@ -317,6 +352,16 @@ class OmnichannelThreadMessageModel {
         omnichannelFirstMappedFromSources<String>(
           <Map<String, dynamic>>[media, json],
           const <String>['document_url', 'media.document_url'],
+          omnichannelString,
+        ),
+      ),
+      documentDownloadUrl: _normalizeMediaUrl(
+        omnichannelFirstMappedFromSources<String>(
+          <Map<String, dynamic>>[media, json],
+          const <String>[
+            'document_download_url',
+            'media.document_download_url',
+          ],
           omnichannelString,
         ),
       ),
