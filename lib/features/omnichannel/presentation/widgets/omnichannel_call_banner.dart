@@ -13,6 +13,7 @@ class OmnichannelCallBanner extends StatelessWidget {
     this.isFallbackMode = false,
     this.fallbackNote,
     this.onEndCall,
+    this.onClose,
     this.isBusy = false,
   });
 
@@ -21,6 +22,7 @@ class OmnichannelCallBanner extends StatelessWidget {
   final bool isFallbackMode;
   final String? fallbackNote;
   final Future<void> Function()? onEndCall;
+  final VoidCallback? onClose;
   final bool isBusy;
 
   @override
@@ -140,6 +142,27 @@ class OmnichannelCallBanner extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
+              if (onClose != null) ...<Widget>[
+                InkWell(
+                  onTap: onClose,
+                  borderRadius: BorderRadius.circular(999),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.85),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                    ),
+                    child: const Icon(
+                      Icons.close_rounded,
+                      size: 20,
+                      color: Color(0xFF667085),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
               FilledButton.tonalIcon(
                 onPressed: onOpenCall,
                 icon: const Icon(Icons.open_in_new_rounded, size: 18),

@@ -74,6 +74,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   OmnichannelCallReadinessModel? _callReadiness;
   bool _isLoadingCallReadiness = false;
   bool _isClearingCallEligibilityCache = false;
+  bool _showCallReadinessCard = true;
+  bool _showActiveCallCard = true;
   bool _isCallReadinessExpanded = false;
   final bool _pinCallReadinessAboveCallCard = true;
 
@@ -490,6 +492,42 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
   }
 
+  void _hideCallReadinessCard() {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _showCallReadinessCard = false;
+    });
+  }
+
+  void _showCallReadinessCardAgain() {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _showCallReadinessCard = true;
+    });
+  }
+
+  void _hideActiveCallCard() {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _showActiveCallCard = false;
+    });
+  }
+
+  void _showActiveCallCardAgain() {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _showActiveCallCard = true;
+    });
+  }
+
   void _toggleCallReadinessExpanded() {
     if (!mounted) {
       return;
@@ -752,6 +790,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   width: 48,
@@ -817,6 +856,25 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                         fontWeight: FontWeight.w800,
                         color: Color(0xFF344054),
                       ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                InkWell(
+                  onTap: _hideCallReadinessCard,
+                  borderRadius: BorderRadius.circular(999),
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF9FAFB),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                    ),
+                    child: const Icon(
+                      Icons.close_rounded,
+                      size: 20,
+                      color: Color(0xFF667085),
                     ),
                   ),
                 ),
@@ -1192,6 +1250,84 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
 
   Widget _buildCallReadinessPanel() {
     return _buildPinnedCallReadinessSection();
+  }
+
+  Widget _buildCallVisibilityControls() {
+    final canRestoreReadiness = !_showCallReadinessCard;
+    final activeSession = _effectiveCallSession(
+      _controller.selectedConversation,
+    );
+    final canRestoreActiveCallCard =
+        !_showActiveCallCard && omnichannelShouldShowCallBanner(activeSession);
+    final hiddenBoth = canRestoreReadiness && canRestoreActiveCallCard;
+
+    if (!canRestoreReadiness && !canRestoreActiveCallCard) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x12000000),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          if (canRestoreReadiness)
+            OutlinedButton.icon(
+              onPressed: _showCallReadinessCardAgain,
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+              ),
+              icon: const Icon(Icons.visibility_rounded),
+              label: const Text(
+                'Tampilkan Call Readiness',
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          if (canRestoreActiveCallCard)
+            OutlinedButton.icon(
+              onPressed: _showActiveCallCardAgain,
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+              ),
+              icon: const Icon(Icons.visibility_rounded),
+              label: const Text(
+                'Tampilkan Kartu Panggilan',
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          if (hiddenBoth)
+            const Text(
+              'Kartu tambahan disembunyikan agar area chat lebih lega.',
+              style: TextStyle(fontSize: 12.5, color: Color(0xFF667085)),
+            ),
+        ],
+      ),
+    );
   }
 
   String _callSuccessMessage(OmnichannelCallActionResult result) {
@@ -1932,11 +2068,26 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       return child;
     }
 
+    final showVisibilityControls =
+        !_showCallReadinessCard ||
+        (!_showActiveCallCard &&
+            omnichannelShouldShowCallBanner(
+              _effectiveCallSession(_controller.selectedConversation),
+            ));
+    final topSpacing = showVisibilityControls || _showCallReadinessCard
+        ? 12.0
+        : 0.0;
+
     return Column(
       children: [
-        _buildCallReadinessPanel(),
-        const SizedBox(height: 12),
-        Expanded(child: child),
+        if (showVisibilityControls) _buildCallVisibilityControls(),
+        if (_showCallReadinessCard) _buildCallReadinessPanel(),
+        Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(top: topSpacing),
+            child: child,
+          ),
+        ),
       ],
     );
   }
@@ -2000,6 +2151,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       _controller.selectedConversation?.callHistory ?? const [],
                   isCallFallbackMode: _callController.isFallbackMode,
                   callFallbackMessage: _callController.fallbackMessage,
+                  showCallBanner: _showActiveCallCard,
+                  onHideCallBanner: _hideActiveCallCard,
                   threadGroups: _controller.threadGroups,
                   isShellLoading: shellLoading,
                   isConversationLoading: _controller.isConversationLoading,
@@ -2114,6 +2267,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                           const [],
                       isCallFallbackMode: _callController.isFallbackMode,
                       callFallbackMessage: _callController.fallbackMessage,
+                      showCallBanner: _showActiveCallCard,
+                      onHideCallBanner: _hideActiveCallCard,
                       threadGroups: _controller.threadGroups,
                       isShellLoading: shellLoading,
                       isConversationLoading: _controller.isConversationLoading,

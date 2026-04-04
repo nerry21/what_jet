@@ -46,6 +46,8 @@ class OmnichannelCenterPane extends StatefulWidget {
     required this.callHistory,
     required this.isCallFallbackMode,
     required this.callFallbackMessage,
+    this.showCallBanner = true,
+    this.onHideCallBanner,
     required this.isCallLoading,
     required this.onCallTap,
     required this.onVideoTap,
@@ -82,6 +84,8 @@ class OmnichannelCenterPane extends StatefulWidget {
   final List<OmnichannelCallHistoryItemModel> callHistory;
   final bool isCallFallbackMode;
   final String? callFallbackMessage;
+  final bool showCallBanner;
+  final VoidCallback? onHideCallBanner;
   final bool isCallLoading;
   final Future<void> Function() onCallTap;
   final Future<void> Function() onVideoTap;
@@ -436,7 +440,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
 
   Widget? _buildCallBanner() {
     final session = widget.callSession;
-    if (!omnichannelShouldShowCallBanner(session)) {
+    if (!widget.showCallBanner || !omnichannelShouldShowCallBanner(session)) {
       return null;
     }
 
@@ -447,6 +451,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
       fallbackNote: widget.callFallbackMessage,
       onOpenCall: widget.onOpenCallPage ?? () => unawaited(widget.onCallTap()),
       onEndCall: widget.onEndCall,
+      onClose: widget.onHideCallBanner,
     );
   }
 
