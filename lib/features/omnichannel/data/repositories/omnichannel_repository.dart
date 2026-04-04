@@ -443,14 +443,29 @@ class OmnichannelRepository {
     }, fallbackMessage: 'Status panggilan berhasil diperbarui.');
   }
 
-  Future<OmnichannelCallReadinessModel> loadCallReadiness() async {
+  Future<OmnichannelCallReadinessModel> loadCallReadiness({
+    bool forceRefresh = false,
+  }) async {
     final accessToken = await _ensureAdminSession();
     final payload = await _readWithRetry(
-      () => _apiService.fetchCallReadiness(accessToken: accessToken),
+      () => _apiService.fetchCallReadiness(
+        accessToken: accessToken,
+        forceRefresh: forceRefresh,
+      ),
     );
 
     final data = _extractPayloadData(payload);
     return OmnichannelCallReadinessModel.fromJson(data);
+  }
+
+  Future<Map<String, dynamic>> clearCallReadinessCache() async {
+    final accessToken = await _ensureAdminSession();
+
+    final payload = await _readWithRetry(
+      () => _apiService.clearCallReadinessCache(accessToken: accessToken),
+    );
+
+    return _extractPayloadData(payload);
   }
 
   Future<OmnichannelCallActionResult> requestConversationCallPermission({

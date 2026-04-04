@@ -71,6 +71,9 @@ class ApiEndpoints {
 
   static String adminCallReadiness() => '$_adminMobileBase/call/readiness';
 
+  static String adminCallReadinessClearCache() =>
+      '$_adminMobileBase/call/readiness/clear-cache';
+
   static String adminPollList() => '$_adminMobileBase/poll/list';
 
   static String adminDashboardSummary() =>

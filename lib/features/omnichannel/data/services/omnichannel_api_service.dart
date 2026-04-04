@@ -115,10 +115,22 @@ class OmnichannelApiService {
 
   Future<Map<String, dynamic>> fetchCallReadiness({
     required String accessToken,
+    bool forceRefresh = false,
   }) {
-    return _apiClient.get(
-      ApiEndpoints.adminCallReadiness(),
+    final endpoint = forceRefresh
+        ? '${ApiEndpoints.adminCallReadiness()}?force_refresh=1'
+        : ApiEndpoints.adminCallReadiness();
+
+    return _apiClient.get(endpoint, headers: _headers(accessToken));
+  }
+
+  Future<Map<String, dynamic>> clearCallReadinessCache({
+    required String accessToken,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminCallReadinessClearCache(),
       headers: _headers(accessToken),
+      body: const <String, dynamic>{},
     );
   }
 

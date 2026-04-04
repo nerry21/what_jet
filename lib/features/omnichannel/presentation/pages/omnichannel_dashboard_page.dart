@@ -73,6 +73,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   OmnichannelCallSessionModel? _lastObservedCallSession;
   OmnichannelCallReadinessModel? _callReadiness;
   bool _isLoadingCallReadiness = false;
+  bool _isClearingCallEligibilityCache = false;
   bool _isCallReadinessExpanded = false;
   final bool _pinCallReadinessAboveCallCard = true;
 
@@ -372,9 +373,18 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
         return false;
       }
 
+      if (readiness.tierEligibleForCalling == false) {
+        _showSnackBar(
+          readiness.eligibilityReason ??
+              'Calling belum bisa diaktifkan karena messaging limit tier nomor belum memenuhi syarat Meta.',
+        );
+        return false;
+      }
+
       if (readiness.remoteCallingEnabled == false) {
         _showSnackBar(
-          'Calling API belum aktif pada nomor WhatsApp ini. Aktifkan Call Settings nomor di Meta terlebih dahulu.',
+          readiness.eligibilityReason ??
+              'Calling API belum aktif pada nomor WhatsApp ini. Aktifkan Call Settings nomor di Meta terlebih dahulu.',
         );
         return false;
       }
@@ -397,7 +407,10 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
   }
 
-  Future<void> _loadCallReadiness({bool silent = false}) async {
+  Future<void> _loadCallReadiness({
+    bool silent = false,
+    bool forceRefresh = false,
+  }) async {
     if (!silent) {
       setState(() {
         _isLoadingCallReadiness = true;
@@ -405,7 +418,9 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
 
     try {
-      final readiness = await widget.repository.loadCallReadiness();
+      final readiness = await widget.repository.loadCallReadiness(
+        forceRefresh: forceRefresh,
+      );
       if (!mounted) {
         return;
       }
@@ -431,6 +446,48 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     setState(() {
       _isLoadingCallReadiness = false;
     });
+  }
+
+  Future<void> _clearCallEligibilityCacheNow() async {
+    if (_isClearingCallEligibilityCache) {
+      return;
+    }
+
+    setState(() {
+      _isClearingCallEligibilityCache = true;
+    });
+
+    try {
+      final result = await widget.repository.clearCallReadinessCache();
+
+      if (!mounted) {
+        return;
+      }
+
+      _showSnackBar(
+        (result['message']?.toString().trim().isNotEmpty ?? false)
+            ? result['message'].toString().trim()
+            : 'Eligibility cache berhasil dihapus.',
+      );
+
+      await _loadCallReadiness(silent: true, forceRefresh: true);
+    } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      _showSnackBar('Gagal menghapus eligibility cache: ${error.message}');
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      _showSnackBar('Gagal menghapus eligibility cache: $error');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isClearingCallEligibilityCache = false;
+        });
+      }
+    }
   }
 
   void _toggleCallReadinessExpanded() {
@@ -463,13 +520,108 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     if (!mounted) {
       return;
     }
-    await _loadCallReadiness(silent: true);
+    await _loadCallReadiness(silent: true, forceRefresh: true);
+  }
+
+  // ignore: unused_element
+  Widget _buildLegacyStickyReadinessHeader() {
+    final readiness = _callReadiness;
+    final isReady = readiness?.ok == true;
+    final statusText = readiness?.statusLabel ?? 'Checking...';
+    final chipBg = isReady ? const Color(0xFFEAFBF1) : const Color(0xFFFFEEEE);
+    final chipFg = isReady ? const Color(0xFF157F3D) : const Color(0xFFD92D20);
+    final borderColor = isReady
+        ? const Color(0xFFC7EFD6)
+        : const Color(0xFFF4C7C3);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.96),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x12000000),
+            blurRadius: 14,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: chipFg,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Call Readiness • $statusText',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                      color: chipFg,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          InkWell(
+            onTap: _toggleCallReadinessExpanded,
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: chipBg,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: borderColor),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _isCallReadinessExpanded ? 'Ringkas' : 'Detail',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: chipFg,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  AnimatedRotation(
+                    turns: _isCallReadinessExpanded ? 0.5 : 0.0,
+                    duration: const Duration(milliseconds: 220),
+                    child: Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: chipFg,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildStickyReadinessHeader() {
     final readiness = _callReadiness;
     final isReady = readiness?.ok == true;
-    final statusText = readiness?.statusLabel ?? 'Checking...';
+    final statusText = readiness?.tierEligibleForCalling == false
+        ? 'Not Ready • Tier Too Low'
+        : (readiness?.statusLabel ?? 'Checking...');
     final chipBg = isReady ? const Color(0xFFEAFBF1) : const Color(0xFFFFEEEE);
     final chipFg = isReady ? const Color(0xFF157F3D) : const Color(0xFFD92D20);
     final borderColor = isReady
@@ -647,7 +799,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 InkWell(
                   onTap: _isLoadingCallReadiness
                       ? null
-                      : () => unawaited(_loadCallReadiness()),
+                      : () => unawaited(_loadCallReadiness(forceRefresh: true)),
                   borderRadius: BorderRadius.circular(999),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -702,6 +854,132 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
               ),
             ),
             const SizedBox(height: 12),
+            if (readiness != null &&
+                ((readiness.eligibilityReason?.trim().isNotEmpty ?? false) ||
+                    (readiness.messagingLimitTier?.trim().isNotEmpty ??
+                        false) ||
+                    (readiness.qualityRating?.trim().isNotEmpty ?? false)))
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(13),
+                decoration: BoxDecoration(
+                  color: isReady
+                      ? const Color(0xFFF5FBF7)
+                      : const Color(0xFFFFF8F2),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isReady
+                        ? const Color(0xFFD6F0DE)
+                        : const Color(0xFFF5D9B8),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        if (readiness.eligibilityFromCache)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(
+                                color: const Color(0xFFE5E7EB),
+                              ),
+                            ),
+                            child: Text(
+                              readiness.eligibilityCacheTtlSeconds != null
+                                  ? 'Cached • ${readiness.eligibilityCacheTtlSeconds}s TTL'
+                                  : 'Cached',
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF344054),
+                              ),
+                            ),
+                          ),
+                        if ((readiness.messagingLimitTier?.trim().isNotEmpty ??
+                            false))
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(
+                                color: const Color(0xFFE5E7EB),
+                              ),
+                            ),
+                            child: Text(
+                              'Tier: ${readiness.messagingLimitTier}',
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF344054),
+                              ),
+                            ),
+                          ),
+                        if ((readiness.qualityRating?.trim().isNotEmpty ??
+                            false))
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(
+                                color: const Color(0xFFE5E7EB),
+                              ),
+                            ),
+                            child: Text(
+                              'Quality: ${readiness.qualityRating}',
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF344054),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    if ((readiness.eligibilityReason?.trim().isNotEmpty ??
+                        false)) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        readiness.eligibilityReason!,
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          height: 1.45,
+                          color: Color(0xFF9A3412),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            if (readiness != null && readiness.eligibilityFromCache) ...[
+              const SizedBox(height: 8),
+              const Text(
+                'Data eligibility saat ini berasal dari cache. Gunakan tombol Clear Eligibility Cache untuk memaksa pemeriksaan ulang dari Meta.',
+                style: TextStyle(
+                  fontSize: 11.8,
+                  height: 1.4,
+                  color: Color(0xFF667085),
+                ),
+              ),
+            ],
             if (readiness == null && _isLoadingCallReadiness)
               const Text(
                 'Sedang memeriksa backend dan pengaturan Meta...',
@@ -717,7 +995,9 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   border: Border.all(color: const Color(0xFFE5E7EB)),
                 ),
                 child: Text(
-                  hasMissingConfig
+                  (readiness.eligibilityReason?.trim().isNotEmpty ?? false)
+                      ? readiness.eligibilityReason!
+                      : hasMissingConfig
                       ? 'Terdapat ${readiness.missing.length} konfigurasi yang belum lengkap dan $checksCount pemeriksaan readiness.'
                       : 'Tersedia $checksCount pemeriksaan readiness. Buka detail untuk melihat status lengkap.',
                   style: const TextStyle(
@@ -843,6 +1123,38 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                     label: const Text(
                       'Open Meta Call Settings Checklist',
                       style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12.5,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed:
+                        (_isLoadingCallReadiness ||
+                            _isClearingCallEligibilityCache)
+                        ? null
+                        : () => unawaited(_clearCallEligibilityCacheNow()),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      side: const BorderSide(color: Color(0xFFF5D0D5)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      foregroundColor: const Color(0xFFB42318),
+                    ),
+                    icon: Icon(
+                      _isClearingCallEligibilityCache
+                          ? Icons.hourglass_top_rounded
+                          : Icons.cleaning_services_rounded,
+                    ),
+                    label: Text(
+                      _isClearingCallEligibilityCache
+                          ? 'Clearing...'
+                          : 'Clear Eligibility Cache',
+                      style: const TextStyle(
                         fontWeight: FontWeight.w800,
                         fontSize: 12.5,
                       ),
