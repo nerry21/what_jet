@@ -76,8 +76,15 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   bool _isClearingCallEligibilityCache = false;
   bool _showCallReadinessCard = true;
   bool _showActiveCallCard = true;
+  Offset _callReadinessBubbleOffset = const Offset(0, 0);
+  Offset _activeCallBubbleOffset = const Offset(0, 56);
   bool _isCallReadinessExpanded = false;
   final bool _pinCallReadinessAboveCallCard = true;
+
+  static const double _floatingBubbleWidth = 190.0;
+  static const double _floatingBubbleHeight = 46.0;
+  static const double _floatingBubbleBaseRight = 14.0;
+  static const double _floatingBubbleBaseBottom = 74.0;
 
   bool get _shouldAutoExpandCallReadiness {
     final readiness = _callReadiness;
@@ -492,6 +499,68 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
   }
 
+  Offset _clampBubbleOffset(
+    Offset candidate, {
+    required Size viewportSize,
+    required double bubbleWidth,
+    required double bubbleHeight,
+    double rightPadding = 14,
+    double bottomPadding = 18,
+    double topPadding = 12,
+    double leftPadding = 12,
+    double baseRight = _floatingBubbleBaseRight,
+    double baseBottom = _floatingBubbleBaseBottom,
+  }) {
+    final maxRight = max(
+      rightPadding,
+      viewportSize.width - bubbleWidth - leftPadding,
+    );
+    final minDx = baseRight - maxRight;
+    final maxDx = baseRight - rightPadding;
+
+    final maxBottom = max(
+      bottomPadding,
+      viewportSize.height - bubbleHeight - topPadding,
+    );
+    final minDy = baseBottom - maxBottom;
+    final maxDy = baseBottom - bottomPadding;
+
+    return Offset(
+      candidate.dx.clamp(minDx, maxDx).toDouble(),
+      candidate.dy.clamp(minDy, maxDy).toDouble(),
+    );
+  }
+
+  void _updateCallReadinessBubbleOffset(Offset delta, Size viewportSize) {
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _callReadinessBubbleOffset = _clampBubbleOffset(
+        _callReadinessBubbleOffset + delta,
+        viewportSize: viewportSize,
+        bubbleWidth: _floatingBubbleWidth,
+        bubbleHeight: _floatingBubbleHeight,
+      );
+    });
+  }
+
+  void _updateActiveCallBubbleOffset(Offset delta, Size viewportSize) {
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _activeCallBubbleOffset = _clampBubbleOffset(
+        _activeCallBubbleOffset + delta,
+        viewportSize: viewportSize,
+        bubbleWidth: _floatingBubbleWidth,
+        bubbleHeight: _floatingBubbleHeight,
+      );
+    });
+  }
+
   void _hideCallReadinessCard() {
     if (!mounted) {
       return;
@@ -507,6 +576,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
     setState(() {
       _showCallReadinessCard = true;
+      _callReadinessBubbleOffset = const Offset(0, 0);
     });
   }
 
@@ -525,6 +595,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
     setState(() {
       _showActiveCallCard = true;
+      _activeCallBubbleOffset = const Offset(0, 56);
     });
   }
 
@@ -1252,80 +1323,153 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     return _buildPinnedCallReadinessSection();
   }
 
-  Widget _buildCallVisibilityControls() {
+  Widget _buildFloatingHiddenCallChips() {
     final canRestoreReadiness = !_showCallReadinessCard;
     final activeSession = _effectiveCallSession(
       _controller.selectedConversation,
     );
     final canRestoreActiveCallCard =
         !_showActiveCallCard && omnichannelShouldShowCallBanner(activeSession);
-    final hiddenBoth = canRestoreReadiness && canRestoreActiveCallCard;
 
     if (!canRestoreReadiness && !canRestoreActiveCallCard) {
       return const SizedBox.shrink();
     }
 
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x12000000),
-            blurRadius: 12,
-            offset: Offset(0, 4),
-          ),
-        ],
+    return Positioned.fill(
+      child: IgnorePointer(
+        ignoring: false,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final viewportSize = Size(
+              constraints.maxWidth,
+              constraints.maxHeight,
+            );
+            final callReadinessOffset = _clampBubbleOffset(
+              _callReadinessBubbleOffset,
+              viewportSize: viewportSize,
+              bubbleWidth: _floatingBubbleWidth,
+              bubbleHeight: _floatingBubbleHeight,
+            );
+            final activeCallOffset = _clampBubbleOffset(
+              _activeCallBubbleOffset,
+              viewportSize: viewportSize,
+              bubbleWidth: _floatingBubbleWidth,
+              bubbleHeight: _floatingBubbleHeight,
+            );
+
+            return Stack(
+              children: [
+                if (canRestoreReadiness)
+                  _buildDraggableFloatingRestoreBubble(
+                    label: 'Call Readiness',
+                    icon: Icons.verified_outlined,
+                    offset: callReadinessOffset,
+                    baseRight: _floatingBubbleBaseRight,
+                    baseBottom: _floatingBubbleBaseBottom,
+                    onTap: _showCallReadinessCardAgain,
+                    onPanUpdate: (delta) =>
+                        _updateCallReadinessBubbleOffset(delta, viewportSize),
+                    accentColor: const Color(0xFFE53935),
+                    borderColor: const Color(0xFFF2B8B5),
+                    iconBg: const Color(0xFFFFF1F0),
+                  ),
+                if (canRestoreActiveCallCard)
+                  _buildDraggableFloatingRestoreBubble(
+                    label: 'Kartu Panggilan',
+                    icon: Icons.call_outlined,
+                    offset: activeCallOffset,
+                    baseRight: _floatingBubbleBaseRight,
+                    baseBottom: _floatingBubbleBaseBottom,
+                    onTap: _showActiveCallCardAgain,
+                    onPanUpdate: (delta) =>
+                        _updateActiveCallBubbleOffset(delta, viewportSize),
+                    accentColor: const Color(0xFF9A6700),
+                    borderColor: const Color(0xFFE7D7A5),
+                    iconBg: const Color(0xFFFFF8E8),
+                  ),
+              ],
+            );
+          },
+        ),
       ),
-      child: Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        children: [
-          if (canRestoreReadiness)
-            OutlinedButton.icon(
-              onPressed: _showCallReadinessCardAgain,
-              style: OutlinedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+    );
+  }
+
+  Widget _buildDraggableFloatingRestoreBubble({
+    required String label,
+    required IconData icon,
+    required Offset offset,
+    required double baseRight,
+    required double baseBottom,
+    required VoidCallback onTap,
+    required ValueChanged<Offset> onPanUpdate,
+    required Color accentColor,
+    required Color borderColor,
+    required Color iconBg,
+  }) {
+    return Positioned(
+      right: baseRight - offset.dx,
+      bottom: baseBottom - offset.dy,
+      child: SafeArea(
+        child: GestureDetector(
+          onPanUpdate: (details) => onPanUpdate(details.delta),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(999),
+              child: Ink(
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.97),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: borderColor),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x1F000000),
+                      blurRadius: 16,
+                      offset: Offset(0, 8),
+                    ),
+                  ],
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 9,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 26,
+                        height: 26,
+                        decoration: BoxDecoration(
+                          color: iconBg,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Icon(icon, size: 15, color: accentColor),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        label,
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF344054),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.open_in_full_rounded,
+                        size: 16,
+                        color: accentColor.withValues(alpha: 0.9),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              icon: const Icon(Icons.visibility_rounded),
-              label: const Text(
-                'Tampilkan Call Readiness',
-                style: TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
-          if (canRestoreActiveCallCard)
-            OutlinedButton.icon(
-              onPressed: _showActiveCallCardAgain,
-              style: OutlinedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
-              ),
-              icon: const Icon(Icons.visibility_rounded),
-              label: const Text(
-                'Tampilkan Kartu Panggilan',
-                style: TextStyle(fontWeight: FontWeight.w700),
-              ),
-            ),
-          if (hiddenBoth)
-            const Text(
-              'Kartu tambahan disembunyikan agar area chat lebih lega.',
-              style: TextStyle(fontSize: 12.5, color: Color(0xFF667085)),
-            ),
-        ],
+          ),
+        ),
       ),
     );
   }
@@ -2068,19 +2212,10 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       return child;
     }
 
-    final showVisibilityControls =
-        !_showCallReadinessCard ||
-        (!_showActiveCallCard &&
-            omnichannelShouldShowCallBanner(
-              _effectiveCallSession(_controller.selectedConversation),
-            ));
-    final topSpacing = showVisibilityControls || _showCallReadinessCard
-        ? 12.0
-        : 0.0;
+    final topSpacing = _showCallReadinessCard ? 12.0 : 0.0;
 
     return Column(
       children: [
-        if (showVisibilityControls) _buildCallVisibilityControls(),
         if (_showCallReadinessCard) _buildCallReadinessPanel(),
         Expanded(
           child: Padding(
@@ -2443,9 +2578,13 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 ),
               ],
             );
+            final layeredShellBody = Stack(
+              fit: StackFit.expand,
+              children: [shellBody, _buildFloatingHiddenCallChips()],
+            );
 
             if (isMobileShell) {
-              return ColoredBox(color: Colors.white, child: shellBody);
+              return ColoredBox(color: Colors.white, child: layeredShellBody);
             }
 
             return Container(
@@ -2461,7 +2600,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   ],
                 ),
               ),
-              child: shellBody,
+              child: layeredShellBody,
             );
           },
         ),
