@@ -3,6 +3,7 @@ class ApiEndpoints {
 
   static const String _mobileAuthBase = '/api/mobile/auth';
   static const String _mobileLiveChatBase = '/api/mobile/live-chat';
+  static const String _mobileStatusFeedBase = '/api/mobile/status-feed';
   static const String _adminMobileAuthBase = '/api/admin-mobile/auth';
   static const String _adminMobileBase = '/api/admin-mobile';
 
@@ -110,4 +111,12 @@ class ApiEndpoints {
 
   static String markRead(int conversationId) =>
       '$_mobileLiveChatBase/conversations/$conversationId/mark-read';
+
+  static String customerStatusFeed() => _mobileStatusFeedBase;
+
+  static String customerStatusDetail(int statusId) =>
+      '$_mobileStatusFeedBase/$statusId';
+
+  static String customerStatusMarkViewed(int statusId) =>
+      '$_mobileStatusFeedBase/$statusId/view';
 }

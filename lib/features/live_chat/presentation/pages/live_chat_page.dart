@@ -4,8 +4,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../../../core/config/app_config.dart';
+import '../../../../core/network/api_client.dart';
+import '../../../../core/storage/token_storage.dart';
 import '../../data/models/conversation_model.dart';
 import '../../data/repositories/live_chat_repository.dart';
+import '../../../status/data/repositories/customer_status_repository.dart';
+import '../../../status/data/services/customer_status_api_service.dart';
+import '../../../status/presentation/widgets/customer_status_strip.dart';
 import '../controllers/live_chat_controller.dart';
 import '../widgets/chat_list_tile.dart';
 import 'chat_detail_page.dart';
@@ -21,12 +26,21 @@ class LiveChatPage extends StatefulWidget {
 
 class _LiveChatPageState extends State<LiveChatPage> {
   late final LiveChatController _controller;
+  late final ApiClient _statusApiClient;
+  late final TokenStorage _tokenStorage;
+  late final CustomerStatusRepository _statusRepository;
   final TextEditingController _searchController = TextEditingController();
   _ConversationFilter _filter = _ConversationFilter.all;
 
   @override
   void initState() {
     super.initState();
+    _statusApiClient = ApiClient();
+    _tokenStorage = TokenStorage();
+    _statusRepository = CustomerStatusRepository(
+      apiService: CustomerStatusApiService(_statusApiClient),
+      readAccessToken: _readStatusAccessToken,
+    );
     _controller = LiveChatController(repository: widget.repository);
     _searchController.addListener(_handleSearchChanged);
     unawaited(_controller.initialize());
@@ -34,11 +48,21 @@ class _LiveChatPageState extends State<LiveChatPage> {
 
   @override
   void dispose() {
+    _statusApiClient.dispose();
     _controller.dispose();
     _searchController
       ..removeListener(_handleSearchChanged)
       ..dispose();
     super.dispose();
+  }
+
+  Future<String> _readStatusAccessToken() async {
+    final token = await _tokenStorage.readAccessToken();
+    if (token == null || token.trim().isEmpty) {
+      throw StateError('Token live chat belum tersedia.');
+    }
+
+    return token.trim();
   }
 
   void _handleSearchChanged() {
@@ -283,6 +307,8 @@ class _LiveChatPageState extends State<LiveChatPage> {
               ),
             ),
           const SizedBox(height: 8),
+          _StatusSection(repository: _statusRepository),
+          const Divider(height: 1),
           Expanded(
             child: RefreshIndicator(
               color: AppConfig.green,
@@ -639,6 +665,29 @@ class _SearchInput extends StatelessWidget {
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
       ),
+    );
+  }
+}
+
+class _StatusSection extends StatelessWidget {
+  const _StatusSection({required this.repository});
+
+  final CustomerStatusRepository repository;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        const Padding(
+          padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
+          child: Text(
+            'Status',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+          ),
+        ),
+        CustomerStatusStrip(repository: repository),
+      ],
     );
   }
 }
