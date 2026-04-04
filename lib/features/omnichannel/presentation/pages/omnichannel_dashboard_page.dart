@@ -26,6 +26,7 @@ import '../controllers/omnichannel_call_controller.dart';
 import '../controllers/omnichannel_shell_controller.dart';
 import '../pages/omnichannel_call_page.dart';
 import '../pages/omnichannel_call_history_page.dart';
+import '../pages/omnichannel_updates_page.dart';
 import '../utils/omnichannel_call_status_ui.dart';
 import '../widgets/omnichannel_center_pane.dart';
 import '../widgets/omnichannel_call_settings_checklist_sheet.dart';
@@ -34,7 +35,7 @@ import '../widgets/omnichannel_right_pane.dart';
 import '../widgets/omnichannel_shell_header.dart';
 import '../widgets/omnichannel_surface.dart';
 
-enum _OmnichannelMobilePane { inbox, conversation, insight }
+enum _OmnichannelMobilePane { inbox, updates, conversation, insight }
 
 class OmnichannelDashboardPage extends StatefulWidget {
   const OmnichannelDashboardPage({
@@ -2347,7 +2348,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     required int? selectedConversationId,
     required bool shellLoading,
   }) {
-    final showPaneSelector = _mobilePane == _OmnichannelMobilePane.insight;
+    const showPaneSelector = true;
 
     return Column(
       children: <Widget>[
@@ -2384,6 +2385,9 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   isLoadingMore: _controller.isLoadingMore,
                   hasMore: _controller.hasMoreConversations,
                   useMobileInboxLayout: true,
+                ),
+                _OmnichannelMobilePane.updates => OmnichannelUpdatesPage(
+                  repository: widget.repository,
                 ),
                 _OmnichannelMobilePane.conversation =>
                   _buildCenterPaneWithPinnedReadiness(
@@ -2642,6 +2646,14 @@ class _MobilePaneSelector extends StatelessWidget {
               icon: Icons.inbox_outlined,
               selected: selectedPane == _OmnichannelMobilePane.inbox,
               onTap: () => onPaneSelected(_OmnichannelMobilePane.inbox),
+            ),
+          ),
+          Expanded(
+            child: _MobilePaneButton(
+              label: 'Pembaharuan',
+              icon: Icons.autorenew_rounded,
+              selected: selectedPane == _OmnichannelMobilePane.updates,
+              onTap: () => onPaneSelected(_OmnichannelMobilePane.updates),
             ),
           ),
           Expanded(

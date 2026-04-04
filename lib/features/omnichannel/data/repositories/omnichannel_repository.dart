@@ -11,6 +11,7 @@ import '../models/omnichannel_conversation_list_model.dart';
 import '../models/omnichannel_insight_model.dart';
 import '../models/omnichannel_query_model.dart';
 import '../models/omnichannel_shell_snapshot_model.dart';
+import '../models/omnichannel_status_update_model.dart';
 import '../models/omnichannel_thread_model.dart';
 import '../models/omnichannel_workspace_model.dart';
 import '../services/omnichannel_api_service.dart';
@@ -536,6 +537,65 @@ class OmnichannelRepository {
     return OmnichannelConversationCallHistoryModel.fromPayload(
       _extractPayloadData(payload),
     );
+  }
+
+  Future<List<OmnichannelStatusUpdateModel>> loadStatusUpdates() async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.fetchStatusUpdates(accessToken: accessToken),
+    );
+
+    final data = _extractPayloadData(payload);
+    final rawItems = data['my_statuses'] as List<dynamic>? ?? const <dynamic>[];
+
+    return rawItems
+        .whereType<Map<String, dynamic>>()
+        .map(OmnichannelStatusUpdateModel.fromJson)
+        .toList(growable: false);
+  }
+
+  Future<OmnichannelStatusUpdateModel> createStatusUpdate({
+    required String statusType,
+    String? text,
+    String? caption,
+    String? backgroundColor,
+    String? textColor,
+    String? fontStyle,
+    String? musicTitle,
+    String? musicArtist,
+    List<int>? fileBytes,
+    String? fileName,
+    String? mimeType,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+
+    final payload = await _readWithRetry(
+      () => _apiService.createStatusUpdate(
+        accessToken: accessToken,
+        fields: <String, Object?>{
+          'status_type': statusType,
+          'text': text?.trim(),
+          'caption': caption?.trim(),
+          'background_color': backgroundColor?.trim(),
+          'text_color': textColor?.trim(),
+          'font_style': fontStyle?.trim(),
+          'music_title': musicTitle?.trim(),
+          'music_artist': musicArtist?.trim(),
+        },
+        fileBytes: fileBytes,
+        fileName: fileName,
+        mimeType: mimeType,
+      ),
+    );
+
+    final data = _extractPayloadData(payload);
+    final statusJson = data['status'];
+
+    if (statusJson is! Map<String, dynamic>) {
+      throw StateError('Payload status update tidak valid.');
+    }
+
+    return OmnichannelStatusUpdateModel.fromJson(statusJson);
   }
 
   Future<OmnichannelConversationSnapshotModel> _loadConversationSnapshot(

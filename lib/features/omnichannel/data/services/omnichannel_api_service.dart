@@ -333,6 +333,45 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> fetchStatusUpdates({
+    required String accessToken,
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminStatusUpdates(),
+      headers: _headers(accessToken),
+    );
+  }
+
+  Future<Map<String, dynamic>> createStatusUpdate({
+    required String accessToken,
+    required Map<String, Object?> fields,
+    List<int>? fileBytes,
+    String? fileName,
+    String? mimeType,
+  }) {
+    if (fileBytes == null || fileName == null || fileName.trim().isEmpty) {
+      return _apiClient.post(
+        ApiEndpoints.adminStatusUpdates(),
+        headers: _headers(accessToken),
+        body: fields,
+      );
+    }
+
+    return _apiClient.postMultipart(
+      ApiEndpoints.adminStatusUpdates(),
+      headers: _headers(accessToken),
+      fields: fields,
+      files: <ApiMultipartFile>[
+        ApiMultipartFile(
+          field: 'media_file',
+          bytes: fileBytes,
+          filename: fileName,
+          contentType: mimeType,
+        ),
+      ],
+    );
+  }
+
   Map<String, String> _headers(String accessToken) {
     return <String, String>{'Authorization': 'Bearer $accessToken'};
   }
