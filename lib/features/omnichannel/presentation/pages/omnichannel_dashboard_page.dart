@@ -74,6 +74,16 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   OmnichannelCallReadinessModel? _callReadiness;
   bool _isLoadingCallReadiness = false;
   bool _isCallReadinessExpanded = false;
+  final bool _pinCallReadinessAboveCallCard = true;
+
+  bool get _shouldAutoExpandCallReadiness {
+    final readiness = _callReadiness;
+    if (readiness == null) {
+      return false;
+    }
+
+    return readiness.ok != true;
+  }
 
   @override
   void initState() {
@@ -342,6 +352,9 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       if (mounted) {
         setState(() {
           _callReadiness = readiness;
+          if (_shouldAutoExpandCallReadiness) {
+            _isCallReadinessExpanded = true;
+          }
         });
       }
 
@@ -399,7 +412,9 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
 
       setState(() {
         _callReadiness = readiness;
-        if (!silent) {
+        if (_shouldAutoExpandCallReadiness) {
+          _isCallReadinessExpanded = true;
+        } else if (!silent) {
           _isCallReadinessExpanded = false;
         }
       });
@@ -451,7 +466,99 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     await _loadCallReadiness(silent: true);
   }
 
-  Widget _buildCallReadinessPanel() {
+  Widget _buildStickyReadinessHeader() {
+    final readiness = _callReadiness;
+    final isReady = readiness?.ok == true;
+    final statusText = readiness?.statusLabel ?? 'Checking...';
+    final chipBg = isReady ? const Color(0xFFEAFBF1) : const Color(0xFFFFEEEE);
+    final chipFg = isReady ? const Color(0xFF157F3D) : const Color(0xFFD92D20);
+    final borderColor = isReady
+        ? const Color(0xFFC7EFD6)
+        : const Color(0xFFF4C7C3);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.96),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x12000000),
+            blurRadius: 14,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: chipFg,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Call Readiness • $statusText',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                      color: chipFg,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          InkWell(
+            onTap: _toggleCallReadinessExpanded,
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: chipBg,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: borderColor),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _isCallReadinessExpanded ? 'Ringkas' : 'Detail',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: chipFg,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  AnimatedRotation(
+                    turns: _isCallReadinessExpanded ? 0.5 : 0.0,
+                    duration: const Duration(milliseconds: 220),
+                    child: Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: chipFg,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCallReadinessPanelContent() {
     final readiness = _callReadiness;
     final statusText = readiness?.statusLabel ?? 'Checking...';
     final isReady = readiness?.ok == true;
@@ -471,7 +578,6 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     final hasMissingConfig = readiness?.missing.isNotEmpty == true;
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         gradient: LinearGradient(
@@ -565,79 +671,35 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
               ],
             ),
             const SizedBox(height: 14),
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: statusBg,
-                    borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: statusBorder),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: statusFg,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        statusText,
-                        style: TextStyle(
-                          color: statusFg,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                InkWell(
-                  onTap: _toggleCallReadinessExpanded,
-                  borderRadius: BorderRadius.circular(999),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: statusBg,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: statusBorder),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF2F4F7),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          _isCallReadinessExpanded ? 'Ringkas' : 'Detail',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF344054),
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        AnimatedRotation(
-                          turns: _isCallReadinessExpanded ? 0.5 : 0.0,
-                          duration: const Duration(milliseconds: 220),
-                          child: const Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            color: Color(0xFF344054),
-                          ),
-                        ),
-                      ],
+                      color: statusFg,
+                      shape: BoxShape.circle,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Text(
+                    statusText,
+                    style: TextStyle(
+                      color: statusFg,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 12),
             if (readiness == null && _isLoadingCallReadiness)
@@ -654,69 +716,16 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: const Color(0xFFE5E7EB)),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFFFFF),
-                            borderRadius: BorderRadius.circular(999),
-                            border: Border.all(color: const Color(0xFFE5E7EB)),
-                          ),
-                          child: Text(
-                            '$checksCount checks',
-                            style: const TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF344054),
-                            ),
-                          ),
-                        ),
-                        if (hasMissingConfig)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFFAEB),
-                              borderRadius: BorderRadius.circular(999),
-                              border: Border.all(
-                                color: const Color(0xFFF7D79B),
-                              ),
-                            ),
-                            child: Text(
-                              '${readiness.missing.length} missing config',
-                              style: const TextStyle(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xFFB54708),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      hasMissingConfig
-                          ? 'Terdapat ${readiness.missing.length} konfigurasi yang belum lengkap dan $checksCount pemeriksaan readiness.'
-                          : 'Tersedia $checksCount pemeriksaan readiness. Buka detail untuk melihat status lengkap.',
-                      style: const TextStyle(
-                        fontSize: 12.5,
-                        height: 1.45,
-                        color: Color(0xFF667085),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  hasMissingConfig
+                      ? 'Terdapat ${readiness.missing.length} konfigurasi yang belum lengkap dan $checksCount pemeriksaan readiness.'
+                      : 'Tersedia $checksCount pemeriksaan readiness. Buka detail untuk melihat status lengkap.',
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    height: 1.45,
+                    color: Color(0xFF667085),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             AnimatedCrossFade(
@@ -846,6 +855,31 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
         ),
       ),
     );
+  }
+
+  Widget _buildPinnedCallReadinessSection() {
+    if (!_pinCallReadinessAboveCallCard) {
+      return Container(
+        margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+        child: _buildCallReadinessPanelContent(),
+      );
+    }
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildStickyReadinessHeader(),
+          const SizedBox(height: 10),
+          _buildCallReadinessPanelContent(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCallReadinessPanel() {
+    return _buildPinnedCallReadinessSection();
   }
 
   String _callSuccessMessage(OmnichannelCallActionResult result) {
@@ -1581,6 +1615,20 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     );
   }
 
+  Widget _buildCenterPaneWithPinnedReadiness({required Widget child}) {
+    if (!_pinCallReadinessAboveCallCard) {
+      return child;
+    }
+
+    return Column(
+      children: [
+        _buildCallReadinessPanel(),
+        const SizedBox(height: 12),
+        Expanded(child: child),
+      ],
+    );
+  }
+
   Widget _buildDesktopShell({
     required BoxConstraints constraints,
     required OmnichannelWorkspaceModel workspace,
@@ -1625,42 +1673,44 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
             ),
             SizedBox(width: gap),
             Expanded(
-              child: OmnichannelCenterPane(
-                conversation: _controller.selectedConversation,
-                callSession: _effectiveCallSession(
-                  _controller.selectedConversation,
+              child: _buildCenterPaneWithPinnedReadiness(
+                child: OmnichannelCenterPane(
+                  conversation: _controller.selectedConversation,
+                  callSession: _effectiveCallSession(
+                    _controller.selectedConversation,
+                  ),
+                  callTimeline: _effectiveCallTimeline(
+                    _controller.selectedConversation,
+                  ),
+                  callHistorySummary:
+                      _controller.selectedConversation?.callHistorySummary,
+                  callHistory:
+                      _controller.selectedConversation?.callHistory ?? const [],
+                  isCallFallbackMode: _callController.isFallbackMode,
+                  callFallbackMessage: _callController.fallbackMessage,
+                  threadGroups: _controller.threadGroups,
+                  isShellLoading: shellLoading,
+                  isConversationLoading: _controller.isConversationLoading,
+                  isSendingReply: _isSendingReply,
+                  isSendingContact: _isSendingContact,
+                  onSendReply: _sendAdminReply,
+                  onSendGalleryImage: _sendAdminGalleryImage,
+                  onSendCameraImage: _sendAdminCameraImage,
+                  onSendVoiceNote: _toggleVoiceNoteRecording,
+                  onCancelVoiceNote: _cancelVoiceNoteRecording,
+                  isRecordingVoiceNote: _isRecordingVoiceNote,
+                  onSendContact: _sendAdminContact,
+                  isTogglingBot: _isTogglingBot,
+                  onToggleBot: _toggleBot,
+                  isCallLoading: _callController.isLoading,
+                  onCallTap: _startConversationCall,
+                  onVideoTap: _showVideoCallUnavailable,
+                  onOpenCallPage: () => unawaited(_openCurrentCallPage()),
+                  onOpenCallHistory: () =>
+                      unawaited(_openConversationCallHistory()),
+                  onEndCall: _endConversationCall,
+                  onOpenInbox: null,
                 ),
-                callTimeline: _effectiveCallTimeline(
-                  _controller.selectedConversation,
-                ),
-                callHistorySummary:
-                    _controller.selectedConversation?.callHistorySummary,
-                callHistory:
-                    _controller.selectedConversation?.callHistory ?? const [],
-                isCallFallbackMode: _callController.isFallbackMode,
-                callFallbackMessage: _callController.fallbackMessage,
-                threadGroups: _controller.threadGroups,
-                isShellLoading: shellLoading,
-                isConversationLoading: _controller.isConversationLoading,
-                isSendingReply: _isSendingReply,
-                isSendingContact: _isSendingContact,
-                onSendReply: _sendAdminReply,
-                onSendGalleryImage: _sendAdminGalleryImage,
-                onSendCameraImage: _sendAdminCameraImage,
-                onSendVoiceNote: _toggleVoiceNoteRecording,
-                onCancelVoiceNote: _cancelVoiceNoteRecording,
-                isRecordingVoiceNote: _isRecordingVoiceNote,
-                onSendContact: _sendAdminContact,
-                isTogglingBot: _isTogglingBot,
-                onToggleBot: _toggleBot,
-                isCallLoading: _callController.isLoading,
-                onCallTap: _startConversationCall,
-                onVideoTap: _showVideoCallUnavailable,
-                onOpenCallPage: () => unawaited(_openCurrentCallPage()),
-                onOpenCallHistory: () =>
-                    unawaited(_openConversationCallHistory()),
-                onEndCall: _endConversationCall,
-                onOpenInbox: null,
               ),
             ),
             SizedBox(width: gap),
@@ -1735,44 +1785,48 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   hasMore: _controller.hasMoreConversations,
                   useMobileInboxLayout: true,
                 ),
-                _OmnichannelMobilePane.conversation => OmnichannelCenterPane(
-                  conversation: _controller.selectedConversation,
-                  callSession: _effectiveCallSession(
-                    _controller.selectedConversation,
+                _OmnichannelMobilePane.conversation =>
+                  _buildCenterPaneWithPinnedReadiness(
+                    child: OmnichannelCenterPane(
+                      conversation: _controller.selectedConversation,
+                      callSession: _effectiveCallSession(
+                        _controller.selectedConversation,
+                      ),
+                      callTimeline: _effectiveCallTimeline(
+                        _controller.selectedConversation,
+                      ),
+                      callHistorySummary:
+                          _controller.selectedConversation?.callHistorySummary,
+                      callHistory:
+                          _controller.selectedConversation?.callHistory ??
+                          const [],
+                      isCallFallbackMode: _callController.isFallbackMode,
+                      callFallbackMessage: _callController.fallbackMessage,
+                      threadGroups: _controller.threadGroups,
+                      isShellLoading: shellLoading,
+                      isConversationLoading: _controller.isConversationLoading,
+                      isSendingReply: _isSendingReply,
+                      isSendingContact: _isSendingContact,
+                      onSendReply: _sendAdminReply,
+                      onSendGalleryImage: _sendAdminGalleryImage,
+                      onSendCameraImage: _sendAdminCameraImage,
+                      onSendVoiceNote: _toggleVoiceNoteRecording,
+                      onCancelVoiceNote: _cancelVoiceNoteRecording,
+                      isRecordingVoiceNote: _isRecordingVoiceNote,
+                      onSendContact: _sendAdminContact,
+                      isTogglingBot: _isTogglingBot,
+                      onToggleBot: _toggleBot,
+                      isCallLoading: _callController.isLoading,
+                      onCallTap: _startConversationCall,
+                      onVideoTap: _showVideoCallUnavailable,
+                      onOpenCallPage: () => unawaited(_openCurrentCallPage()),
+                      onOpenCallHistory: () =>
+                          unawaited(_openConversationCallHistory()),
+                      onEndCall: _endConversationCall,
+                      onOpenInbox: () =>
+                          _setMobilePane(_OmnichannelMobilePane.inbox),
+                    ),
                   ),
-                  callTimeline: _effectiveCallTimeline(
-                    _controller.selectedConversation,
-                  ),
-                  callHistorySummary:
-                      _controller.selectedConversation?.callHistorySummary,
-                  callHistory:
-                      _controller.selectedConversation?.callHistory ?? const [],
-                  isCallFallbackMode: _callController.isFallbackMode,
-                  callFallbackMessage: _callController.fallbackMessage,
-                  threadGroups: _controller.threadGroups,
-                  isShellLoading: shellLoading,
-                  isConversationLoading: _controller.isConversationLoading,
-                  isSendingReply: _isSendingReply,
-                  isSendingContact: _isSendingContact,
-                  onSendReply: _sendAdminReply,
-                  onSendGalleryImage: _sendAdminGalleryImage,
-                  onSendCameraImage: _sendAdminCameraImage,
-                  onSendVoiceNote: _toggleVoiceNoteRecording,
-                  onCancelVoiceNote: _cancelVoiceNoteRecording,
-                  isRecordingVoiceNote: _isRecordingVoiceNote,
-                  onSendContact: _sendAdminContact,
-                  isTogglingBot: _isTogglingBot,
-                  onToggleBot: _toggleBot,
-                  isCallLoading: _callController.isLoading,
-                  onCallTap: _startConversationCall,
-                  onVideoTap: _showVideoCallUnavailable,
-                  onOpenCallPage: () => unawaited(_openCurrentCallPage()),
-                  onOpenCallHistory: () =>
-                      unawaited(_openConversationCallHistory()),
-                  onEndCall: _endConversationCall,
-                  onOpenInbox: () =>
-                      _setMobilePane(_OmnichannelMobilePane.inbox),
-                ),
                 _OmnichannelMobilePane.insight => OmnichannelRightPane(
                   conversation: _controller.selectedConversation,
                   insight: _controller.insight,
@@ -1896,7 +1950,6 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                     color: AppConfig.green,
                     backgroundColor: Colors.transparent,
                   ),
-                _buildCallReadinessPanel(),
                 Expanded(
                   child: contentPadding == 0
                       ? LayoutBuilder(
