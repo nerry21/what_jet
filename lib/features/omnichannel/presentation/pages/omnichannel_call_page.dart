@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/omnichannel_call_session_model.dart';
 import '../../data/services/omnichannel_call_media_service.dart';
 import '../controllers/omnichannel_call_controller.dart';
@@ -118,7 +118,7 @@ class _OmnichannelCallPageState extends State<OmnichannelCallPage>
                               end: Alignment.bottomRight,
                               colors: <Color>[
                                 color.withValues(alpha: 0.94),
-                                AppConfig.greenLight,
+                                AppColors.primary200,
                               ],
                             ),
                             boxShadow: <BoxShadow>[
@@ -334,7 +334,7 @@ class _OmnichannelCallPageState extends State<OmnichannelCallPage>
                                         ),
                                       ),
                                 style: FilledButton.styleFrom(
-                                  backgroundColor: AppConfig.danger,
+                                  backgroundColor: AppColors.error,
                                   foregroundColor: Colors.white,
                                 ),
                                 icon: const Icon(
@@ -353,7 +353,7 @@ class _OmnichannelCallPageState extends State<OmnichannelCallPage>
                                         ),
                                       ),
                                 style: FilledButton.styleFrom(
-                                  backgroundColor: AppConfig.danger,
+                                  backgroundColor: AppColors.error,
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 18,
@@ -579,7 +579,7 @@ class _MediaStatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusColor = mediaSnapshot.supportsRealtimeVoice
-        ? AppConfig.success
+        ? AppColors.success
         : const Color(0xFFE0B24A);
 
     return Container(

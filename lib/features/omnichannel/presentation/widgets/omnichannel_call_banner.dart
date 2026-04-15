@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/omnichannel_call_session_model.dart';
 import '../utils/omnichannel_call_status_ui.dart';
 import 'omnichannel_call_status_chip.dart';
@@ -87,7 +87,7 @@ class OmnichannelCallBanner extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 12,
                     height: 1.35,
-                    color: AppConfig.mutedText,
+                    color: AppColors.neutral500,
                   ),
                 ),
                 if (isFallbackMode) ...<Widget>[
@@ -101,7 +101,7 @@ class OmnichannelCallBanner extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: AppConfig.mutedText,
+                      color: AppColors.neutral500,
                     ),
                   ),
                 ],
@@ -121,7 +121,7 @@ class OmnichannelCallBanner extends StatelessWidget {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(999),
                           border: Border.all(
-                            color: AppConfig.softBackgroundAlt,
+                            color: AppColors.borderLight,
                           ),
                         ),
                         child: Text(
@@ -129,7 +129,7 @@ class OmnichannelCallBanner extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: AppConfig.mutedText,
+                            color: AppColors.neutral500,
                           ),
                         ),
                       ),
@@ -183,7 +183,7 @@ class OmnichannelCallBanner extends StatelessWidget {
                       : const Icon(Icons.call_end_rounded, size: 18),
                   label: const Text('Akhiri'),
                   style: TextButton.styleFrom(
-                    foregroundColor: AppConfig.danger,
+                    foregroundColor: AppColors.error,
                   ),
                 ),
               ],

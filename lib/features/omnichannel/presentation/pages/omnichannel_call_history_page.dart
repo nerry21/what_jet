@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/network/api_client.dart';
 import '../../data/models/omnichannel_call_history_item_model.dart';
 import '../../data/repositories/omnichannel_repository.dart';
@@ -111,7 +111,7 @@ class _OmnichannelCallHistoryPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConfig.softBackground,
+      backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
         title: const Text('Riwayat Panggilan'),
         actions: <Widget>[
@@ -144,7 +144,7 @@ class _OmnichannelCallHistoryPageState
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.45,
-                  color: AppConfig.mutedText,
+                  color: AppColors.neutral500,
                 ),
               ),
               const SizedBox(height: 16),
@@ -180,20 +180,20 @@ class _OmnichannelCallHistoryPageState
                                     );
                                     unawaited(_loadHistory());
                                   },
-                            selectedColor: AppConfig.green.withValues(
+                            selectedColor: AppColors.primary.withValues(
                               alpha: 0.14,
                             ),
                             backgroundColor: Colors.white,
                             side: BorderSide(
                               color: selected
-                                  ? AppConfig.green.withValues(alpha: 0.28)
-                                  : AppConfig.softBackgroundAlt,
+                                  ? AppColors.primary.withValues(alpha: 0.28)
+                                  : AppColors.borderLight,
                             ),
                             labelStyle: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                               color: selected
-                                  ? AppConfig.green
+                                  ? AppColors.primary
                                   : Colors.black87,
                             ),
                           );
@@ -206,7 +206,7 @@ class _OmnichannelCallHistoryPageState
                           margin: const EdgeInsets.only(bottom: 12),
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppConfig.danger.withValues(alpha: 0.08),
+                            color: AppColors.error.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Row(
@@ -214,7 +214,7 @@ class _OmnichannelCallHistoryPageState
                               const Icon(
                                 Icons.error_outline_rounded,
                                 size: 16,
-                                color: AppConfig.danger,
+                                color: AppColors.error,
                               ),
                               const SizedBox(width: 8),
                               Expanded(
@@ -222,7 +222,7 @@ class _OmnichannelCallHistoryPageState
                                   _errorMessage!,
                                   style: const TextStyle(
                                     fontSize: 12,
-                                    color: AppConfig.danger,
+                                    color: AppColors.error,
                                   ),
                                 ),
                               ),
@@ -254,7 +254,7 @@ class _OmnichannelCallHistoryPageState
             const Icon(
               Icons.call_made_rounded,
               size: 34,
-              color: AppConfig.subtleText,
+              color: AppColors.neutral300,
             ),
             const SizedBox(height: 12),
             const Text(
@@ -274,7 +274,7 @@ class _OmnichannelCallHistoryPageState
               style: const TextStyle(
                 fontSize: 13,
                 height: 1.45,
-                color: AppConfig.mutedText,
+                color: AppColors.neutral500,
               ),
             ),
           ],
@@ -292,9 +292,9 @@ class _OmnichannelCallHistoryPageState
         return Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: AppConfig.softBackground,
+            color: AppColors.scaffoldBackground,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: AppConfig.softBackgroundAlt),
+            border: Border.all(color: AppColors.borderLight),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,7 +343,7 @@ class _OmnichannelCallHistoryPageState
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: AppConfig.green,
+                            color: AppColors.primary,
                           ),
                         ),
                       ],
@@ -359,7 +359,7 @@ class _OmnichannelCallHistoryPageState
                       style: const TextStyle(
                         fontSize: 12,
                         height: 1.4,
-                        color: AppConfig.mutedText,
+                        color: AppColors.neutral500,
                       ),
                     ),
                     if (item.waCallId?.trim().isNotEmpty ?? false) ...<Widget>[
@@ -368,7 +368,7 @@ class _OmnichannelCallHistoryPageState
                         'WA Call ID: ${item.waCallId}',
                         style: const TextStyle(
                           fontSize: 11,
-                          color: AppConfig.subtleText,
+                          color: AppColors.neutral300,
                         ),
                       ),
                     ],

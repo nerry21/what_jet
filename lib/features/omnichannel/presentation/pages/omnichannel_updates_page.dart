@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:record/record.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/omnichannel_status_update_model.dart';
 import '../../data/repositories/omnichannel_repository.dart';
 
@@ -619,7 +619,7 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
                   child: Text(
                     _formatDate(item.postedAt),
                     style: const TextStyle(
-                      color: AppConfig.mutedText,
+                      color: AppColors.neutral500,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                     ),
@@ -628,13 +628,13 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
                 const Icon(
                   Icons.visibility_outlined,
                   size: 18,
-                  color: AppConfig.mutedText,
+                  color: AppColors.neutral500,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   '${item.viewCount}',
                   style: const TextStyle(
-                    color: AppConfig.mutedText,
+                    color: AppColors.neutral500,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -660,7 +660,7 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Icon(icon, size: 44, color: AppConfig.green),
+          Icon(icon, size: 44, color: AppColors.primary),
           const SizedBox(height: 10),
           Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
         ],
@@ -760,7 +760,7 @@ class _ComposerActionCard extends StatelessWidget {
             ),
             child: Column(
               children: <Widget>[
-                Icon(icon, size: 30, color: AppConfig.green),
+                Icon(icon, size: 30, color: AppColors.primary),
                 const SizedBox(height: 10),
                 Text(
                   label,

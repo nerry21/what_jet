@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/storage/token_storage.dart';
 import '../../data/models/conversation_model.dart';
@@ -142,7 +143,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConfig.softBackground,
+      backgroundColor: AppColors.scaffoldBackground,
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -151,8 +152,8 @@ class _LiveChatPageState extends State<LiveChatPage> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: <Color>[
-              AppConfig.softBackground,
-              AppConfig.softBackgroundAlt,
+              AppColors.scaffoldBackground,
+              AppColors.borderLight,
             ],
           ),
         ),
@@ -167,7 +168,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
 
               if (_controller.isInitializing && !hasShellData) {
                 return const Center(
-                  child: CircularProgressIndicator(color: AppConfig.green),
+                  child: CircularProgressIndicator(color: AppColors.primary),
                 );
               }
 
@@ -297,10 +298,10 @@ class _LiveChatPageState extends State<LiveChatPage> {
                     : 'Retry',
                 foregroundColor: _controller.isOffline
                     ? const Color(0xFF9A6700)
-                    : AppConfig.danger,
+                    : AppColors.error,
                 backgroundColor: _controller.isOffline
                     ? const Color(0xFFFFF4E5)
-                    : AppConfig.danger.withValues(alpha: 0.08),
+                    : AppColors.error.withValues(alpha: 0.08),
                 onTap: () => _controller.reconnectSession(
                   clearSession: _controller.isUnauthorized,
                 ),
@@ -311,7 +312,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
           const Divider(height: 1),
           Expanded(
             child: RefreshIndicator(
-              color: AppConfig.green,
+              color: AppColors.primary,
               onRefresh: _controller.refresh,
               child: conversations.isEmpty
                   ? ListView(
@@ -430,7 +431,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
                         onPressed: () => Navigator.of(context).pop(null),
                         icon: const Icon(
                           Icons.close,
-                          color: AppConfig.mutedText,
+                          color: AppColors.neutral500,
                         ),
                       ),
                     ],
@@ -441,7 +442,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
                     style: TextStyle(
                       fontSize: 14,
                       height: 1.5,
-                      color: AppConfig.mutedText,
+                      color: AppColors.neutral500,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -460,8 +461,8 @@ class _LiveChatPageState extends State<LiveChatPage> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: <Color>[
-                            AppConfig.green,
-                            AppConfig.greenLight,
+                            AppColors.primary,
+                            AppColors.primary200,
                           ],
                         ),
                         borderRadius: BorderRadius.circular(12),
@@ -572,7 +573,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
         content: Text(message),
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-        backgroundColor: isError ? AppConfig.danger : AppConfig.success,
+        backgroundColor: isError ? AppColors.error : AppColors.success,
       ),
     );
   }
@@ -599,7 +600,7 @@ class _SidebarHeader extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: <Color>[AppConfig.green, AppConfig.green],
+          colors: <Color>[AppColors.primary, AppColors.primary],
         ),
       ),
       child: Row(
@@ -658,9 +659,9 @@ class _SearchInput extends StatelessWidget {
       child: TextField(
         controller: controller,
         decoration: const InputDecoration(
-          prefixIcon: Icon(Icons.search, color: AppConfig.subtleText),
+          prefixIcon: Icon(Icons.search, color: AppColors.neutral300),
           hintText: 'Cari chat atau status',
-          hintStyle: TextStyle(color: AppConfig.subtleText),
+          hintStyle: TextStyle(color: AppColors.neutral300),
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
@@ -714,7 +715,7 @@ class _FilterChipButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: active
-                ? AppConfig.green.withValues(alpha: 0.12)
+                ? AppColors.primary.withValues(alpha: 0.12)
                 : const Color(0xFFF0F0F0),
             borderRadius: BorderRadius.circular(999),
           ),
@@ -723,7 +724,7 @@ class _FilterChipButton extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: active ? AppConfig.green : AppConfig.mutedText,
+              color: active ? AppColors.primary : AppColors.neutral500,
             ),
           ),
         ),
@@ -800,18 +801,18 @@ class _SidebarEmptyState extends StatelessWidget {
             width: 78,
             height: 78,
             decoration: BoxDecoration(
-              color: AppConfig.green.withValues(alpha: 0.12),
+              color: AppColors.primary.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: isLoading
                 ? const Padding(
                     padding: EdgeInsets.all(20),
-                    child: CircularProgressIndicator(color: AppConfig.green),
+                    child: CircularProgressIndicator(color: AppColors.primary),
                   )
                 : const Icon(
                     Icons.chat_bubble_outline_rounded,
                     size: 34,
-                    color: AppConfig.green,
+                    color: AppColors.primary,
                   ),
           ),
           const SizedBox(height: 18),
@@ -831,7 +832,7 @@ class _SidebarEmptyState extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               height: 1.5,
-              color: AppConfig.mutedText,
+              color: AppColors.neutral500,
             ),
           ),
           const SizedBox(height: 18),
@@ -840,7 +841,7 @@ class _SidebarEmptyState extends StatelessWidget {
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: <Color>[AppConfig.green, AppConfig.greenLight],
+                colors: <Color>[AppColors.primary, AppColors.primary200],
               ),
               borderRadius: BorderRadius.circular(12),
             ),
@@ -880,13 +881,13 @@ class _DesktopPlaceholder extends StatelessWidget {
                 width: 84,
                 height: 84,
                 decoration: BoxDecoration(
-                  color: AppConfig.green.withValues(alpha: 0.12),
+                  color: AppColors.primary.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.message_outlined,
                   size: 36,
-                  color: AppConfig.green,
+                  color: AppColors.primary,
                 ),
               ),
               const SizedBox(height: 20),
@@ -905,7 +906,7 @@ class _DesktopPlaceholder extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.5,
-                  color: AppConfig.mutedText,
+                  color: AppColors.neutral500,
                 ),
               ),
             ],
@@ -958,7 +959,7 @@ class _ShellErrorState extends StatelessWidget {
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: <Color>[AppConfig.green, AppConfig.greenLight],
+                      colors: <Color>[AppColors.primary, AppColors.primary200],
                     ),
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(24),
@@ -996,13 +997,13 @@ class _ShellErrorState extends StatelessWidget {
                         width: 72,
                         height: 72,
                         decoration: BoxDecoration(
-                          color: AppConfig.danger.withValues(alpha: 0.08),
+                          color: AppColors.error.withValues(alpha: 0.08),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Icons.wifi_off_rounded,
                           size: 32,
-                          color: AppConfig.danger,
+                          color: AppColors.error,
                         ),
                       ),
                       const SizedBox(height: 18),
@@ -1022,7 +1023,7 @@ class _ShellErrorState extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 14,
                           height: 1.5,
-                          color: AppConfig.mutedText,
+                          color: AppColors.neutral500,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -1034,8 +1035,8 @@ class _ShellErrorState extends StatelessWidget {
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: <Color>[
-                                AppConfig.green,
-                                AppConfig.greenLight,
+                                AppColors.primary,
+                                AppColors.primary200,
                               ],
                             ),
                             borderRadius: BorderRadius.circular(14),
@@ -1104,7 +1105,7 @@ class _GreyInput extends StatelessWidget {
         maxLines: maxLines,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: const TextStyle(color: AppConfig.subtleText),
+          hintStyle: const TextStyle(color: AppColors.neutral300),
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(
             horizontal: 16,

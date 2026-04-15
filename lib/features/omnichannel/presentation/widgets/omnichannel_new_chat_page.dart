@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/omnichannel_conversation_list_model.dart';
 
 class OmnichannelNewChatPage extends StatefulWidget {
@@ -603,7 +603,7 @@ class _OutlinedField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppConfig.green, width: 1.4),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.4),
         ),
       ),
     );
@@ -683,7 +683,7 @@ class _NewChatActionTile extends StatelessWidget {
               width: 38,
               height: 38,
               decoration: const BoxDecoration(
-                color: AppConfig.green,
+                color: AppColors.primary,
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: Colors.white, size: 21),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/omnichannel_call_history_item_model.dart';
 import '../utils/omnichannel_call_status_ui.dart';
 import 'omnichannel_surface.dart';
@@ -46,7 +46,7 @@ class OmnichannelCallHistorySection extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 height: 1.45,
-                color: AppConfig.subtleText,
+                color: AppColors.neutral300,
               ),
             )
           else
@@ -76,7 +76,7 @@ class _HistorySummaryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppConfig.softBackgroundAlt),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +89,7 @@ class _HistorySummaryCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: AppConfig.mutedText,
+                    color: AppColors.neutral500,
                   ),
                 ),
               ),
@@ -156,7 +156,7 @@ class _HistoryRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppConfig.softBackgroundAlt),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,7 +205,7 @@ class _HistoryRow extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 11,
                     height: 1.4,
-                    color: AppConfig.mutedText,
+                    color: AppColors.neutral500,
                   ),
                 ),
               ],
@@ -228,7 +228,7 @@ class _MetaPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: AppConfig.softBackground,
+        color: AppColors.scaffoldBackground,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -239,7 +239,7 @@ class _MetaPill extends StatelessWidget {
             style: const TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: AppConfig.subtleText,
+              color: AppColors.neutral300,
             ),
           ),
           const SizedBox(height: 3),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/conversation_model.dart';
 import 'channel_badge.dart';
 
@@ -33,7 +33,7 @@ class ChatListTile extends StatelessWidget {
           border: Border(
             bottom: const BorderSide(color: Color(0xFFF5F5F5)),
             left: selected
-                ? const BorderSide(color: AppConfig.green, width: 4)
+                ? const BorderSide(color: AppColors.primary, width: 4)
                 : BorderSide.none,
           ),
         ),
@@ -74,7 +74,7 @@ class ChatListTile extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontSize: 13,
-                            color: AppConfig.mutedText,
+                            color: AppColors.neutral500,
                           ),
                         ),
                       ),
@@ -85,7 +85,7 @@ class ChatListTile extends StatelessWidget {
                           height: 20,
                           alignment: Alignment.center,
                           decoration: const BoxDecoration(
-                            color: AppConfig.green,
+                            color: AppColors.primary,
                             shape: BoxShape.circle,
                           ),
                           child: Text(
@@ -106,7 +106,7 @@ class ChatListTile extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               timeLabel,
-              style: const TextStyle(fontSize: 12, color: AppConfig.subtleText),
+              style: const TextStyle(fontSize: 12, color: AppColors.neutral300),
             ),
           ],
         ),
@@ -136,11 +136,11 @@ class _AvatarBubble extends StatelessWidget {
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: <Color>[AppConfig.green, AppConfig.greenLight],
+                colors: <Color>[AppColors.primary, AppColors.primary200],
               ),
               boxShadow: <BoxShadow>[
                 BoxShadow(
-                  color: AppConfig.green.withValues(alpha: 0.22),
+                  color: AppColors.primary.withValues(alpha: 0.22),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -163,7 +163,7 @@ class _AvatarBubble extends StatelessWidget {
               width: 14,
               height: 14,
               decoration: BoxDecoration(
-                color: AppConfig.success,
+                color: AppColors.success,
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 3),
                 boxShadow: const <BoxShadow>[

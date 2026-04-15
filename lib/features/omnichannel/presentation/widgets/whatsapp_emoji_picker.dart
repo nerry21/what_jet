@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 
 Future<void> showWhatsAppEmojiPicker({
   required BuildContext context,
@@ -81,13 +81,13 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
                     onPressed: widget.onBackspacePressed,
                     icon: const Icon(
                       Icons.backspace_outlined,
-                      color: AppConfig.mutedText,
+                      color: AppColors.neutral500,
                     ),
                   ),
                   IconButton(
                     tooltip: 'Tutup',
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close, color: AppConfig.mutedText),
+                    icon: const Icon(Icons.close, color: AppColors.neutral500),
                   ),
                 ],
               ),
@@ -110,7 +110,7 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: AppConfig.subtleText,
+                      color: AppColors.neutral300,
                     ),
                   ),
                 ],
@@ -128,7 +128,7 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
 
                   return Material(
                     color: isSelected
-                        ? AppConfig.green.withValues(alpha: 0.12)
+                        ? AppColors.primary.withValues(alpha: 0.12)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(16),
                     child: InkWell(
@@ -144,8 +144,8 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
                           category.icon,
                           size: 20,
                           color: isSelected
-                              ? AppConfig.green
-                              : AppConfig.mutedText,
+                              ? AppColors.primary
+                              : AppColors.neutral500,
                         ),
                       ),
                     ),

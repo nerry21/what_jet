@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class OmnichannelPaneCard extends StatelessWidget {
   const OmnichannelPaneCard({
@@ -21,7 +21,7 @@ class OmnichannelPaneCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: AppConfig.softBackgroundAlt.withValues(alpha: 0.9),
+          color: AppColors.borderLight.withValues(alpha: 0.9),
         ),
         boxShadow: <BoxShadow>[
           BoxShadow(
@@ -54,10 +54,10 @@ class OmnichannelSectionCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppConfig.softBackground.withValues(alpha: 0.7),
+        color: AppColors.scaffoldBackground.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppConfig.softBackgroundAlt.withValues(alpha: 0.85),
+          color: AppColors.borderLight.withValues(alpha: 0.85),
         ),
       ),
       child: Column(
@@ -71,7 +71,7 @@ class OmnichannelSectionCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: AppConfig.mutedText,
+                    color: AppColors.neutral500,
                   ),
                 ),
               ),
@@ -102,12 +102,12 @@ class OmnichannelInlineBanner extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppConfig.danger.withValues(alpha: 0.08),
+        color: AppColors.error.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: <Widget>[
-          const Icon(Icons.error_outline, color: AppConfig.danger),
+          const Icon(Icons.error_outline, color: AppColors.error),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -115,7 +115,7 @@ class OmnichannelInlineBanner extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 13,
                 height: 1.4,
-                color: AppConfig.danger,
+                color: AppColors.error,
               ),
             ),
           ),
@@ -153,10 +153,10 @@ class OmnichannelEmptyState extends StatelessWidget {
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color: AppConfig.green.withValues(alpha: 0.12),
+                color: AppColors.primary.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 32, color: AppConfig.green),
+              child: Icon(icon, size: 32, color: AppColors.primary),
             ),
             const SizedBox(height: 16),
             Text(
@@ -175,7 +175,7 @@ class OmnichannelEmptyState extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 14,
                 height: 1.5,
-                color: AppConfig.mutedText,
+                color: AppColors.neutral500,
               ),
             ),
           ],
@@ -213,13 +213,13 @@ class OmnichannelErrorState extends StatelessWidget {
                   width: 72,
                   height: 72,
                   decoration: BoxDecoration(
-                    color: AppConfig.danger.withValues(alpha: 0.08),
+                    color: AppColors.error.withValues(alpha: 0.08),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.wifi_off_rounded,
                     size: 32,
-                    color: AppConfig.danger,
+                    color: AppColors.error,
                   ),
                 ),
                 const SizedBox(height: 18),
@@ -239,7 +239,7 @@ class OmnichannelErrorState extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     height: 1.5,
-                    color: AppConfig.mutedText,
+                    color: AppColors.neutral500,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -250,7 +250,7 @@ class OmnichannelErrorState extends StatelessWidget {
                       gradient: const LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: <Color>[AppConfig.green, AppConfig.greenLight],
+                        colors: <Color>[AppColors.primary, AppColors.primary200],
                       ),
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -294,7 +294,7 @@ class OmnichannelSkeletonBlock extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: AppConfig.softBackgroundAlt.withValues(alpha: 0.9),
+        color: AppColors.borderLight.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(radius),
       ),
     );

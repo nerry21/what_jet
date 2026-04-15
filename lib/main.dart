@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'core/config/app_config.dart';
 import 'core/network/api_client.dart';
+import 'core/theme/app_theme.dart';
 import 'core/routing/app_routes.dart';
 import 'core/storage/admin_token_storage.dart';
 import 'features/admin_auth/data/models/admin_user_model.dart';
@@ -162,7 +163,7 @@ class _WhatsJetAppState extends State<WhatsJetApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: AppConfig.appTitle,
-      theme: AppConfig.theme(),
+      theme: AppTheme.light(),
       initialRoute: _initialRoute,
       onGenerateRoute: _onGenerateRoute,
     );

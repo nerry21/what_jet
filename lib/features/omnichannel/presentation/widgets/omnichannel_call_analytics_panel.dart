@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/omnichannel_call_analytics_summary_model.dart';
 import '../../data/models/omnichannel_call_daily_trend_item_model.dart';
 import '../../data/models/omnichannel_call_history_item_model.dart';
@@ -89,17 +89,17 @@ class _SummaryGrid extends StatelessWidget {
       _SummaryTileData(
         label: 'Completed',
         value: '${summary.completedCalls}',
-        color: AppConfig.success,
+        color: AppColors.success,
       ),
       _SummaryTileData(
         label: 'Missed',
         value: '${summary.missedCalls}',
-        color: AppConfig.mutedText,
+        color: AppColors.neutral500,
       ),
       _SummaryTileData(
         label: 'Rejected',
         value: '${summary.rejectedCalls}',
-        color: AppConfig.danger,
+        color: AppColors.error,
       ),
       _SummaryTileData(
         label: 'Failed',
@@ -109,7 +109,7 @@ class _SummaryGrid extends StatelessWidget {
       _SummaryTileData(
         label: 'Rata-rata',
         value: summary.averageDurationHuman,
-        color: AppConfig.green,
+        color: AppColors.primary,
       ),
     ];
 
@@ -147,7 +147,7 @@ class _SummaryTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppConfig.softBackgroundAlt),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,7 +157,7 @@ class _SummaryTile extends StatelessWidget {
             style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: AppConfig.subtleText,
+              color: AppColors.neutral300,
             ),
           ),
           const SizedBox(height: 6),
@@ -191,7 +191,7 @@ class _OutcomeBreakdown extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
-            color: AppConfig.mutedText,
+            color: AppColors.neutral500,
           ),
         ),
         const SizedBox(height: 10),
@@ -200,14 +200,14 @@ class _OutcomeBreakdown extends StatelessWidget {
           style: const TextStyle(
             fontSize: 12,
             height: 1.4,
-            color: AppConfig.subtleText,
+            color: AppColors.neutral300,
           ),
         ),
         const SizedBox(height: 12),
         if (items.isEmpty)
           const Text(
             'Breakdown panggilan belum tersedia.',
-            style: TextStyle(fontSize: 12, color: AppConfig.subtleText),
+            style: TextStyle(fontSize: 12, color: AppColors.neutral300),
           )
         else
           Column(
@@ -262,7 +262,7 @@ class _OutcomeRow extends StatelessWidget {
                 '${item.percentage.toStringAsFixed(1)}%',
                 style: const TextStyle(
                   fontSize: 11,
-                  color: AppConfig.subtleText,
+                  color: AppColors.neutral300,
                 ),
               ),
             ],
@@ -274,7 +274,7 @@ class _OutcomeRow extends StatelessWidget {
               minHeight: 6,
               value: ((item.percentage / 100).clamp(0, 1)).toDouble(),
               color: color,
-              backgroundColor: AppConfig.softBackgroundAlt,
+              backgroundColor: AppColors.borderLight,
             ),
           ),
         ],
@@ -302,14 +302,14 @@ class _DailyTrendSection extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
-            color: AppConfig.mutedText,
+            color: AppColors.neutral500,
           ),
         ),
         const SizedBox(height: 10),
         if (visibleItems.isEmpty)
           const Text(
             'Trend panggilan harian belum tersedia.',
-            style: TextStyle(fontSize: 12, color: AppConfig.subtleText),
+            style: TextStyle(fontSize: 12, color: AppColors.neutral300),
           )
         else
           Column(
@@ -345,14 +345,14 @@ class _DailyTrendRow extends StatelessWidget {
           ),
           Text(
             '${item.totalCalls} call',
-            style: const TextStyle(fontSize: 12, color: AppConfig.mutedText),
+            style: const TextStyle(fontSize: 12, color: AppColors.neutral500),
           ),
           const SizedBox(width: 10),
           Text(
             omnichannelCallDurationText(
               durationSeconds: item.totalDurationSeconds,
             ),
-            style: const TextStyle(fontSize: 11, color: AppConfig.subtleText),
+            style: const TextStyle(fontSize: 11, color: AppColors.neutral300),
           ),
         ],
       ),
@@ -376,14 +376,14 @@ class _RecentCallsSection extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
-            color: AppConfig.mutedText,
+            color: AppColors.neutral500,
           ),
         ),
         const SizedBox(height: 10),
         if (items.isEmpty)
           const Text(
             'Belum ada panggilan terbaru untuk ditampilkan.',
-            style: TextStyle(fontSize: 12, color: AppConfig.subtleText),
+            style: TextStyle(fontSize: 12, color: AppColors.neutral300),
           )
         else
           Column(
@@ -417,7 +417,7 @@ class _RecentCallRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppConfig.softBackgroundAlt),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -460,7 +460,7 @@ class _RecentCallRow extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             item.customerContact,
-            style: const TextStyle(fontSize: 11, color: AppConfig.subtleText),
+            style: const TextStyle(fontSize: 11, color: AppColors.neutral300),
           ),
           const SizedBox(height: 8),
           Text(
@@ -471,7 +471,7 @@ class _RecentCallRow extends StatelessWidget {
                 durationHuman: item.durationHuman,
               ),
             ].join(' | '),
-            style: const TextStyle(fontSize: 11, color: AppConfig.mutedText),
+            style: const TextStyle(fontSize: 11, color: AppColors.neutral500),
           ),
           if (item.conversationId != null &&
               onOpenConversation != null) ...<Widget>[
@@ -483,7 +483,7 @@ class _RecentCallRow extends StatelessWidget {
                 icon: const Icon(Icons.open_in_new_rounded, size: 16),
                 label: const Text('Buka chat'),
                 style: TextButton.styleFrom(
-                  foregroundColor: AppConfig.green,
+                  foregroundColor: AppColors.primary,
                   padding: EdgeInsets.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   minimumSize: const Size(0, 0),
@@ -510,7 +510,7 @@ class _CapabilityCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppConfig.softBackgroundAlt),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -520,7 +520,7 @@ class _CapabilityCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: AppConfig.mutedText,
+              color: AppColors.neutral500,
             ),
           ),
           const SizedBox(height: 8),
@@ -531,7 +531,7 @@ class _CapabilityCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 12,
               height: 1.45,
-              color: AppConfig.subtleText,
+              color: AppColors.neutral300,
             ),
           ),
           const SizedBox(height: 10),
@@ -575,7 +575,7 @@ class _CapabilityChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = enabled ? AppConfig.success : AppConfig.subtleText;
+    final color = enabled ? AppColors.success : AppColors.neutral300;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -607,7 +607,7 @@ class _PanelNotice extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppConfig.danger.withValues(alpha: 0.08),
+        color: AppColors.error.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -618,7 +618,7 @@ class _PanelNotice extends StatelessWidget {
             child: Icon(
               Icons.error_outline_rounded,
               size: 16,
-              color: AppConfig.danger,
+              color: AppColors.error,
             ),
           ),
           const SizedBox(width: 8),
@@ -628,7 +628,7 @@ class _PanelNotice extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 12,
                 height: 1.4,
-                color: AppConfig.danger,
+                color: AppColors.error,
               ),
             ),
           ),
@@ -660,7 +660,7 @@ class _AnalyticsEmptyState extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             height: 1.45,
-            color: AppConfig.subtleText,
+            color: AppColors.neutral300,
           ),
         ),
         if (onRetry != null) ...<Widget>[
@@ -700,7 +700,7 @@ class _AnalyticsSkeleton extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppConfig.softBackgroundAlt),
+                border: Border.all(color: AppColors.borderLight),
               ),
               child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

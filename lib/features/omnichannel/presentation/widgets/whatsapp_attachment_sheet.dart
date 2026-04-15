@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 
 Future<void> showWhatsAppAttachmentSheet({
   required BuildContext context,
@@ -197,7 +197,7 @@ class _AttachmentActionTile extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: AppConfig.mutedText,
+                color: AppColors.neutral500,
               ),
             ),
           ],

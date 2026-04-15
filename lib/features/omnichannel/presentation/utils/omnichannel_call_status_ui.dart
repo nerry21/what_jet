@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/omnichannel_call_session_model.dart';
 import '../../data/models/omnichannel_call_timeline_item_model.dart';
 
@@ -162,11 +162,11 @@ Color omnichannelCallOutcomeColor(String? finalStatus) {
   final normalized = _normalizeToken(finalStatus);
 
   return switch (normalized) {
-    'completed' => AppConfig.success,
-    'missed' || 'cancelled' => AppConfig.mutedText,
-    'rejected' || 'failed' => AppConfig.danger,
+    'completed' => AppColors.success,
+    'missed' || 'cancelled' => AppColors.neutral500,
+    'rejected' || 'failed' => AppColors.error,
     'permission_pending' => const Color(0xFFAF7E00),
-    _ => AppConfig.green,
+    _ => AppColors.primary,
   };
 }
 
@@ -186,15 +186,15 @@ IconData omnichannelCallOutcomeIcon(String? finalStatus) {
 
 Color omnichannelCallStatusColor(OmnichannelCallSessionModel? session) {
   if (session == null) {
-    return AppConfig.mutedText;
+    return AppColors.neutral500;
   }
 
   if (session.isConnected) {
-    return AppConfig.success;
+    return AppColors.success;
   }
 
   if (session.isFailed || session.isRejected) {
-    return AppConfig.danger;
+    return AppColors.error;
   }
 
   if (session.isPermissionRequested || session.requiresPermission) {
@@ -202,14 +202,14 @@ Color omnichannelCallStatusColor(OmnichannelCallSessionModel? session) {
   }
 
   if (session.isRinging || session.isInitiatedLike) {
-    return AppConfig.green;
+    return AppColors.primary;
   }
 
   if (session.isEnded || session.isMissed) {
-    return AppConfig.mutedText;
+    return AppColors.neutral500;
   }
 
-  return AppConfig.green;
+  return AppColors.primary;
 }
 
 IconData omnichannelCallStatusIcon(OmnichannelCallSessionModel? session) {
@@ -310,11 +310,11 @@ Color omnichannelCallTimelineColor(OmnichannelCallTimelineItemModel item) {
   final event = _normalizeToken(item.event) ?? _normalizeToken(item.status);
 
   return switch (event) {
-    'connected' || 'permission_granted' => AppConfig.success,
-    'failed' || 'rejected' => AppConfig.danger,
-    'missed' || 'ended' => AppConfig.mutedText,
+    'connected' || 'permission_granted' => AppColors.success,
+    'failed' || 'rejected' => AppColors.error,
+    'missed' || 'ended' => AppColors.neutral500,
     'permission_requested' => const Color(0xFFAF7E00),
-    _ => AppConfig.green,
+    _ => AppColors.primary,
   };
 }
 

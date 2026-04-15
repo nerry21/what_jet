@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/omnichannel_call_session_model.dart';
 import '../../data/models/omnichannel_call_timeline_item_model.dart';
 import '../utils/omnichannel_call_status_ui.dart';
@@ -33,11 +33,11 @@ class OmnichannelCallTimelineSection extends StatelessWidget {
         : Colors.white;
     final borderColor = dark
         ? Colors.white.withValues(alpha: 0.08)
-        : AppConfig.softBackgroundAlt;
+        : AppColors.borderLight;
     final titleColor = dark ? Colors.white : Colors.black87;
     final subtitleColor = dark
         ? const Color(0xFFB8C7C2)
-        : AppConfig.mutedText;
+        : AppColors.neutral500;
     final visibleItems = items.length > maxItems
         ? items.sublist(items.length - maxItems)
         : items;
@@ -100,7 +100,7 @@ class OmnichannelCallTimelineSection extends StatelessWidget {
                         width: 1.5,
                         color: dark
                             ? Colors.white.withValues(alpha: 0.12)
-                            : AppConfig.softBackgroundAlt,
+                            : AppColors.borderLight,
                       ),
                     ),
                 ],
@@ -127,14 +127,14 @@ class _CallSummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final surface = dark
         ? Colors.white.withValues(alpha: 0.06)
-        : AppConfig.softBackground;
+        : AppColors.scaffoldBackground;
     final border = dark
         ? Colors.white.withValues(alpha: 0.08)
-        : AppConfig.softBackgroundAlt;
+        : AppColors.borderLight;
     final titleColor = dark ? Colors.white : Colors.black87;
     final detailColor = dark
         ? const Color(0xFFB8C7C2)
-        : AppConfig.mutedText;
+        : AppColors.neutral500;
 
     return Container(
       width: double.infinity,
@@ -178,7 +178,7 @@ class _TimelineRow extends StatelessWidget {
     final labelColor = dark ? Colors.white : Colors.black87;
     final detailColor = dark
         ? const Color(0xFFB8C7C2)
-        : AppConfig.mutedText;
+        : AppColors.neutral500;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,

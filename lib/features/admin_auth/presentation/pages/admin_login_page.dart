@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../../../core/routing/app_routes.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/repositories/admin_auth_repository.dart';
 import '../controllers/admin_auth_controller.dart';
 
@@ -83,7 +84,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConfig.softBackground,
+      backgroundColor: AppColors.scaffoldBackground,
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -92,8 +93,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: <Color>[
-              AppConfig.softBackground,
-              AppConfig.softBackgroundAlt,
+              AppColors.scaffoldBackground,
+              AppColors.borderLight,
             ],
           ),
         ),
@@ -132,8 +133,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: <Color>[
-                                  AppConfig.green,
-                                  AppConfig.greenLight,
+                                  AppColors.primary,
+                                  AppColors.primary200,
                                 ],
                               ),
                               borderRadius: BorderRadius.vertical(
@@ -207,7 +208,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                                       _obscurePassword
                                           ? Icons.visibility_outlined
                                           : Icons.visibility_off_outlined,
-                                      color: AppConfig.mutedText,
+                                      color: AppColors.neutral500,
                                     ),
                                   ),
                                 ),
@@ -220,8 +221,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                         colors: <Color>[
-                                          AppConfig.green,
-                                          AppConfig.greenLight,
+                                          AppColors.primary,
+                                          AppColors.primary200,
                                         ],
                                       ),
                                       borderRadius: BorderRadius.circular(14),
@@ -261,7 +262,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                                   'API Base URL: ${AppConfig.baseUrl}',
                                   style: const TextStyle(
                                     fontSize: 12,
-                                    color: AppConfig.subtleText,
+                                    color: AppColors.neutral300,
                                   ),
                                 ),
                               ],
@@ -287,7 +288,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         content: Text(message),
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-        backgroundColor: isError ? AppConfig.danger : AppConfig.success,
+        backgroundColor: isError ? AppColors.error : AppColors.success,
       ),
     );
   }
@@ -308,10 +309,10 @@ class _AdminAuthBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final foregroundColor = isOffline
         ? const Color(0xFF9A6700)
-        : AppConfig.danger;
+        : AppColors.error;
     final backgroundColor = isOffline
         ? const Color(0xFFFFF4E5)
-        : AppConfig.danger.withValues(alpha: 0.08);
+        : AppColors.error.withValues(alpha: 0.08);
 
     return Container(
       width: double.infinity,
@@ -397,7 +398,7 @@ class _AdminInput extends StatelessWidget {
         onSubmitted: onSubmitted,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: const TextStyle(color: AppConfig.subtleText),
+          hintStyle: const TextStyle(color: AppColors.neutral300),
           border: InputBorder.none,
           suffixIcon: suffixIcon,
           contentPadding: const EdgeInsets.symmetric(

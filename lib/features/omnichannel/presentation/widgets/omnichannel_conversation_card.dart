@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../live_chat/presentation/widgets/channel_badge.dart';
 import '../../data/models/omnichannel_conversation_list_model.dart';
 import 'omnichannel_surface.dart';
@@ -31,13 +31,13 @@ class OmnichannelConversationCard extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: selected
-                ? AppConfig.green.withValues(alpha: 0.08)
-                : AppConfig.softBackground.withValues(alpha: 0.72),
+                ? AppColors.primary.withValues(alpha: 0.08)
+                : AppColors.scaffoldBackground.withValues(alpha: 0.72),
             borderRadius: BorderRadius.circular(22),
             border: Border.all(
               color: selected
-                  ? AppConfig.green.withValues(alpha: 0.28)
-                  : AppConfig.softBackgroundAlt.withValues(alpha: 0.9),
+                  ? AppColors.primary.withValues(alpha: 0.28)
+                  : AppColors.borderLight.withValues(alpha: 0.9),
             ),
           ),
           child: Column(
@@ -56,11 +56,11 @@ class OmnichannelConversationCard extends StatelessWidget {
                         end: Alignment.bottomRight,
                         colors: <Color>[
                           item.channel == 'mobile_live_chat'
-                              ? AppConfig.green
-                              : AppConfig.purple,
+                              ? AppColors.primary
+                              : AppColors.accent,
                           item.channel == 'mobile_live_chat'
-                              ? AppConfig.greenLight
-                              : AppConfig.purpleLight,
+                              ? AppColors.primary200
+                              : AppColors.accent200,
                         ],
                       ),
                     ),
@@ -96,7 +96,7 @@ class OmnichannelConversationCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontSize: 12,
-                            color: AppConfig.mutedText,
+                            color: AppColors.neutral500,
                           ),
                         ),
                       ],
@@ -111,8 +111,8 @@ class OmnichannelConversationCard extends StatelessWidget {
                           ? FontWeight.w700
                           : FontWeight.w500,
                       color: item.hasUnread
-                          ? AppConfig.green
-                          : AppConfig.subtleText,
+                          ? AppColors.primary
+                          : AppColors.neutral300,
                     ),
                   ),
                 ],
@@ -125,7 +125,7 @@ class OmnichannelConversationCard extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 13,
                   height: 1.45,
-                  color: AppConfig.mutedText,
+                  color: AppColors.neutral500,
                 ),
               ),
               const SizedBox(height: 12),
@@ -152,7 +152,7 @@ class OmnichannelConversationCard extends StatelessWidget {
                         vertical: 5,
                       ),
                       decoration: BoxDecoration(
-                        color: AppConfig.green,
+                        color: AppColors.primary,
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
@@ -204,10 +204,10 @@ class _MiniStatusChip extends StatelessWidget {
 Color _statusColor(String statusLabel) {
   final normalized = statusLabel.toLowerCase();
   if (normalized.contains('takeover') || normalized.contains('human')) {
-    return AppConfig.purple;
+    return AppColors.accent;
   }
 
-  return AppConfig.green;
+  return AppColors.primary;
 }
 
 String _safeInitial(String? value, {required String fallback}) {

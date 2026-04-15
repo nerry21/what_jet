@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class ChannelBadge extends StatelessWidget {
   const ChannelBadge({super.key, required this.channel, this.compact = false});
@@ -17,11 +17,11 @@ class ChannelBadge extends StatelessWidget {
         ? 'WhatsApp'
         : channel.replaceAll('_', ' ');
     final backgroundColor = isMobileLiveChat
-        ? AppConfig.green.withValues(alpha: 0.12)
-        : AppConfig.purple.withValues(alpha: 0.12);
+        ? AppColors.primary.withValues(alpha: 0.12)
+        : AppColors.accent.withValues(alpha: 0.12);
     final foregroundColor = isMobileLiveChat
-        ? AppConfig.green
-        : AppConfig.purple;
+        ? AppColors.primary
+        : AppColors.accent;
 
     return Container(
       padding: EdgeInsets.symmetric(

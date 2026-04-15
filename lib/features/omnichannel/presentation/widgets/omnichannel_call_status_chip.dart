@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/omnichannel_call_session_model.dart';
 import '../utils/omnichannel_call_status_ui.dart';
 
@@ -45,7 +45,7 @@ class OmnichannelCallStatusChip extends StatelessWidget {
             style: TextStyle(
               fontSize: compact ? 11 : 12,
               fontWeight: FontWeight.w700,
-              color: session == null ? AppConfig.mutedText : color,
+              color: session == null ? AppColors.neutral500 : color,
             ),
           ),
         ],

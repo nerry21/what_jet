@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/omnichannel_conversation_list_model.dart';
 import '../../data/models/omnichannel_workspace_model.dart';
 import 'omnichannel_conversation_card.dart';
@@ -87,7 +87,7 @@ class OmnichannelLeftPane extends StatelessWidget {
                         vertical: 7,
                       ),
                       decoration: BoxDecoration(
-                        color: AppConfig.green.withValues(alpha: 0.12),
+                        color: AppColors.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
@@ -95,7 +95,7 @@ class OmnichannelLeftPane extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w800,
-                          color: AppConfig.green,
+                          color: AppColors.primary,
                         ),
                       ),
                     ),
@@ -161,7 +161,7 @@ class OmnichannelLeftPane extends StatelessWidget {
                                         style: const TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w700,
-                                          color: AppConfig.subtleText,
+                                          color: AppColors.neutral300,
                                         ),
                                       ),
                                     ],
@@ -207,14 +207,14 @@ class OmnichannelLeftPane extends StatelessWidget {
                                                 child:
                                                     CircularProgressIndicator(
                                                       strokeWidth: 2,
-                                                      color: AppConfig.green,
+                                                      color: AppColors.primary,
                                                     ),
                                               )
                                             : const Text(
                                                 'Scroll untuk memuat lagi',
                                                 style: TextStyle(
                                                   fontSize: 12,
-                                                  color: AppConfig.subtleText,
+                                                  color: AppColors.neutral300,
                                                 ),
                                               ),
                                       ),
@@ -260,12 +260,12 @@ class _SummaryStrip extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: <Color>[
-            AppConfig.green.withValues(alpha: 0.10),
-            AppConfig.greenLight.withValues(alpha: 0.12),
+            AppColors.primary.withValues(alpha: 0.10),
+            AppColors.primary200.withValues(alpha: 0.12),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppConfig.green.withValues(alpha: 0.12)),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.12)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,7 +275,7 @@ class _SummaryStrip extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: AppConfig.mutedText,
+              color: AppColors.neutral500,
             ),
           ),
           const SizedBox(height: 12),
@@ -302,7 +302,7 @@ class _SummaryStrip extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               height: 1.5,
-              color: AppConfig.mutedText,
+              color: AppColors.neutral500,
             ),
           ),
         ],
@@ -331,7 +331,7 @@ class _MetricTile extends StatelessWidget {
         children: <Widget>[
           Text(
             label,
-            style: const TextStyle(fontSize: 12, color: AppConfig.mutedText),
+            style: const TextStyle(fontSize: 12, color: AppColors.neutral500),
           ),
           const SizedBox(height: 8),
           if (value == null)
@@ -361,18 +361,18 @@ class _SearchField extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppConfig.softBackground.withValues(alpha: 0.9),
+        color: AppColors.scaffoldBackground.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppConfig.softBackgroundAlt),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: TextField(
         controller: controller,
         enabled: enabled,
         textInputAction: TextInputAction.search,
         decoration: const InputDecoration(
-          prefixIcon: Icon(Icons.search, color: AppConfig.subtleText),
+          prefixIcon: Icon(Icons.search, color: AppColors.neutral300),
           hintText: 'Cari customer, preview, atau channel',
-          hintStyle: TextStyle(color: AppConfig.subtleText),
+          hintStyle: TextStyle(color: AppColors.neutral300),
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
@@ -406,7 +406,7 @@ class _FilterGroup extends StatelessWidget {
           style: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            color: AppConfig.mutedText,
+            color: AppColors.neutral500,
           ),
         ),
         const SizedBox(height: 10),
@@ -456,13 +456,13 @@ class _FilterChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             color: active
-                ? AppConfig.green.withValues(alpha: 0.12)
-                : AppConfig.softBackground.withValues(alpha: 0.9),
+                ? AppColors.primary.withValues(alpha: 0.12)
+                : AppColors.scaffoldBackground.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
               color: active
-                  ? AppConfig.green.withValues(alpha: 0.18)
-                  : AppConfig.softBackgroundAlt,
+                  ? AppColors.primary.withValues(alpha: 0.18)
+                  : AppColors.borderLight,
             ),
           ),
           child: Row(
@@ -473,7 +473,7 @@ class _FilterChip extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: active ? AppConfig.green : AppConfig.mutedText,
+                  color: active ? AppColors.primary : AppColors.neutral500,
                 ),
               ),
               const SizedBox(width: 8),
@@ -481,7 +481,7 @@ class _FilterChip extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                 decoration: BoxDecoration(
                   color: active
-                      ? AppConfig.green.withValues(alpha: 0.14)
+                      ? AppColors.primary.withValues(alpha: 0.14)
                       : Colors.white,
                   borderRadius: BorderRadius.circular(999),
                 ),
@@ -490,7 +490,7 @@ class _FilterChip extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
-                    color: active ? AppConfig.green : AppConfig.mutedText,
+                    color: active ? AppColors.primary : AppColors.neutral500,
                   ),
                 ),
               ),
@@ -518,9 +518,9 @@ class _ConversationListSkeleton extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: AppConfig.softBackground.withValues(alpha: 0.75),
+            color: AppColors.scaffoldBackground.withValues(alpha: 0.75),
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: AppConfig.softBackgroundAlt),
+            border: Border.all(color: AppColors.borderLight),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -619,7 +619,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                               fontSize: 26,
                               fontWeight: FontWeight.w700,
                               letterSpacing: -0.8,
-                              color: AppConfig.green,
+                              color: AppColors.primary,
                             ),
                           ),
                         ),
@@ -732,14 +732,14 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                                         height: 20,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          color: AppConfig.green,
+                                          color: AppColors.primary,
                                         ),
                                       )
                                     : const Text(
                                         'Scroll untuk memuat lagi',
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: AppConfig.subtleText,
+                                          color: AppColors.neutral300,
                                         ),
                                       ),
                               ),
@@ -764,7 +764,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
             right: 18,
             bottom: 78 + bottomInset,
             child: Material(
-              color: AppConfig.green,
+              color: AppColors.primary,
               borderRadius: BorderRadius.circular(18),
               elevation: 5,
               shadowColor: Colors.black.withValues(alpha: 0.24),
@@ -977,7 +977,7 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: AppConfig.green,
+                              color: AppColors.primary,
                               borderRadius: BorderRadius.circular(999),
                             ),
                             alignment: Alignment.center,
@@ -1067,7 +1067,7 @@ class _MobileBottomNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = selected ? AppConfig.green : Colors.black87;
+    final iconColor = selected ? AppColors.primary : Colors.black87;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -1104,7 +1104,7 @@ class _MobileBottomNavItem extends StatelessWidget {
                       vertical: 1,
                     ),
                     decoration: BoxDecoration(
-                      color: AppConfig.green,
+                      color: AppColors.primary,
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(

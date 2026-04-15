@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/chat_message_model.dart';
 
 class MessageBubble extends StatelessWidget {
@@ -47,12 +47,12 @@ class MessageBubble extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: <Color>[
-                        AppConfig.bubbleOutgoing,
-                        AppConfig.bubbleOutgoingAlt,
+                        AppColors.bubbleOutgoing,
+                        AppColors.bubbleOutgoingGradientEnd,
                       ],
                     )
                   : null,
-              color: message.isMine ? null : AppConfig.bubbleIncoming,
+              color: message.isMine ? null : AppColors.bubbleIncoming,
               borderRadius: BorderRadius.circular(18),
               boxShadow: const <BoxShadow>[
                 BoxShadow(
@@ -111,7 +111,7 @@ class _StatusIcon extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         child: const Padding(
           padding: EdgeInsets.all(2),
-          child: Icon(Icons.refresh_rounded, size: 16, color: AppConfig.danger),
+          child: Icon(Icons.refresh_rounded, size: 16, color: AppColors.error),
         ),
       );
     }
@@ -120,7 +120,7 @@ class _StatusIcon extends StatelessWidget {
       return const Icon(
         Icons.schedule_rounded,
         size: 14,
-        color: AppConfig.mutedText,
+        color: AppColors.neutral500,
       );
     }
 
@@ -128,7 +128,7 @@ class _StatusIcon extends StatelessWidget {
       return const Icon(
         Icons.done_all_rounded,
         size: 14,
-        color: AppConfig.readReceipt,
+        color: AppColors.readReceipt,
       );
     }
 
@@ -136,10 +136,10 @@ class _StatusIcon extends StatelessWidget {
       return const Icon(
         Icons.done_all_rounded,
         size: 14,
-        color: AppConfig.green,
+        color: AppColors.primary,
       );
     }
 
-    return const Icon(Icons.done_rounded, size: 14, color: AppConfig.green);
+    return const Icon(Icons.done_rounded, size: 14, color: AppColors.primary);
   }
 }

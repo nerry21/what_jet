@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class ChatInputBar extends StatelessWidget {
   const ChatInputBar({
@@ -31,7 +31,7 @@ class ChatInputBar extends StatelessWidget {
         children: <Widget>[
           const _RoundActionButton(
             icon: Icons.emoji_emotions_outlined,
-            color: AppConfig.green,
+            color: AppColors.primary,
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -54,7 +54,7 @@ class ChatInputBar extends StatelessWidget {
                       textInputAction: TextInputAction.newline,
                       decoration: const InputDecoration(
                         hintText: 'Aa',
-                        hintStyle: TextStyle(color: AppConfig.subtleText),
+                        hintStyle: TextStyle(color: AppColors.neutral300),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 16,
@@ -73,7 +73,7 @@ class ChatInputBar extends StatelessWidget {
                   icon: isSending
                       ? Icons.schedule_send_rounded
                       : Icons.send_rounded,
-                  color: AppConfig.green,
+                  color: AppColors.primary,
                   onTap: enabled ? onSend : null,
                 ),
               ],
@@ -82,7 +82,7 @@ class ChatInputBar extends StatelessWidget {
           const SizedBox(width: 8),
           const _RoundActionButton(
             icon: Icons.attach_file_rounded,
-            color: AppConfig.green,
+            color: AppColors.primary,
           ),
         ],
       ),

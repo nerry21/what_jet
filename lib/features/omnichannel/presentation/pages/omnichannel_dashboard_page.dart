@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:record/record.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../admin_auth/data/models/admin_user_model.dart';
@@ -2512,8 +2512,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: <Color>[
-                      AppConfig.softBackground,
-                      AppConfig.softBackgroundAlt,
+                      AppColors.scaffoldBackground,
+                      AppColors.borderLight,
                     ],
                   ),
                 ),
@@ -2553,7 +2553,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                     _callController.isLoading)
                   const LinearProgressIndicator(
                     minHeight: 2,
-                    color: AppConfig.green,
+                    color: AppColors.primary,
                     backgroundColor: Colors.transparent,
                   ),
                 Expanded(
@@ -2599,8 +2599,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: <Color>[
-                    AppConfig.softBackground,
-                    AppConfig.softBackgroundAlt,
+                    AppColors.scaffoldBackground,
+                    AppColors.borderLight,
                   ],
                 ),
               ),
@@ -2629,7 +2629,7 @@ class _MobilePaneSelector extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppConfig.softBackgroundAlt),
+        border: Border.all(color: AppColors.borderLight),
         boxShadow: <BoxShadow>[
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -2704,7 +2704,7 @@ class _MobilePaneButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           decoration: BoxDecoration(
             color: selected
-                ? AppConfig.green.withValues(alpha: 0.12)
+                ? AppColors.primary.withValues(alpha: 0.12)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(14),
           ),
@@ -2714,7 +2714,7 @@ class _MobilePaneButton extends StatelessWidget {
               Icon(
                 icon,
                 size: 18,
-                color: selected ? AppConfig.green : AppConfig.mutedText,
+                color: selected ? AppColors.primary : AppColors.neutral500,
               ),
               const SizedBox(height: 6),
               Text(
@@ -2723,7 +2723,7 @@ class _MobilePaneButton extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: selected ? AppConfig.green : AppConfig.mutedText,
+                  color: selected ? AppColors.primary : AppColors.neutral500,
                 ),
               ),
             ],

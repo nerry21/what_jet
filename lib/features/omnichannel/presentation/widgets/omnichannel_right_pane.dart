@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/omnichannel_call_analytics_summary_model.dart';
 import '../../data/models/omnichannel_conversation_detail_model.dart';
 import '../../data/models/omnichannel_insight_model.dart';
@@ -66,7 +66,7 @@ class OmnichannelRightPane extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         height: 1.45,
-                        color: AppConfig.subtleText,
+                        color: AppColors.neutral300,
                       ),
                     ),
                   )
@@ -118,9 +118,9 @@ class _ProfileCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppConfig.softBackground.withValues(alpha: 0.72),
+        color: AppColors.scaffoldBackground.withValues(alpha: 0.72),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppConfig.softBackgroundAlt),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Row(
         children: <Widget>[
@@ -131,7 +131,7 @@ class _ProfileCard extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: <Color>[AppConfig.green, AppConfig.greenLight],
+                colors: <Color>[AppColors.primary, AppColors.primary200],
               ),
               shape: BoxShape.circle,
             ),
@@ -163,7 +163,7 @@ class _ProfileCard extends StatelessWidget {
                   safeContact,
                   style: const TextStyle(
                     fontSize: 13,
-                    color: AppConfig.mutedText,
+                    color: AppColors.neutral500,
                   ),
                 ),
               ],
@@ -190,13 +190,13 @@ class _TagSection extends StatelessWidget {
         style: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w700,
-          color: AppConfig.subtleText,
+          color: AppColors.neutral300,
         ),
       ),
       child: tags.isEmpty
           ? const Text(
               'Belum ada tag',
-              style: TextStyle(fontSize: 13, color: AppConfig.subtleText),
+              style: TextStyle(fontSize: 13, color: AppColors.neutral300),
             )
           : Wrap(
               spacing: 8,
@@ -217,16 +217,16 @@ class _TagChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: AppConfig.green.withValues(alpha: 0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: AppConfig.green.withValues(alpha: 0.18)),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.18)),
       ),
       child: Text(
         label,
         style: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w700,
-          color: AppConfig.green,
+          color: AppColors.primary,
         ),
       ),
     );
@@ -245,7 +245,7 @@ class _QuickDetailsCard extends StatelessWidget {
       child: details.isEmpty
           ? const Text(
               'Belum ada detail',
-              style: TextStyle(fontSize: 13, color: AppConfig.subtleText),
+              style: TextStyle(fontSize: 13, color: AppColors.neutral300),
             )
           : Column(
               children: details.entries.map((entry) {
@@ -259,7 +259,7 @@ class _QuickDetailsCard extends StatelessWidget {
                           entry.key,
                           style: const TextStyle(
                             fontSize: 12,
-                            color: AppConfig.subtleText,
+                            color: AppColors.neutral300,
                           ),
                         ),
                       ),
@@ -296,7 +296,7 @@ class _InsightNotesCard extends StatelessWidget {
       child: noteLines.isEmpty
           ? const Text(
               'Belum ada insight',
-              style: TextStyle(fontSize: 13, color: AppConfig.subtleText),
+              style: TextStyle(fontSize: 13, color: AppColors.neutral300),
             )
           : Column(
               children: noteLines.map((note) {
@@ -310,7 +310,7 @@ class _InsightNotesCard extends StatelessWidget {
                         height: 8,
                         margin: const EdgeInsets.only(top: 6),
                         decoration: const BoxDecoration(
-                          color: AppConfig.green,
+                          color: AppColors.primary,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -321,7 +321,7 @@ class _InsightNotesCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 13,
                             height: 1.45,
-                            color: AppConfig.mutedText,
+                            color: AppColors.neutral500,
                           ),
                         ),
                       ),
@@ -347,9 +347,9 @@ class _RightPaneSkeleton extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppConfig.softBackground.withValues(alpha: 0.72),
+            color: AppColors.scaffoldBackground.withValues(alpha: 0.72),
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: AppConfig.softBackgroundAlt),
+            border: Border.all(color: AppColors.borderLight),
           ),
           child: const Row(
             children: <Widget>[

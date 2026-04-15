@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../admin_auth/data/models/admin_user_model.dart';
 
 class OmnichannelShellHeader extends StatelessWidget {
@@ -26,7 +26,7 @@ class OmnichannelShellHeader extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: <Color>[AppConfig.green, AppConfig.greenLight],
+          colors: <Color>[AppColors.primary, AppColors.primary200],
         ),
       ),
       child: LayoutBuilder(

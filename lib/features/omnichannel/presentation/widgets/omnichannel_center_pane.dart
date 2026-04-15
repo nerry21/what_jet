@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/omnichannel_call_history_item_model.dart';
 import '../../../live_chat/presentation/widgets/channel_badge.dart';
 import '../../data/models/omnichannel_call_session_model.dart';
@@ -871,7 +871,7 @@ class _MobileConversationAppBar extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(bottom: BorderSide(color: AppConfig.softBackgroundAlt)),
+        border: Border(bottom: BorderSide(color: AppColors.borderLight)),
       ),
       child: Column(
         children: <Widget>[
@@ -892,11 +892,11 @@ class _MobileConversationAppBar extends StatelessWidget {
                     end: Alignment.bottomRight,
                     colors: <Color>[
                       conversation?.channel == 'mobile_live_chat'
-                          ? AppConfig.green
-                          : AppConfig.purple,
+                          ? AppColors.primary
+                          : AppColors.accent,
                       conversation?.channel == 'mobile_live_chat'
-                          ? AppConfig.greenLight
-                          : AppConfig.purpleLight,
+                          ? AppColors.primary200
+                          : AppColors.accent200,
                     ],
                   ),
                 ),
@@ -935,7 +935,7 @@ class _MobileConversationAppBar extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 13,
-                              color: AppConfig.mutedText,
+                              color: AppColors.neutral500,
                             ),
                           ),
                         ),
@@ -947,7 +947,7 @@ class _MobileConversationAppBar extends StatelessWidget {
                               height: 14,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: AppConfig.green,
+                                color: AppColors.primary,
                               ),
                             ),
                           ),
@@ -1055,12 +1055,12 @@ class _BotControlBanner extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: isEnabled
-            ? AppConfig.green.withValues(alpha: 0.08)
+            ? AppColors.primary.withValues(alpha: 0.08)
             : const Color(0xFFFFF4EA),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isEnabled
-              ? AppConfig.green.withValues(alpha: 0.20)
+              ? AppColors.primary.withValues(alpha: 0.20)
               : const Color(0xFFF1C69A),
         ),
       ),
@@ -1086,7 +1086,7 @@ class _BotControlBanner extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 12,
                     height: 1.3,
-                    color: AppConfig.mutedText,
+                    color: AppColors.neutral500,
                   ),
                 ),
               ],
@@ -1120,7 +1120,7 @@ class _BotToggleAction extends StatelessWidget {
     return FilledButton.icon(
       onPressed: isBusy ? null : () async => onPressed(),
       style: FilledButton.styleFrom(
-        backgroundColor: isEnabled ? const Color(0xFFF38A22) : AppConfig.green,
+        backgroundColor: isEnabled ? const Color(0xFFF38A22) : AppColors.primary,
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -1165,7 +1165,7 @@ class _MobileDateSeparator extends StatelessWidget {
           style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
-            color: AppConfig.mutedText,
+            color: AppColors.neutral500,
           ),
         ),
       ),
@@ -1285,7 +1285,7 @@ class _MobileConversationBubble extends StatelessWidget {
       return const Icon(
         Icons.error_outline_rounded,
         size: 15,
-        color: AppConfig.danger,
+        color: AppColors.error,
       );
     }
 
@@ -1293,14 +1293,14 @@ class _MobileConversationBubble extends StatelessWidget {
       return const Icon(
         Icons.schedule_rounded,
         size: 15,
-        color: AppConfig.subtleText,
+        color: AppColors.neutral300,
       );
     }
 
     return Icon(
       Icons.done_all_rounded,
       size: 16,
-      color: message.isRead ? const Color(0xFF53BDEB) : AppConfig.subtleText,
+      color: message.isRead ? const Color(0xFF53BDEB) : AppColors.neutral300,
     );
   }
 }
@@ -1411,7 +1411,7 @@ class _MobileConversationComposerState
                     : () => widget.onCancelVoiceNoteTap(),
                 icon: const Icon(
                   Icons.delete_outline_rounded,
-                  color: AppConfig.subtleText,
+                  color: AppColors.neutral300,
                   size: 28,
                 ),
               ),
@@ -1456,7 +1456,7 @@ class _MobileConversationComposerState
               ),
               const SizedBox(width: 10),
               Material(
-                color: AppConfig.green,
+                color: AppColors.primary,
                 borderRadius: BorderRadius.circular(999),
                 child: InkWell(
                   onTap: widget.isSending ? null : widget.onVoiceNoteTap,
@@ -1517,7 +1517,7 @@ class _MobileConversationComposerState
                               : () => widget.onEmojiTap(),
                           icon: const Icon(
                             Icons.emoji_emotions_outlined,
-                            color: AppConfig.subtleText,
+                            color: AppColors.neutral300,
                           ),
                         ),
                         Expanded(
@@ -1549,19 +1549,19 @@ class _MobileConversationComposerState
                                   height: 18,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: AppConfig.green,
+                                    color: AppColors.primary,
                                   ),
                                 )
                               : const Icon(
                                   Icons.attach_file_rounded,
-                                  color: AppConfig.subtleText,
+                                  color: AppColors.neutral300,
                                 ),
                         ),
                         IconButton(
                           onPressed: widget.onCameraTap,
                           icon: const Icon(
                             Icons.camera_alt_outlined,
-                            color: AppConfig.subtleText,
+                            color: AppColors.neutral300,
                           ),
                         ),
                       ],
@@ -1570,7 +1570,7 @@ class _MobileConversationComposerState
                 ),
                 const SizedBox(width: 8),
                 Material(
-                  color: AppConfig.green,
+                  color: AppColors.primary,
                   borderRadius: BorderRadius.circular(999),
                   child: InkWell(
                     onTap: widget.isSending
@@ -1770,9 +1770,9 @@ class _CenterHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppConfig.softBackground.withValues(alpha: 0.72),
+        color: AppColors.scaffoldBackground.withValues(alpha: 0.72),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppConfig.softBackgroundAlt),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1795,7 +1795,7 @@ class _CenterHeader extends StatelessWidget {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(999),
                           border: Border.all(
-                            color: AppConfig.softBackgroundAlt,
+                            color: AppColors.borderLight,
                           ),
                         ),
                         child: const Icon(
@@ -1817,11 +1817,11 @@ class _CenterHeader extends StatelessWidget {
                     end: Alignment.bottomRight,
                     colors: <Color>[
                       conversation.channel == 'mobile_live_chat'
-                          ? AppConfig.green
-                          : AppConfig.purple,
+                          ? AppColors.primary
+                          : AppColors.accent,
                       conversation.channel == 'mobile_live_chat'
-                          ? AppConfig.greenLight
-                          : AppConfig.purpleLight,
+                          ? AppColors.primary200
+                          : AppColors.accent200,
                     ],
                   ),
                 ),
@@ -1869,7 +1869,7 @@ class _CenterHeader extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 13,
                         height: 1.35,
-                        color: AppConfig.mutedText,
+                        color: AppColors.neutral500,
                       ),
                     ),
                   ],
@@ -1883,7 +1883,7 @@ class _CenterHeader extends StatelessWidget {
                     height: 18,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: AppConfig.green,
+                      color: AppColors.primary,
                     ),
                   ),
                 ),
@@ -1940,7 +1940,7 @@ class _CenterHeader extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 12,
-                  color: AppConfig.mutedText,
+                  color: AppColors.neutral500,
                 ),
               ),
             ),
@@ -1972,7 +1972,7 @@ class _HeaderBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: AppConfig.softBackgroundAlt),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Text(
         label,
@@ -1981,7 +1981,7 @@ class _HeaderBadge extends StatelessWidget {
         style: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w700,
-          color: AppConfig.mutedText,
+          color: AppColors.neutral500,
         ),
       ),
     );
@@ -1997,12 +1997,12 @@ class _DateSeparator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: <Widget>[
-        const Expanded(child: Divider(color: AppConfig.softBackgroundAlt)),
+        const Expanded(child: Divider(color: AppColors.borderLight)),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 10),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: AppConfig.softBackground.withValues(alpha: 0.85),
+            color: AppColors.scaffoldBackground.withValues(alpha: 0.85),
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(
@@ -2010,11 +2010,11 @@ class _DateSeparator extends StatelessWidget {
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: AppConfig.mutedText,
+              color: AppColors.neutral500,
             ),
           ),
         ),
-        const Expanded(child: Divider(color: AppConfig.softBackgroundAlt)),
+        const Expanded(child: Divider(color: AppColors.borderLight)),
       ],
     );
   }
@@ -2041,12 +2041,12 @@ class _ThreadBubble extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: <Color>[
-                      AppConfig.bubbleOutgoing,
-                      AppConfig.bubbleOutgoingAlt,
+                      AppColors.bubbleOutgoing,
+                      AppColors.bubbleOutgoingGradientEnd,
                     ],
                   )
                 : null,
-            color: message.isMine ? null : AppConfig.bubbleIncoming,
+            color: message.isMine ? null : AppColors.bubbleIncoming,
             borderRadius: BorderRadius.circular(20),
             boxShadow: <BoxShadow>[
               BoxShadow(
@@ -2064,7 +2064,7 @@ class _ThreadBubble extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: message.isMine ? AppConfig.green : AppConfig.mutedText,
+                  color: message.isMine ? AppColors.primary : AppColors.neutral500,
                 ),
               ),
               const SizedBox(height: 5),
@@ -2118,7 +2118,7 @@ class _ThreadBubble extends StatelessWidget {
                     formatOmnichannelThreadTime(message.sentAt),
                     style: const TextStyle(
                       fontSize: 11,
-                      color: AppConfig.subtleText,
+                      color: AppColors.neutral300,
                     ),
                   ),
                   if (message.statusLabel != null) ...<Widget>[
@@ -2128,7 +2128,7 @@ class _ThreadBubble extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: AppConfig.green,
+                        color: AppColors.primary,
                       ),
                     ),
                   ],
@@ -2181,7 +2181,7 @@ class _ConversationImagePreview extends StatelessWidget {
                     child: Center(
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: AppConfig.green,
+                        color: AppColors.primary,
                       ),
                     ),
                   );
@@ -2195,14 +2195,14 @@ class _ConversationImagePreview extends StatelessWidget {
                         children: <Widget>[
                           Icon(
                             Icons.broken_image_outlined,
-                            color: AppConfig.subtleText,
+                            color: AppColors.neutral300,
                           ),
                           SizedBox(height: 6),
                           Text(
                             'Gambar tidak tersedia',
                             style: TextStyle(
                               fontSize: 12,
-                              color: AppConfig.mutedText,
+                              color: AppColors.neutral500,
                             ),
                           ),
                         ],
@@ -2379,7 +2379,7 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
               ),
               child: Icon(
                 _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                color: AppConfig.green,
+                color: AppColors.primary,
                 size: compact ? 22 : 26,
               ),
             ),
@@ -2420,7 +2420,7 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
                       _formatDuration(_position),
                       style: const TextStyle(
                         fontSize: 11,
-                        color: AppConfig.mutedText,
+                        color: AppColors.neutral500,
                       ),
                     ),
                     if ((widget.message.originalName?.trim().isNotEmpty ??
@@ -2433,7 +2433,7 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontSize: 11,
-                            color: AppConfig.mutedText,
+                            color: AppColors.neutral500,
                           ),
                         ),
                       ),
@@ -2456,7 +2456,7 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
               ),
               child: const Icon(
                 Icons.download_rounded,
-                color: AppConfig.green,
+                color: AppColors.primary,
                 size: 20,
               ),
             ),
@@ -2502,7 +2502,7 @@ class _ConversationVideoCard extends StatefulWidget {
                   child: Icon(
                     Icons.play_circle_fill_rounded,
                     size: 54,
-                    color: AppConfig.green,
+                    color: AppColors.primary,
                   ),
                 ),
                 Positioned(
@@ -2552,7 +2552,7 @@ class _ConversationVideoCard extends StatefulWidget {
                 if (message.sizeBytes != null)
                   _formatFileSize(message.sizeBytes!),
               ].join(' â€¢ '),
-              style: const TextStyle(fontSize: 12, color: AppConfig.mutedText),
+              style: const TextStyle(fontSize: 12, color: AppColors.neutral500),
             ),
           ],
         ],
@@ -2586,7 +2586,7 @@ class _ConversationVideoCard extends StatefulWidget {
                   child: Icon(
                     Icons.play_circle_fill_rounded,
                     size: 54,
-                    color: AppConfig.green,
+                    color: AppColors.primary,
                   ),
                 ),
                 Positioned(
@@ -2636,7 +2636,7 @@ class _ConversationVideoCard extends StatefulWidget {
                 if (message.sizeBytes != null)
                   _formatFileSize(message.sizeBytes!),
               ].join(' • '),
-              style: const TextStyle(fontSize: 12, color: AppConfig.mutedText),
+              style: const TextStyle(fontSize: 12, color: AppColors.neutral500),
             ),
           ],
         ],
@@ -2784,7 +2784,7 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
                 if (widget.message.sizeBytes != null)
                   _formatFileSize(widget.message.sizeBytes!),
               ].join(' • '),
-              style: const TextStyle(fontSize: 12, color: AppConfig.mutedText),
+              style: const TextStyle(fontSize: 12, color: AppColors.neutral500),
             ),
           ],
         ],
@@ -2936,7 +2936,7 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
       fit: StackFit.expand,
       children: <Widget>[
         const Center(
-          child: Icon(Icons.videocam_rounded, size: 52, color: AppConfig.green),
+          child: Icon(Icons.videocam_rounded, size: 52, color: AppColors.primary),
         ),
         Positioned(
           right: 8,
@@ -3083,7 +3083,7 @@ class _ConversationDocumentCard extends StatelessWidget {
             ),
             child: const Icon(
               Icons.description_outlined,
-              color: AppConfig.green,
+              color: AppColors.primary,
             ),
           ),
           const SizedBox(width: 10),
@@ -3115,7 +3115,7 @@ class _ConversationDocumentCard extends StatelessWidget {
               ),
               child: const Icon(
                 Icons.download_rounded,
-                color: AppConfig.green,
+                color: AppColors.primary,
                 size: 20,
               ),
             ),
@@ -3185,9 +3185,9 @@ class _ActiveComposer extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppConfig.softBackground.withValues(alpha: 0.8),
+        color: AppColors.scaffoldBackground.withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppConfig.softBackgroundAlt),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Row(
         children: <Widget>[
@@ -3195,7 +3195,7 @@ class _ActiveComposer extends StatelessWidget {
             icon: Icons.person_add_alt_1_rounded,
             label: 'Kontak',
             busy: isSendingContact,
-            activeColor: AppConfig.green,
+            activeColor: AppColors.primary,
             onTap: isSendingContact ? null : onSendContact,
           ),
           const SizedBox(width: 8),
@@ -3235,26 +3235,26 @@ class _ActiveComposer extends StatelessWidget {
                     : 'Tulis balasan admin untuk live chat...',
                 hintStyle: const TextStyle(
                   fontSize: 13,
-                  color: AppConfig.subtleText,
+                  color: AppColors.neutral300,
                 ),
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
                   borderSide: const BorderSide(
-                    color: AppConfig.softBackgroundAlt,
+                    color: AppColors.borderLight,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
                   borderSide: const BorderSide(
-                    color: AppConfig.softBackgroundAlt,
+                    color: AppColors.borderLight,
                   ),
                 ),
                 disabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
                   borderSide: const BorderSide(
-                    color: AppConfig.softBackgroundAlt,
+                    color: AppColors.borderLight,
                   ),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
@@ -3266,7 +3266,7 @@ class _ActiveComposer extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Material(
-            color: isSending ? AppConfig.subtleText : AppConfig.green,
+            color: isSending ? AppColors.neutral300 : AppColors.primary,
             borderRadius: BorderRadius.circular(999),
             child: InkWell(
               onTap: isSending ? null : onSubmit,
@@ -3323,7 +3323,7 @@ class _ComposerActionButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: AppConfig.softBackgroundAlt),
+            border: Border.all(color: AppColors.borderLight),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -3334,7 +3334,7 @@ class _ComposerActionButton extends StatelessWidget {
                   height: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: AppConfig.green,
+                    color: AppColors.primary,
                   ),
                 )
               else
@@ -3382,11 +3382,11 @@ class _ComposerIconButton extends StatelessWidget {
             height: 42,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: AppConfig.softBackgroundAlt),
+              border: Border.all(color: AppColors.borderLight),
             ),
             child: Icon(
               icon,
-              color: onTap == null ? AppConfig.subtleText : AppConfig.mutedText,
+              color: onTap == null ? AppColors.neutral300 : AppColors.neutral500,
               size: 18,
             ),
           ),
@@ -3490,7 +3490,7 @@ class _SendContactDialogState extends State<_SendContactDialog> {
                   const SizedBox(height: 8),
                   const Text(
                     'Kontak ini akan dikirim ke customer melalui WhatsApp.',
-                    style: TextStyle(fontSize: 13, color: AppConfig.mutedText),
+                    style: TextStyle(fontSize: 13, color: AppColors.neutral500),
                   ),
                   const SizedBox(height: 18),
                   _DialogField(
@@ -3594,7 +3594,7 @@ class _DialogField extends StatelessWidget {
           style: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            color: AppConfig.mutedText,
+            color: AppColors.neutral500,
           ),
         ),
         const SizedBox(height: 8),
@@ -3605,18 +3605,18 @@ class _DialogField extends StatelessWidget {
           decoration: InputDecoration(
             hintText: hintText,
             filled: true,
-            fillColor: AppConfig.softBackground,
+            fillColor: AppColors.scaffoldBackground,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: AppConfig.softBackgroundAlt),
+              borderSide: const BorderSide(color: AppColors.borderLight),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: AppConfig.softBackgroundAlt),
+              borderSide: const BorderSide(color: AppColors.borderLight),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: AppConfig.green),
+              borderSide: const BorderSide(color: AppColors.primary),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
@@ -3640,9 +3640,9 @@ class _CenterPaneSkeleton extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppConfig.softBackground.withValues(alpha: 0.72),
+            color: AppColors.scaffoldBackground.withValues(alpha: 0.72),
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: AppConfig.softBackgroundAlt),
+            border: Border.all(color: AppColors.borderLight),
           ),
           child: const Row(
             children: <Widget>[

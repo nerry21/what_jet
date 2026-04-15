@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/chat_message_model.dart';
 import '../../data/models/conversation_model.dart';
 import '../../data/repositories/live_chat_repository.dart';
@@ -172,7 +173,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                             'Sesi mobile berakhir. Kembali dan login ulang.',
                         actionLabel: 'Kembali',
                         color: const Color(0xFFFFECEE),
-                        foregroundColor: AppConfig.danger,
+                        foregroundColor: AppColors.error,
                         onTap: () {
                           Navigator.of(context).maybePop();
                         },
@@ -192,7 +193,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                         label: _controller.errorMessage!,
                         actionLabel: 'Refresh',
                         color: const Color(0xFFFFECEE),
-                        foregroundColor: AppConfig.danger,
+                        foregroundColor: AppColors.error,
                         onTap: _controller.refresh,
                       ),
                     Expanded(child: _buildMessageArea(context)),
@@ -220,7 +221,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     }
 
     return Scaffold(
-      backgroundColor: AppConfig.softBackground,
+      backgroundColor: AppColors.scaffoldBackground,
       body: SafeArea(child: content),
     );
   }
@@ -228,7 +229,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   Widget _buildMessageArea(BuildContext context) {
     if (_controller.isLoading && !_controller.hasMessages) {
       return const Center(
-        child: CircularProgressIndicator(color: AppConfig.green),
+        child: CircularProgressIndicator(color: AppColors.primary),
       );
     }
 
@@ -259,7 +260,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         final bubbleMaxWidth = constraints.maxWidth * (compact ? 0.78 : 0.56);
 
         return RefreshIndicator(
-          color: AppConfig.green,
+          color: AppColors.primary,
           onRefresh: _controller.refresh,
           child: ListView.separated(
             controller: _scrollController,
@@ -332,7 +333,7 @@ class _ConversationHeader extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: <Color>[AppConfig.green, AppConfig.green],
+          colors: <Color>[AppColors.primary, AppColors.primary],
         ),
       ),
       child: Row(
@@ -460,13 +461,13 @@ class _ConversationEmptyState extends StatelessWidget {
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color: AppConfig.green.withValues(alpha: 0.12),
+                color: AppColors.primary.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.message_outlined,
                 size: 32,
-                color: AppConfig.green,
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(height: 16),
@@ -485,7 +486,7 @@ class _ConversationEmptyState extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 height: 1.5,
-                color: AppConfig.mutedText,
+                color: AppColors.neutral500,
               ),
             ),
             const SizedBox(height: 16),
@@ -494,8 +495,8 @@ class _ConversationEmptyState extends StatelessWidget {
               icon: const Icon(Icons.refresh_rounded),
               label: const Text('Refresh'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppConfig.green,
-                side: const BorderSide(color: AppConfig.green),
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary),
               ),
             ),
           ],
@@ -530,13 +531,13 @@ class _ConversationErrorState extends StatelessWidget {
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color: AppConfig.danger.withValues(alpha: 0.08),
+                color: AppColors.error.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.wifi_off_rounded,
                 size: 32,
-                color: AppConfig.danger,
+                color: AppColors.error,
               ),
             ),
             const SizedBox(height: 16),
@@ -555,7 +556,7 @@ class _ConversationErrorState extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 14,
                 height: 1.5,
-                color: AppConfig.mutedText,
+                color: AppColors.neutral500,
               ),
             ),
             const SizedBox(height: 16),
@@ -564,7 +565,7 @@ class _ConversationErrorState extends StatelessWidget {
               icon: const Icon(Icons.refresh_rounded),
               label: Text(actionLabel),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppConfig.green,
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
               ),
             ),
@@ -677,7 +678,7 @@ class _DummyCallScreenState extends State<_DummyCallScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: <Color>[AppConfig.green, AppConfig.greenLight],
+            colors: <Color>[AppColors.primary, AppColors.primary200],
           ),
         ),
         child: SafeArea(
