@@ -21,41 +21,55 @@ class OmnichannelShellHeader extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(16, 16, 16, 18),
+      padding: EdgeInsets.fromLTRB(20, 18, 20, 20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: <Color>[AppColors.primary, AppColors.primary200],
+          colors: <Color>[
+            AppColors.primary.withValues(alpha: 0.95),
+            AppColors.primary700,
+          ],
         ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.15),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isCompact = constraints.maxWidth < 880;
+
+          // Admin identity card
           final identityCard = Container(
             padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.white.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: AppColors.white.withValues(alpha: 0.24)),
+              color: AppColors.white.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppColors.white.withValues(alpha: 0.16),
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  width: 42,
-                  height: 42,
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.white.withValues(alpha: 0.24),
-                    shape: BoxShape.circle,
+                    color: AppColors.white.withValues(alpha: 0.20),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   alignment: Alignment.center,
                   child: Text(
                     adminInitial,
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.surfacePrimary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.white,
                     ),
                   ),
                 ),
@@ -68,15 +82,15 @@ class OmnichannelShellHeader extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.surfacePrimary,
+                        color: AppColors.white,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       _safeText(currentUser?.roleLabel, fallback: 'Workspace'),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xD9FFFFFF),
+                        color: AppColors.white.withValues(alpha: 0.70),
                       ),
                     ),
                   ],
@@ -85,14 +99,30 @@ class OmnichannelShellHeader extends StatelessWidget {
             ),
           );
 
-          final logoutButton = OutlinedButton.icon(
-            onPressed: isLoggingOut ? null : onLogout,
-            icon: const Icon(Icons.logout_rounded),
-            label: Text(isLoggingOut ? 'Keluar...' : 'Logout'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.white,
-              side: BorderSide(color: AppColors.white.withValues(alpha: 0.38)),
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          final logoutButton = Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: AppColors.white.withValues(alpha: 0.25),
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: TextButton.icon(
+              onPressed: isLoggingOut ? null : onLogout,
+              icon: Icon(
+                Icons.logout_rounded,
+                size: 18,
+                color: AppColors.white.withValues(alpha: 0.80),
+              ),
+              label: Text(
+                isLoggingOut ? 'Keluar...' : 'Logout',
+                style: TextStyle(
+                  color: AppColors.white.withValues(alpha: 0.80),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              ),
             ),
           );
 
@@ -100,22 +130,22 @@ class OmnichannelShellHeader extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                const Text(
-                  'Admin Omnichannel',
+                Text(
+                  'WhatsJet Admin',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.4,
-                    color: AppColors.surfacePrimary,
+                    color: AppColors.white,
                   ),
                 ),
-                const SizedBox(height: 6),
-                const Text(
-                  'Inbox admin untuk membaca conversation lintas channel tanpa menyentuh flow customer live chat.',
+                const SizedBox(height: 4),
+                Text(
+                  'Omnichannel inbox — lintas channel tanpa mengganggu flow customer.',
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.5,
-                    color: Color(0xE6FFFFFF),
+                    color: AppColors.white.withValues(alpha: 0.70),
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -128,26 +158,26 @@ class OmnichannelShellHeader extends StatelessWidget {
 
           return Row(
             children: <Widget>[
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      'Admin Omnichannel',
+                      'WhatsJet Admin',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.4,
-                        color: AppColors.surfacePrimary,
+                        color: AppColors.white,
                       ),
                     ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 4),
                     Text(
-                      'Inbox admin untuk membaca conversation lintas channel tanpa menyentuh flow customer live chat.',
+                      'Omnichannel inbox — lintas channel tanpa mengganggu flow customer.',
                       style: TextStyle(
                         fontSize: 13,
                         height: 1.5,
-                        color: Color(0xE6FFFFFF),
+                        color: AppColors.white.withValues(alpha: 0.70),
                       ),
                     ),
                   ],

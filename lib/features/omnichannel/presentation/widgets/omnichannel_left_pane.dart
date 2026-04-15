@@ -596,88 +596,121 @@ class _MobileWhatsAppInbox extends StatelessWidget {
     final listBottomPadding = 102.0 + bottomInset;
 
     return ColoredBox(
-      color: AppColors.surfaceSecondary,
+      color: AppColors.scaffoldBackground,
       child: Stack(
         children: <Widget>[
           Column(
             children: <Widget>[
+              // ═══ PREMIUM HEADER ═══
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.fromLTRB(16, 10, 16, 10),
+                padding: EdgeInsets.fromLTRB(20, 14, 16, 14),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondary,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.surfaceSecondary,
+                      AppColors.scaffoldBackground,
+                    ],
+                  ),
                   border: Border(
-                    bottom: BorderSide(color: AppColors.borderLight),
+                    bottom: BorderSide(
+                      color: AppColors.primary.withValues(alpha: 0.08),
+                    ),
                   ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
+                    // Title row
                     Row(
                       children: <Widget>[
-                        const Expanded(
-                          child: Text(
-                            'WhatsApp',
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.8,
-                              color: AppColors.primary,
-                            ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                'WhatsJet',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.8,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Omnichannel Console',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.neutral400,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        _MobileHeaderIcon(
-                          icon: Icons.camera_alt_outlined,
+                        _PremiumHeaderIcon(
+                          icon: Icons.search_rounded,
                           onTap: () {},
                         ),
-                        const SizedBox(width: 2),
-                        _MobileHeaderIcon(
+                        const SizedBox(width: 6),
+                        _PremiumHeaderIcon(
                           icon: Icons.more_vert_rounded,
                           onTap: () {},
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
-                    DecoratedBox(
+                    const SizedBox(height: 14),
+
+                    // Search bar - dark glass style
+                    Container(
                       decoration: BoxDecoration(
                         color: AppColors.surfaceTertiary,
-                        borderRadius: AppRadii.borderRadiusPill,
+                        borderRadius: AppRadii.borderRadiusMd,
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.06),
+                        ),
                       ),
                       child: TextField(
                         controller: searchController,
                         textInputAction: TextInputAction.search,
                         style: TextStyle(
-                          fontSize: 17,
+                          fontSize: 14,
                           color: AppColors.neutral800,
                         ),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           prefixIcon: Icon(
                             Icons.search_rounded,
-                            size: 24,
-                            color: AppColors.neutral400,
+                            size: 20,
+                            color: AppColors.neutral300,
                           ),
-                          hintText: 'Tanya Meta AI atau cari',
+                          hintText: 'Cari percakapan...',
                           hintStyle: TextStyle(
-                            color: AppColors.neutral400,
-                            fontSize: 17,
+                            color: AppColors.neutral300,
+                            fontSize: 14,
                           ),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 13,
+                            horizontal: 14,
+                            vertical: 12,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
+
+                    // Scope chips with glow
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: workspace.filters
                             .map(
                               (option) => Padding(
-                                padding: EdgeInsets.only(right: 10),
-                                child: _MobileScopeChip(
+                                padding: EdgeInsets.only(right: 8),
+                                child: _PremiumScopeChip(
                                   label: option.label,
                                   count: option.count,
                                   selected: selectedScope == option.key,
@@ -691,9 +724,11 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                   ],
                 ),
               ),
+
+              // ═══ CONVERSATION LIST ═══
               Expanded(
                 child: isLoading
-                    ? const _MobileWhatsAppListSkeleton()
+                    ? const _PremiumListSkeleton()
                     : items.isEmpty
                     ? Padding(
                         padding: EdgeInsets.fromLTRB(
@@ -709,18 +744,19 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                               'Tidak ada conversation yang cocok dengan filter yang aktif.',
                         ),
                       )
-                    : ListView.separated(
+                    : ListView.builder(
                         controller: scrollController,
-                        physics: const ClampingScrollPhysics(),
+                        physics: const BouncingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics(),
+                        ),
                         padding: EdgeInsets.fromLTRB(
                           0,
-                          2,
+                          4,
                           0,
                           listBottomPadding,
                         ),
                         itemCount:
                             items.length + ((isLoadingMore || hasMore) ? 1 : 0),
-                        separatorBuilder: (_, __) => const SizedBox.shrink(),
                         itemBuilder: (context, index) {
                           if (index >= items.length) {
                             return Padding(
@@ -730,7 +766,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                               ),
                               child: Center(
                                 child: isLoadingMore
-                                    ? const SizedBox(
+                                    ? SizedBox(
                                         width: 20,
                                         height: 20,
                                         child: CircularProgressIndicator(
@@ -738,7 +774,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                                           color: AppColors.primary,
                                         ),
                                       )
-                                    : const Text(
+                                    : Text(
                                         'Scroll untuk memuat lagi',
                                         style: TextStyle(
                                           fontSize: 12,
@@ -750,7 +786,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                           }
 
                           final item = items[index];
-                          return _MobileWhatsAppConversationTile(
+                          return _PremiumConversationTile(
                             item: item,
                             selected:
                                 selectedConversationId == item.id ||
@@ -760,36 +796,58 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                         },
                       ),
               ),
-              const _MobileWhatsAppBottomBar(),
+
+              // ═══ PREMIUM BOTTOM NAV ═══
+              const _PremiumBottomBar(),
             ],
           ),
+
+          // ═══ FAB with glow ring ═══
           Positioned(
             right: 18,
             bottom: 78 + bottomInset,
-            child: Material(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(18),
-              elevation: 5,
-              shadowColor: AppColors.neutral800.withValues(alpha: 0.24),
-              child: InkWell(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => OmnichannelNewChatPage(
-                        items: items,
-                        onConversationSelected: onConversationTap,
-                      ),
-                    ),
-                  );
-                },
+            child: Container(
+              decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(18),
-                child: const SizedBox(
-                  width: 58,
-                  height: 58,
-                  child: Icon(
-                    Icons.person_add_alt_1_rounded,
-                    color: AppColors.surfacePrimary,
-                    size: 28,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    blurRadius: 20,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(18),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => OmnichannelNewChatPage(
+                          items: items,
+                          onConversationSelected: onConversationTap,
+                        ),
+                      ),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(18),
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [AppColors.primary, AppColors.primary700],
+                      ),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Icon(
+                      Icons.person_add_alt_1_rounded,
+                      color: AppColors.white,
+                      size: 26,
+                    ),
                   ),
                 ),
               ),
@@ -801,8 +859,12 @@ class _MobileWhatsAppInbox extends StatelessWidget {
   }
 }
 
-class _MobileHeaderIcon extends StatelessWidget {
-  const _MobileHeaderIcon({required this.icon, required this.onTap});
+// ═══════════════════════════════════════════════════════════════════════════
+// PREMIUM HEADER ICON — Rounded dark glass button
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _PremiumHeaderIcon extends StatelessWidget {
+  const _PremiumHeaderIcon({required this.icon, required this.onTap});
 
   final IconData icon;
   final VoidCallback onTap;
@@ -813,19 +875,30 @@ class _MobileHeaderIcon extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: AppRadii.borderRadiusPill,
-        child: SizedBox(
-          width: 34,
-          height: 34,
-          child: Icon(icon, color: AppColors.neutral800, size: 23),
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: AppColors.surfaceTertiary,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: AppColors.primary.withValues(alpha: 0.06),
+            ),
+          ),
+          child: Icon(icon, color: AppColors.neutral500, size: 20),
         ),
       ),
     );
   }
 }
 
-class _MobileScopeChip extends StatelessWidget {
-  const _MobileScopeChip({
+// ═══════════════════════════════════════════════════════════════════════════
+// PREMIUM SCOPE CHIP — With emerald glow on active
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _PremiumScopeChip extends StatelessWidget {
+  const _PremiumScopeChip({
     required this.label,
     required this.count,
     required this.selected,
@@ -839,31 +912,34 @@ class _MobileScopeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: AppRadii.borderRadiusPill,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 9),
-          decoration: BoxDecoration(
-            color: selected
-                ? AppColors.primary.withValues(alpha: 0.12)
-                : AppColors.surfaceSecondary,
-            borderRadius: AppRadii.borderRadiusPill,
-            border: Border.all(
-              color: selected
-                  ? AppColors.primary.withValues(alpha: 0.28)
-                  : AppColors.borderLight,
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primary : AppColors.surfaceTertiary,
+          borderRadius: AppRadii.borderRadiusPill,
+          border: Border.all(
+            color: selected ? AppColors.primary : AppColors.borderLight,
           ),
-          child: Text(
-            '$label $count',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: selected ? AppColors.primary : AppColors.neutral400,
-            ),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.30),
+                    blurRadius: 12,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Text(
+          '$label $count',
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: selected ? AppColors.white : AppColors.neutral500,
           ),
         ),
       ),
@@ -871,8 +947,12 @@ class _MobileScopeChip extends StatelessWidget {
   }
 }
 
-class _MobileWhatsAppConversationTile extends StatelessWidget {
-  const _MobileWhatsAppConversationTile({
+// ═══════════════════════════════════════════════════════════════════════════
+// PREMIUM CONVERSATION TILE — Rounded avatar, glow badge, status dot
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _PremiumConversationTile extends StatelessWidget {
+  const _PremiumConversationTile({
     required this.item,
     required this.selected,
     required this.onTap,
@@ -886,48 +966,66 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final displayName = (item.customerLabel ?? item.title).trim();
     final initial = _mobileConversationInitial(displayName);
-    final avatarColors = _mobileConversationAvatarColors(displayName);
+    final avatarColors = _premiumAvatarColors(displayName);
+    final hasUnread = item.unreadCount > 0;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         child: Container(
-          color: selected
-              ? AppColors.primary.withValues(alpha: 0.12)
-              : AppColors.surfaceSecondary,
-          padding: EdgeInsets.fromLTRB(16, 11, 14, 11),
+          padding: EdgeInsets.fromLTRB(16, 12, 14, 12),
+          decoration: BoxDecoration(
+            color: selected
+                ? AppColors.primary.withValues(alpha: 0.06)
+                : Colors.transparent,
+            border: Border(
+              bottom: BorderSide(
+                color: AppColors.borderLight.withValues(alpha: 0.5),
+                width: 0.5,
+              ),
+            ),
+          ),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
+              // Avatar with rounded corners + glow
               Container(
-                width: 52,
-                height: 52,
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(16),
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: avatarColors,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: avatarColors.last.withValues(alpha: 0.25),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   initial,
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.surfacePrimary,
+                    color: AppColors.white,
                   ),
                 ),
               ),
               const SizedBox(width: 14),
+
+              // Content
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Expanded(
                           child: Text(
@@ -935,8 +1033,10 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                              fontWeight: hasUnread
+                                  ? FontWeight.w700
+                                  : FontWeight.w600,
                               color: AppColors.neutral800,
                             ),
                           ),
@@ -945,9 +1045,13 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                         Text(
                           formatOmnichannelListTime(item.lastActivityAt),
                           style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.neutral400,
+                            fontSize: 12,
+                            fontWeight: hasUnread
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                            color: hasUnread
+                                ? AppColors.primary
+                                : AppColors.neutral400,
                           ),
                         ),
                       ],
@@ -955,25 +1059,26 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: <Widget>[
-                        const Icon(
+                        Icon(
                           Icons.done_all_rounded,
-                          size: 18,
-                          color: AppColors.neutral400,
+                          size: 16,
+                          color: hasUnread
+                              ? AppColors.primary
+                              : AppColors.neutral300,
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             item.preview,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
+                              fontSize: 14,
                               color: AppColors.neutral400,
                             ),
                           ),
                         ),
-                        if (item.unreadCount > 0) ...<Widget>[
+                        if (hasUnread) ...<Widget>[
                           const SizedBox(width: 8),
                           Container(
                             constraints: const BoxConstraints(minWidth: 22),
@@ -982,8 +1087,22 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primary,
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.primary,
+                                  AppColors.primary700,
+                                ],
+                              ),
                               borderRadius: AppRadii.borderRadiusPill,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.35,
+                                  ),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
                             alignment: Alignment.center,
                             child: Text(
@@ -991,7 +1110,7 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.surfacePrimary,
+                                color: AppColors.white,
                               ),
                             ),
                           ),
@@ -1009,44 +1128,59 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
   }
 }
 
-class _MobileWhatsAppBottomBar extends StatelessWidget {
-  const _MobileWhatsAppBottomBar();
+// ═══════════════════════════════════════════════════════════════════════════
+// PREMIUM BOTTOM BAR — Dark glass with emerald active indicator
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _PremiumBottomBar extends StatelessWidget {
+  const _PremiumBottomBar({this.badgeCount});
+
+  final int? badgeCount;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
       child: Container(
-        padding: EdgeInsets.fromLTRB(8, 6, 8, 8),
+        padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
         decoration: BoxDecoration(
-          color: AppColors.surfaceSecondary,
-          border: Border(top: BorderSide(color: AppColors.borderLight)),
+          color: AppColors.surfacePrimary,
+          border: Border(
+            top: BorderSide(color: AppColors.primary.withValues(alpha: 0.08)),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0x30000000),
+              blurRadius: 20,
+              offset: const Offset(0, -4),
+            ),
+          ],
         ),
-        child: const Row(
+        child: Row(
           children: <Widget>[
             Expanded(
-              child: _MobileBottomNavItem(
-                icon: Icons.chat_bubble_outline_rounded,
-                label: 'Chat',
+              child: _PremiumNavItem(
+                icon: Icons.chat_bubble_rounded,
+                label: 'Inbox',
                 selected: true,
-                badgeCount: 1,
+                badgeCount: badgeCount,
               ),
             ),
             Expanded(
-              child: _MobileBottomNavItem(
+              child: _PremiumNavItem(
                 icon: Icons.autorenew_rounded,
                 label: 'Pembaruan',
               ),
             ),
             Expanded(
-              child: _MobileBottomNavItem(
-                icon: Icons.panorama_fish_eye_rounded,
-                label: 'Meta AI',
+              child: _PremiumNavItem(
+                icon: Icons.insights_rounded,
+                label: 'Insight',
               ),
             ),
             Expanded(
-              child: _MobileBottomNavItem(
-                icon: Icons.call_outlined,
+              child: _PremiumNavItem(
+                icon: Icons.call_rounded,
                 label: 'Panggilan',
               ),
             ),
@@ -1057,8 +1191,8 @@ class _MobileWhatsAppBottomBar extends StatelessWidget {
   }
 }
 
-class _MobileBottomNavItem extends StatelessWidget {
-  const _MobileBottomNavItem({
+class _PremiumNavItem extends StatelessWidget {
+  const _PremiumNavItem({
     required this.icon,
     required this.label,
     this.selected = false,
@@ -1072,49 +1206,58 @@ class _MobileBottomNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = selected ? AppColors.primary : AppColors.neutral800;
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         SizedBox(
-          width: 48,
+          width: 52,
           height: 32,
           child: Stack(
             clipBehavior: Clip.none,
             children: <Widget>[
               Align(
                 alignment: Alignment.center,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  width: 42,
+                child: Container(
+                  width: 48,
                   height: 28,
                   decoration: BoxDecoration(
                     color: selected
-                        ? AppColors.primary.withValues(alpha: 0.12)
+                        ? AppColors.primary.withValues(alpha: 0.15)
                         : Colors.transparent,
                     borderRadius: AppRadii.borderRadiusLg,
                   ),
                   alignment: Alignment.center,
-                  child: Icon(icon, size: 24, color: iconColor),
+                  child: Icon(
+                    icon,
+                    size: 22,
+                    color: selected ? AppColors.primary : AppColors.neutral400,
+                  ),
                 ),
               ),
-              if (badgeCount != null)
+              if (badgeCount != null && badgeCount! > 0)
                 Positioned(
-                  right: 4,
-                  top: -1,
+                  right: 2,
+                  top: -4,
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      gradient: LinearGradient(
+                        colors: [AppColors.primary, AppColors.primary700],
+                      ),
                       borderRadius: AppRadii.borderRadiusPill,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.4),
+                          blurRadius: 6,
+                        ),
+                      ],
                     ),
                     child: Text(
                       '$badgeCount',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.surfacePrimary,
+                        color: AppColors.white,
                       ),
                     ),
                   ),
@@ -1122,56 +1265,84 @@ class _MobileBottomNavItem extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 3),
         Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-            color: AppColors.neutral800,
+            color: selected ? AppColors.primary : AppColors.neutral400,
           ),
         ),
+        if (selected)
+          Container(
+            width: 16,
+            height: 2,
+            margin: EdgeInsets.only(top: 3),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: AppRadii.borderRadiusPill,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.5),
+                  blurRadius: 4,
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
 }
 
-class _MobileWhatsAppListSkeleton extends StatelessWidget {
-  const _MobileWhatsAppListSkeleton();
+// ═══════════════════════════════════════════════════════════════════════════
+// PREMIUM LIST SKELETON — Shimmer dark
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _PremiumListSkeleton extends StatelessWidget {
+  const _PremiumListSkeleton();
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      physics: const ClampingScrollPhysics(),
-      padding: EdgeInsets.fromLTRB(0, 2, 0, 110),
+    return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.fromLTRB(0, 4, 0, 110),
       itemCount: 6,
-      separatorBuilder: (_, __) => const SizedBox.shrink(),
       itemBuilder: (context, index) {
-        return const Padding(
-          padding: EdgeInsets.fromLTRB(16, 11, 14, 11),
+        return Padding(
+          padding: EdgeInsets.fromLTRB(16, 12, 14, 12),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              OmnichannelSkeletonBlock(width: 52, height: 52, radius: 26),
-              SizedBox(width: 14),
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceTertiary,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: OmnichannelSkeletonBlock(
-                            width: 140,
-                            height: 16,
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        OmnichannelSkeletonBlock(width: 38, height: 12),
-                      ],
+                    Container(
+                      width: 140,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceTertiary,
+                        borderRadius: AppRadii.borderRadiusSm,
+                      ),
                     ),
-                    SizedBox(height: 10),
-                    OmnichannelSkeletonBlock(width: 200, height: 14),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 200,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceTertiary,
+                        borderRadius: AppRadii.borderRadiusSm,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -1182,6 +1353,10 @@ class _MobileWhatsAppListSkeleton extends StatelessWidget {
     );
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PREMIUM AVATAR COLORS — More vibrant gradient pairs
+// ═══════════════════════════════════════════════════════════════════════════
 
 String _mobileConversationInitial(String value) {
   final text = value.trim();
@@ -1199,18 +1374,22 @@ String _mobileConversationInitial(String value) {
   return text.characters.first.toUpperCase();
 }
 
-List<Color> _mobileConversationAvatarColors(String value) {
+List<Color> _premiumAvatarColors(String value) {
   final text = value.trim();
   final seed = text.isEmpty ? 0 : text.characters.first.codeUnitAt(0);
 
-  switch (seed % 4) {
+  switch (seed % 6) {
     case 0:
-      return const <Color>[Color(0xFF5B6C7B), Color(0xFF667A8A)];
+      return const <Color>[Color(0xFF00A86B), Color(0xFF006B44)]; // Emerald
     case 1:
-      return const <Color>[Color(0xFF8D58E8), Color(0xFFB86BFF)];
+      return const <Color>[Color(0xFF9B7FDB), Color(0xFF6B4FB8)]; // Purple
     case 2:
-      return const <Color>[Color(0xFF6B7280), Color(0xFF4B5563)];
+      return const <Color>[Color(0xFF4A9EF5), Color(0xFF2563EB)]; // Blue
+    case 3:
+      return const <Color>[Color(0xFFE85454), Color(0xFFC02424)]; // Coral
+    case 4:
+      return const <Color>[Color(0xFFF5A623), Color(0xFFD48806)]; // Amber
     default:
-      return const <Color>[Color(0xFF0EAD98), Color(0xFF17C3B2)];
+      return const <Color>[Color(0xFF2DD89A), Color(0xFF00A86B)]; // Mint
   }
 }

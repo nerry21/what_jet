@@ -22,23 +22,30 @@ class OmnichannelConversationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final statusColor = _statusColor(item.statusLabel);
     final initial = _safeInitial(item.customerLabel, fallback: 'C');
+    final avatarColors = _cardAvatarColors(
+      item.channel,
+      item.customerLabel ?? '',
+    );
+    final hasUnread = item.unreadCount > 0;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: AppRadii.borderRadiusXl,
-        child: Container(
+        borderRadius: AppRadii.borderRadiusLg,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
           padding: EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: selected
                 ? AppColors.primary.withValues(alpha: 0.08)
-                : AppColors.scaffoldBackground.withValues(alpha: 0.72),
-            borderRadius: AppRadii.borderRadiusXl,
+                : AppColors.surfaceSecondary,
+            borderRadius: AppRadii.borderRadiusLg,
             border: Border.all(
               color: selected
-                  ? AppColors.primary.withValues(alpha: 0.28)
-                  : AppColors.borderLight.withValues(alpha: 0.9),
+                  ? AppColors.primary.withValues(alpha: 0.20)
+                  : AppColors.borderLight.withValues(alpha: 0.5),
             ),
           ),
           child: Column(
@@ -47,31 +54,32 @@ class OmnichannelConversationCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+                  // Rounded avatar with gradient + glow
                   Container(
-                    width: 42,
-                    height: 42,
+                    width: 44,
+                    height: 44,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
+                      borderRadius: BorderRadius.circular(14),
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: <Color>[
-                          item.channel == 'mobile_live_chat'
-                              ? AppColors.primary
-                              : AppColors.accent,
-                          item.channel == 'mobile_live_chat'
-                              ? AppColors.primary200
-                              : AppColors.accent200,
-                        ],
+                        colors: avatarColors,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: avatarColors.last.withValues(alpha: 0.25),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       initial,
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.surfacePrimary,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.white,
                       ),
                     ),
                   ),
@@ -86,18 +94,20 @@ class OmnichannelConversationCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: hasUnread
+                                ? FontWeight.w700
+                                : FontWeight.w600,
                             color: AppColors.neutral800,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 3),
                         Text(
                           item.customerLabel ?? item.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.neutral500,
+                            color: AppColors.neutral400,
                           ),
                         ),
                       ],
@@ -108,17 +118,15 @@ class OmnichannelConversationCard extends StatelessWidget {
                     formatOmnichannelListTime(item.lastActivityAt),
                     style: TextStyle(
                       fontSize: 11,
-                      fontWeight: item.hasUnread
-                          ? FontWeight.w700
-                          : FontWeight.w500,
-                      color: item.hasUnread
+                      fontWeight: hasUnread ? FontWeight.w600 : FontWeight.w400,
+                      color: hasUnread
                           ? AppColors.primary
                           : AppColors.neutral300,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               Text(
                 item.preview,
                 maxLines: 2,
@@ -126,20 +134,20 @@ class OmnichannelConversationCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.45,
-                  color: AppColors.neutral500,
+                  color: AppColors.neutral400,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               Row(
                 children: <Widget>[
                   Expanded(
                     child: Wrap(
                       spacing: 8,
-                      runSpacing: 8,
+                      runSpacing: 6,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: <Widget>[
                         ChannelBadge(channel: item.channel, compact: true),
-                        _MiniStatusChip(
+                        _PremiumStatusChip(
                           label: item.statusLabel,
                           color: statusColor,
                         ),
@@ -150,18 +158,27 @@ class OmnichannelConversationCard extends StatelessWidget {
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: 10,
-                        vertical: 5,
+                        vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary,
+                        gradient: LinearGradient(
+                          colors: [AppColors.primary, AppColors.primary700],
+                        ),
                         borderRadius: AppRadii.borderRadiusPill,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.30),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Text(
                         '${item.unreadCount}',
                         style: TextStyle(
                           fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.surfacePrimary,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.white,
                         ),
                       ),
                     ),
@@ -175,8 +192,8 @@ class OmnichannelConversationCard extends StatelessWidget {
   }
 }
 
-class _MiniStatusChip extends StatelessWidget {
-  const _MiniStatusChip({required this.label, required this.color});
+class _PremiumStatusChip extends StatelessWidget {
+  const _PremiumStatusChip({required this.label, required this.color});
 
   final String label;
   final Color color;
@@ -184,17 +201,17 @@ class _MiniStatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: color.withValues(alpha: 0.10),
         borderRadius: AppRadii.borderRadiusPill,
-        border: Border.all(color: color.withValues(alpha: 0.18)),
+        border: Border.all(color: color.withValues(alpha: 0.15)),
       ),
       child: Text(
         label,
         style: TextStyle(
           fontSize: 11,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w600,
           color: color,
         ),
       ),
@@ -207,7 +224,6 @@ Color _statusColor(String statusLabel) {
   if (normalized.contains('takeover') || normalized.contains('human')) {
     return AppColors.accent;
   }
-
   return AppColors.primary;
 }
 
@@ -217,4 +233,24 @@ String _safeInitial(String? value, {required String fallback}) {
     return fallback;
   }
   return text.characters.first.toUpperCase();
+}
+
+List<Color> _cardAvatarColors(String channel, String name) {
+  if (channel == 'mobile_live_chat' || channel == 'chat') {
+    return <Color>[AppColors.accent, AppColors.accent600];
+  }
+
+  final seed = name.isEmpty ? 0 : name.characters.first.codeUnitAt(0);
+  switch (seed % 5) {
+    case 0:
+      return <Color>[AppColors.primary, AppColors.primary700];
+    case 1:
+      return <Color>[AppColors.accent, AppColors.accent600];
+    case 2:
+      return const <Color>[Color(0xFF4A9EF5), Color(0xFF2563EB)];
+    case 3:
+      return const <Color>[Color(0xFFF5A623), Color(0xFFD48806)];
+    default:
+      return const <Color>[Color(0xFF2DD89A), Color(0xFF00A86B)];
+  }
 }

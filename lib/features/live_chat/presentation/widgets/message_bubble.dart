@@ -20,72 +20,104 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isOutgoing = message.isMine;
+
     return TweenAnimationBuilder<double>(
-      duration: const Duration(milliseconds: 280),
+      duration: const Duration(milliseconds: 320),
       curve: Curves.easeOutCubic,
       tween: Tween<double>(begin: 0, end: 1),
       builder: (context, value, child) {
         return Opacity(
           opacity: value,
           child: Transform.translate(
-            offset: Offset(0, (1 - value) * 10),
+            offset: Offset(0, (1 - value) * 12),
             child: child,
           ),
         );
       },
       child: Align(
-        alignment: message.isMine
-            ? Alignment.centerRight
-            : Alignment.centerLeft,
+        alignment: isOutgoing ? Alignment.centerRight : Alignment.centerLeft,
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxWidth),
           child: Container(
-            margin: EdgeInsets.only(bottom: 8),
+            margin: EdgeInsets.only(bottom: 6),
             padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              gradient: message.isMine
+              // Outgoing: emerald gradient with glow
+              gradient: isOutgoing
                   ? LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: <Color>[
-                        AppColors.bubbleOutgoing,
-                        AppColors.bubbleOutgoingGradientEnd,
-                      ],
+                      colors: <Color>[AppColors.primary, AppColors.primary700],
                     )
                   : null,
-              color: message.isMine ? null : AppColors.bubbleIncoming,
-              borderRadius: BorderRadius.circular(18),
+              // Incoming: dark glass surface
+              color: isOutgoing ? null : AppColors.surfaceTertiary,
+              borderRadius: isOutgoing
+                  ? const BorderRadius.only(
+                      topLeft: Radius.circular(18),
+                      topRight: Radius.circular(18),
+                      bottomLeft: Radius.circular(18),
+                      bottomRight: Radius.circular(4),
+                    )
+                  : const BorderRadius.only(
+                      topLeft: Radius.circular(18),
+                      topRight: Radius.circular(18),
+                      bottomLeft: Radius.circular(4),
+                      bottomRight: Radius.circular(18),
+                    ),
+              border: isOutgoing
+                  ? null
+                  : Border.all(
+                      color: AppColors.borderLight.withValues(alpha: 0.5),
+                    ),
               boxShadow: <BoxShadow>[
+                if (isOutgoing)
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.20),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
                 BoxShadow(
-                  color: Color(0x40000000),
-                  blurRadius: 2,
-                  offset: Offset(0, 1),
+                  color: const Color(0x20000000),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                Flexible(
-                  child: Text(
-                    message.text,
-                    style: TextStyle(
-                      fontSize: 15,
-                      height: 1.4,
-                      color: AppColors.neutral800,
-                    ),
+                // Message text
+                Text(
+                  message.text,
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 1.45,
+                    color: isOutgoing ? AppColors.white : AppColors.neutral800,
                   ),
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  timeLabel,
-                  style: TextStyle(fontSize: 11, color: AppColors.neutral400),
+                const SizedBox(height: 4),
+
+                // Time + status row
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      timeLabel,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: isOutgoing
+                            ? AppColors.white.withValues(alpha: 0.60)
+                            : AppColors.neutral300,
+                      ),
+                    ),
+                    if (isOutgoing) ...<Widget>[
+                      const SizedBox(width: 4),
+                      _PremiumStatusIcon(message: message, onRetry: onRetry),
+                    ],
+                  ],
                 ),
-                if (message.isMine) ...<Widget>[
-                  const SizedBox(width: 4),
-                  _StatusIcon(message: message, onRetry: onRetry),
-                ],
               ],
             ),
           ),
@@ -95,8 +127,8 @@ class MessageBubble extends StatelessWidget {
   }
 }
 
-class _StatusIcon extends StatelessWidget {
-  const _StatusIcon({required this.message, this.onRetry});
+class _PremiumStatusIcon extends StatelessWidget {
+  const _PremiumStatusIcon({required this.message, this.onRetry});
 
   final ChatMessageModel message;
   final VoidCallback? onRetry;
@@ -107,7 +139,7 @@ class _StatusIcon extends StatelessWidget {
       return InkWell(
         onTap: onRetry,
         borderRadius: AppRadii.borderRadiusXl,
-        child: const Padding(
+        child: Padding(
           padding: EdgeInsets.all(2),
           child: Icon(Icons.refresh_rounded, size: 16, color: AppColors.error),
         ),
@@ -115,29 +147,33 @@ class _StatusIcon extends StatelessWidget {
     }
 
     if (message.isSending) {
-      return const Icon(
+      return Icon(
         Icons.schedule_rounded,
         size: 14,
-        color: AppColors.neutral500,
+        color: AppColors.white.withValues(alpha: 0.50),
       );
     }
 
     if (message.isReadByCustomer) {
-      return const Icon(
+      return Icon(
         Icons.done_all_rounded,
         size: 14,
-        color: AppColors.readReceipt,
+        color: AppColors.readReceipt, // Bright emerald green
       );
     }
 
     if (message.isDelivered) {
-      return const Icon(
+      return Icon(
         Icons.done_all_rounded,
         size: 14,
-        color: AppColors.primary,
+        color: AppColors.white.withValues(alpha: 0.70),
       );
     }
 
-    return Icon(Icons.done_rounded, size: 14, color: AppColors.primary);
+    return Icon(
+      Icons.done_rounded,
+      size: 14,
+      color: AppColors.white.withValues(alpha: 0.60),
+    );
   }
 }
