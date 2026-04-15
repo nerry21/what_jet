@@ -85,7 +85,7 @@ class _SummaryGrid extends StatelessWidget {
       _SummaryTileData(
         label: 'Total',
         value: '${summary.totalCalls}',
-        color: Colors.black87,
+        color: AppColors.neutral800,
       ),
       _SummaryTileData(
         label: 'Completed',
@@ -146,7 +146,7 @@ class _SummaryTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(color: AppColors.borderLight),
       ),
@@ -246,7 +246,7 @@ class _OutcomeRow extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black87,
+                    color: AppColors.neutral800,
                   ),
                 ),
               ),
@@ -255,7 +255,7 @@ class _OutcomeRow extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black87,
+                  color: AppColors.neutral800,
                 ),
               ),
               const SizedBox(width: 8),
@@ -340,7 +340,7 @@ class _DailyTrendRow extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: Colors.black87,
+                color: AppColors.neutral800,
               ),
             ),
           ),
@@ -416,7 +416,7 @@ class _RecentCallRow extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(color: AppColors.borderLight),
       ),
@@ -433,7 +433,7 @@ class _RecentCallRow extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
-                    color: Colors.black87,
+                    color: AppColors.neutral800,
                   ),
                 ),
               ),
@@ -509,7 +509,7 @@ class _CapabilityCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(color: AppColors.borderLight),
       ),
@@ -699,7 +699,7 @@ class _AnalyticsSkeleton extends StatelessWidget {
               width: 122,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surfaceSecondary,
                 borderRadius: AppRadii.borderRadiusLg,
                 border: Border.all(color: AppColors.borderLight),
               ),

@@ -107,7 +107,7 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
                     decoration: InputDecoration(
                       hintText: 'Ketik status',
                       filled: true,
-                      fillColor: const Color(0xFFF5F5F5),
+                      fillColor: AppColors.surfaceSecondary,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(18),
                         borderSide: BorderSide.none,
@@ -456,9 +456,9 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: const Color(0xFFF7F7F7),
+                color: AppColors.surfaceTertiary,
                 borderRadius: AppRadii.borderRadiusXl,
-                border: Border.all(color: const Color(0xFFE8E8E8)),
+                border: Border.all(color: AppColors.borderLight),
               ),
               child: const Text(
                 'Belum ada status. Buat status teks, foto, video, suara, atau musik dari tombol di atas.',
@@ -520,12 +520,12 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusXxl,
-        border: Border.all(color: const Color(0xFFE9E9E9)),
+        border: Border.all(color: AppColors.borderLight),
         boxShadow: const <BoxShadow>[
           BoxShadow(
-            color: Color(0x12000000),
+            color: Color(0x40000000),
             blurRadius: 18,
             offset: Offset(0, 6),
           ),
@@ -655,7 +655,7 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
       width: double.infinity,
       height: 190,
       decoration: const BoxDecoration(
-        color: Color(0xFFF3F5F7),
+        color: AppColors.surfaceTertiary,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -673,7 +673,7 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
     return InputDecoration(
       hintText: hint,
       filled: true,
-      fillColor: const Color(0xFFF5F5F5),
+      fillColor: AppColors.surfaceSecondary,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
         borderSide: BorderSide.none,
@@ -748,7 +748,7 @@ class _ComposerActionCard extends StatelessWidget {
     return SizedBox(
       width: 106,
       child: Material(
-        color: Colors.white,
+        color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusXl,
         child: InkWell(
           borderRadius: AppRadii.borderRadiusXl,
@@ -757,7 +757,7 @@ class _ComposerActionCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
             decoration: BoxDecoration(
               borderRadius: AppRadii.borderRadiusXl,
-              border: Border.all(color: const Color(0xFFE5E5E5)),
+              border: Border.all(color: AppColors.borderLight),
             ),
             child: Column(
               children: <Widget>[

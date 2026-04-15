@@ -73,7 +73,7 @@ class MessageBubble extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 15,
                       height: 1.4,
-                      color: Colors.black,
+                      color: AppColors.neutral800,
                     ),
                   ),
                 ),
@@ -82,7 +82,7 @@ class MessageBubble extends StatelessWidget {
                   timeLabel,
                   style: const TextStyle(
                     fontSize: 11,
-                    color: Color(0xB3999999),
+                    color: AppColors.neutral400,
                   ),
                 ),
                 if (message.isMine) ...<Widget>[

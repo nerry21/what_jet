@@ -186,10 +186,10 @@ class _LiveChatPageState extends State<LiveChatPage> {
 
               return Container(
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surfaceSecondary,
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: Color(0x14000000),
+                      color: Color(0x40000000),
                       blurRadius: 32,
                       offset: Offset(0, 8),
                     ),
@@ -219,11 +219,11 @@ class _LiveChatPageState extends State<LiveChatPage> {
 
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(right: BorderSide(color: Color(0xFFF0F0F0))),
+        color: AppColors.surfaceSecondary,
+        border: Border(right: BorderSide(color: AppColors.borderLight)),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: Color(0x0A000000),
+            color: Color(0x20000000),
             blurRadius: 8,
             offset: Offset(2, 0),
           ),
@@ -298,10 +298,10 @@ class _LiveChatPageState extends State<LiveChatPage> {
                     ? 'Sambungkan lagi'
                     : 'Retry',
                 foregroundColor: _controller.isOffline
-                    ? const Color(0xFF9A6700)
+                    ? AppColors.warning800
                     : AppColors.error,
                 backgroundColor: _controller.isOffline
-                    ? const Color(0xFFFFF4E5)
+                    ? AppColors.warning50
                     : AppColors.error.withValues(alpha: 0.08),
                 onTap: () => _controller.reconnectSession(
                   clearSession: _controller.isUnauthorized,
@@ -400,11 +400,11 @@ class _LiveChatPageState extends State<LiveChatPage> {
           ),
           child: Container(
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surfaceSecondary,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               boxShadow: <BoxShadow>[
                 BoxShadow(
-                  color: Color(0x1F000000),
+                  color: Color(0x40000000),
                   blurRadius: 32,
                   offset: Offset(0, -8),
                 ),
@@ -425,7 +425,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                          color: AppColors.neutral800,
                         ),
                       ),
                       IconButton(
@@ -458,14 +458,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
                     width: double.infinity,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: <Color>[
-                            AppColors.primary,
-                            AppColors.primary200,
-                          ],
-                        ),
+                        gradient: AppColors.primaryGradient,
                         borderRadius: AppRadii.borderRadiusMd,
                       ),
                       child: TextButton(
@@ -654,7 +647,7 @@ class _SearchInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: const Color(0xFFF0F0F0),
+        color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusXl,
       ),
       child: TextField(
@@ -717,7 +710,7 @@ class _FilterChipButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: active
                 ? AppColors.primary.withValues(alpha: 0.12)
-                : const Color(0xFFF0F0F0),
+                : AppColors.surfaceTertiary,
             borderRadius: AppRadii.borderRadiusPill,
           ),
           child: Text(
@@ -823,7 +816,7 @@ class _SidebarEmptyState extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: AppColors.neutral800,
             ),
           ),
           const SizedBox(height: 8),
@@ -839,11 +832,7 @@ class _SidebarEmptyState extends StatelessWidget {
           const SizedBox(height: 18),
           DecoratedBox(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: <Color>[AppColors.primary, AppColors.primary200],
-              ),
+              gradient: AppColors.primaryGradient,
               borderRadius: AppRadii.borderRadiusMd,
             ),
             child: TextButton.icon(
@@ -871,7 +860,7 @@ class _DesktopPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: AppColors.surfaceSecondary,
       child: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -897,7 +886,7 @@ class _DesktopPlaceholder extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: AppColors.neutral800,
                 ),
               ),
               const SizedBox(height: 8),
@@ -940,11 +929,11 @@ class _ShellErrorState extends StatelessWidget {
           padding: const EdgeInsets.all(24),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surfaceSecondary,
               borderRadius: AppRadii.borderRadiusXxl,
               boxShadow: const <BoxShadow>[
                 BoxShadow(
-                  color: Color(0x14000000),
+                  color: Color(0x40000000),
                   blurRadius: 32,
                   offset: Offset(0, 8),
                 ),
@@ -957,11 +946,7 @@ class _ShellErrorState extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
                   decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: <Color>[AppColors.primary, AppColors.primary200],
-                    ),
+                    gradient: AppColors.primaryGradient,
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(24),
                     ),
@@ -1014,7 +999,7 @@ class _ShellErrorState extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                          color: AppColors.neutral800,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -1032,18 +1017,11 @@ class _ShellErrorState extends StatelessWidget {
                         width: double.infinity,
                         child: DecoratedBox(
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: <Color>[
-                                AppColors.primary,
-                                AppColors.primary200,
-                              ],
-                            ),
+                            gradient: AppColors.primaryGradient,
                             borderRadius: AppRadii.borderRadiusMd,
                             boxShadow: const <BoxShadow>[
                               BoxShadow(
-                                color: Color(0x3300A884),
+                                color: AppColors.primaryGlow,
                                 blurRadius: 12,
                                 offset: Offset(0, 4),
                               ),
@@ -1097,7 +1075,7 @@ class _GreyInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: const Color(0xFFF0F0F0),
+        color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusLg,
       ),
       child: TextField(

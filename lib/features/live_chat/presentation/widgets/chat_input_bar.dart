@@ -24,8 +24,8 @@ class ChatInputBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFF0F0F0))),
+        color: AppColors.surfaceSecondary,
+        border: Border(top: BorderSide(color: AppColors.borderLight)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -42,7 +42,7 @@ class ChatInputBar extends StatelessWidget {
                 Expanded(
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF0F0F0),
+                      color: AppColors.surfaceTertiary,
                       borderRadius: AppRadii.borderRadiusXl,
                     ),
                     child: TextField(
@@ -64,7 +64,7 @@ class ChatInputBar extends StatelessWidget {
                       ),
                       style: const TextStyle(
                         fontSize: 15,
-                        color: Color(0xFF111111),
+                        color: AppColors.neutral800,
                       ),
                     ),
                   ),

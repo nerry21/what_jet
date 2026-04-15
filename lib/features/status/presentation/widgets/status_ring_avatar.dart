@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:what_jet/core/theme/app_colors.dart';
+
 class StatusRingAvatar extends StatelessWidget {
   const StatusRingAvatar({
     super.key,
@@ -17,8 +19,8 @@ class StatusRingAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ringColor = hasUnviewed
-        ? const Color(0xFF25D366)
-        : const Color(0xFFBDBDBD);
+        ? AppColors.primary
+        : AppColors.neutral400;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -36,11 +38,11 @@ class StatusRingAvatar extends StatelessWidget {
           child: Container(
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white,
+              color: AppColors.surfaceSecondary,
             ),
             padding: const EdgeInsets.all(3),
             child: CircleAvatar(
-              backgroundColor: const Color(0xFFE8F5E9),
+              backgroundColor: AppColors.surfaceTertiary,
               backgroundImage: imageUrl != null && imageUrl!.isNotEmpty
                   ? NetworkImage(imageUrl!)
                   : null,
@@ -49,7 +51,7 @@ class StatusRingAvatar extends StatelessWidget {
                       label.isNotEmpty ? label[0].toUpperCase() : 'A',
                       style: const TextStyle(
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF1B5E20),
+                        color: AppColors.primary,
                       ),
                     )
                   : null,

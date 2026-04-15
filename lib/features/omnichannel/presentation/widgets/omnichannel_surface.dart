@@ -19,7 +19,7 @@ class OmnichannelPaneCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusXxxl,
         border: Border.all(
           color: AppColors.borderLight.withValues(alpha: 0.9),
@@ -166,7 +166,7 @@ class OmnichannelEmptyState extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Colors.black,
+                color: AppColors.neutral800,
               ),
             ),
             const SizedBox(height: 8),
@@ -230,7 +230,7 @@ class OmnichannelErrorState extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black,
+                    color: AppColors.neutral800,
                   ),
                 ),
                 const SizedBox(height: 8),

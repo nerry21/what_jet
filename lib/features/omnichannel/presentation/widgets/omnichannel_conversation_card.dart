@@ -87,7 +87,7 @@ class OmnichannelConversationCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
-                            color: Colors.black,
+                            color: AppColors.neutral800,
                           ),
                         ),
                         const SizedBox(height: 4),

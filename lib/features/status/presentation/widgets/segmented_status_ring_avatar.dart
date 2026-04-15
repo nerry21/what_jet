@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:what_jet/core/theme/app_colors.dart';
+
 class SegmentedStatusRingAvatar extends StatelessWidget {
   const SegmentedStatusRingAvatar({
     super.key,
@@ -42,11 +44,11 @@ class SegmentedStatusRingAvatar extends StatelessWidget {
                   child: Container(
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white,
+                      color: AppColors.surfaceSecondary,
                     ),
                     padding: const EdgeInsets.all(3),
                     child: CircleAvatar(
-                      backgroundColor: const Color(0xFFE8F5E9),
+                      backgroundColor: AppColors.surfaceTertiary,
                       backgroundImage: imageUrl != null && imageUrl!.isNotEmpty
                           ? NetworkImage(imageUrl!)
                           : null,
@@ -55,7 +57,7 @@ class SegmentedStatusRingAvatar extends StatelessWidget {
                               label.isNotEmpty ? label[0].toUpperCase() : 'A',
                               style: const TextStyle(
                                 fontWeight: FontWeight.w800,
-                                color: Color(0xFF1B5E20),
+                                color: AppColors.primary,
                               ),
                             )
                           : null,
@@ -110,8 +112,8 @@ class _SegmentedRingPainter extends CustomPainter {
     for (var i = 0; i < totalSegments; i++) {
       final isViewed = i < viewedSegments;
       basePaint.color = isViewed
-          ? const Color(0xFFBDBDBD)
-          : const Color(0xFF25D366);
+          ? AppColors.neutral400
+          : AppColors.primary;
 
       canvas.drawArc(
         rect.deflate(strokeWidth / 2),

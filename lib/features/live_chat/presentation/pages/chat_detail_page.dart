@@ -143,7 +143,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     final content = AnimatedBuilder(
       animation: _controller,
       builder: (context, _) => Material(
-        color: Colors.white,
+        color: AppColors.surfaceSecondary,
         child: Column(
           children: <Widget>[
             _ConversationHeader(
@@ -161,7 +161,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: <Color>[Color(0xFFF9F9F9), Colors.white],
+                    colors: <Color>[AppColors.surfacePrimary, AppColors.surfaceSecondary],
                   ),
                 ),
                 child: Column(
@@ -172,7 +172,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                             _controller.errorMessage ??
                             'Sesi mobile berakhir. Kembali dan login ulang.',
                         actionLabel: 'Kembali',
-                        color: const Color(0xFFFFECEE),
+                        color: AppColors.error50,
                         foregroundColor: AppColors.error,
                         onTap: () {
                           Navigator.of(context).maybePop();
@@ -182,8 +182,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                       _ConversationBanner(
                         label: _controller.connectionMessage!,
                         actionLabel: 'Coba lagi',
-                        color: const Color(0xFFFFF4E5),
-                        foregroundColor: const Color(0xFF9A6700),
+                        color: AppColors.warning50,
+                        foregroundColor: AppColors.warning800,
                         onTap: _controller.refresh,
                       ),
                     if (_controller.errorMessage != null &&
@@ -192,7 +192,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                       _ConversationBanner(
                         label: _controller.errorMessage!,
                         actionLabel: 'Refresh',
-                        color: const Color(0xFFFFECEE),
+                        color: AppColors.error50,
                         foregroundColor: AppColors.error,
                         onTap: _controller.refresh,
                       ),
@@ -329,12 +329,8 @@ class _ConversationHeader extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: <Color>[AppColors.primary, AppColors.primary],
-        ),
+      decoration: BoxDecoration(
+        gradient: AppColors.primaryGradient,
       ),
       child: Row(
         children: <Widget>[
@@ -476,7 +472,7 @@ class _ConversationEmptyState extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Colors.black,
+                color: AppColors.neutral800,
               ),
             ),
             const SizedBox(height: 8),
@@ -546,7 +542,7 @@ class _ConversationErrorState extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Colors.black,
+                color: AppColors.neutral800,
               ),
             ),
             const SizedBox(height: 8),

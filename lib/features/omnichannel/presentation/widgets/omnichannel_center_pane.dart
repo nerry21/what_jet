@@ -788,7 +788,7 @@ class _MobileConversationScaffold extends StatelessWidget {
           );
 
     return ColoredBox(
-      color: const Color(0xFFF0E7DD),
+      color: AppColors.surfaceTertiary,
       child: Column(
         children: <Widget>[
           _MobileConversationAppBar(
@@ -871,7 +871,7 @@ class _MobileConversationAppBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceSecondary,
         border: Border(bottom: BorderSide(color: AppColors.borderLight)),
       ),
       child: Column(
@@ -923,7 +923,7 @@ class _MobileConversationAppBar extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: Colors.black,
+                        color: AppColors.neutral800,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -985,7 +985,7 @@ class _MobileConversationAppBar extends StatelessWidget {
                       ],
                   icon: const Icon(
                     Icons.more_vert_rounded,
-                    color: Colors.black87,
+                    color: AppColors.neutral800,
                   ),
                 ),
               ],
@@ -1023,7 +1023,7 @@ class _MobileAppBarIconButton extends StatelessWidget {
         child: SizedBox(
           width: 40,
           height: 40,
-          child: Icon(icon, color: Colors.black87, size: 24),
+          child: Icon(icon, color: AppColors.neutral800, size: 24),
         ),
       ),
     );
@@ -1057,12 +1057,12 @@ class _BotControlBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: isEnabled
             ? AppColors.primary.withValues(alpha: 0.08)
-            : const Color(0xFFFFF4EA),
+            : AppColors.warning50,
         borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(
           color: isEnabled
               ? AppColors.primary.withValues(alpha: 0.20)
-              : const Color(0xFFF1C69A),
+              : AppColors.warning,
         ),
       ),
       child: Row(
@@ -1076,7 +1076,7 @@ class _BotControlBanner extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
-                    color: Colors.black,
+                    color: AppColors.neutral800,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -1158,7 +1158,7 @@ class _MobileDateSeparator extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.75),
+          color: AppColors.surfaceSecondary.withValues(alpha: 0.75),
           borderRadius: AppRadii.borderRadiusPill,
         ),
         child: Text(
@@ -1185,7 +1185,7 @@ class _MobileConversationBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final timeColor = Colors.black.withValues(alpha: 0.58);
+    final timeColor = AppColors.neutral800.withValues(alpha: 0.58);
     final statusIcon = _buildStatusIcon();
 
     return Align(
@@ -1196,7 +1196,7 @@ class _MobileConversationBubble extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.fromLTRB(12, 9, 12, 8),
           decoration: BoxDecoration(
-            color: message.isMine ? const Color(0xFFD9FDD3) : Colors.white,
+            color: message.isMine ? AppColors.bubbleOutgoing : AppColors.bubbleIncoming,
             borderRadius: BorderRadius.only(
               topLeft: const Radius.circular(18),
               topRight: const Radius.circular(18),
@@ -1240,7 +1240,7 @@ class _MobileConversationBubble extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     height: 1.35,
-                    color: Colors.black,
+                    color: AppColors.neutral800,
                   ),
                 ),
               if (message.displayText.isEmpty &&
@@ -1253,7 +1253,7 @@ class _MobileConversationBubble extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     height: 1.35,
-                    color: Colors.black,
+                    color: AppColors.neutral800,
                   ),
                 ),
               const SizedBox(height: 6),
@@ -1301,7 +1301,7 @@ class _MobileConversationBubble extends StatelessWidget {
     return Icon(
       Icons.done_all_rounded,
       size: 16,
-      color: message.isRead ? const Color(0xFF53BDEB) : AppColors.neutral300,
+      color: message.isRead ? AppColors.readReceipt : AppColors.neutral300,
     );
   }
 }
@@ -1401,7 +1401,7 @@ class _MobileConversationComposerState
     if (widget.isRecordingVoiceNote) {
       return Container(
         padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-        color: const Color(0xFFF0E7DD),
+        color: AppColors.surfaceTertiary,
         child: SafeArea(
           top: false,
           child: Row(
@@ -1421,7 +1421,7 @@ class _MobileConversationComposerState
                   height: 58,
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.surfaceSecondary,
                     borderRadius: AppRadii.borderRadiusXxxl,
                   ),
                   child: Row(
@@ -1431,7 +1431,7 @@ class _MobileConversationComposerState
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.black87,
+                          color: AppColors.neutral800,
                         ),
                       ),
                       const SizedBox(width: 14),
@@ -1441,13 +1441,13 @@ class _MobileConversationComposerState
                         width: 34,
                         height: 34,
                         decoration: const BoxDecoration(
-                          color: Color(0xFFFFF0F0),
+                          color: AppColors.error50,
                           shape: BoxShape.circle,
                         ),
                         alignment: Alignment.center,
                         child: const Icon(
                           Icons.pause_rounded,
-                          color: Color(0xFFE53935),
+                          color: AppColors.error,
                           size: 22,
                         ),
                       ),
@@ -1492,7 +1492,7 @@ class _MobileConversationComposerState
 
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-      color: const Color(0xFFF0E7DD),
+      color: AppColors.surfaceTertiary,
       child: SafeArea(
         top: false,
         child: ValueListenableBuilder<TextEditingValue>(
@@ -1506,7 +1506,7 @@ class _MobileConversationComposerState
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.surfaceSecondary,
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: Row(
@@ -1659,7 +1659,7 @@ class _VoiceNoteWaveform extends StatelessWidget {
                 width: 3,
                 height: height,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3F3F3F),
+                  color: AppColors.neutral300,
                   borderRadius: AppRadii.borderRadiusPill,
                 ),
               ),
@@ -1717,15 +1717,15 @@ class _WhatsAppWallpaper extends StatelessWidget {
 class _WhatsAppWallpaperPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final background = Paint()..color = const Color(0xFFF0E7DD);
+    final background = Paint()..color = AppColors.surfaceTertiary;
     canvas.drawRect(Offset.zero & size, background);
 
     final circlePaint = Paint()
-      ..color = const Color(0xFFD9CEC0).withValues(alpha: 0.32)
+      ..color = AppColors.borderLight.withValues(alpha: 0.32)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2;
     final dotPaint = Paint()
-      ..color = const Color(0xFFD5C6B6).withValues(alpha: 0.22);
+      ..color = AppColors.borderLight.withValues(alpha: 0.22);
 
     const spacing = 56.0;
     for (double y = 18; y < size.height + spacing; y += spacing) {
@@ -1785,7 +1785,7 @@ class _CenterHeader extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: Material(
-                    color: Colors.white,
+                    color: AppColors.surfaceSecondary,
                     borderRadius: AppRadii.borderRadiusPill,
                     child: InkWell(
                       onTap: onOpenInbox,
@@ -1801,7 +1801,7 @@ class _CenterHeader extends StatelessWidget {
                         ),
                         child: const Icon(
                           Icons.arrow_back_rounded,
-                          color: Colors.black87,
+                          color: AppColors.neutral800,
                           size: 20,
                         ),
                       ),
@@ -1854,7 +1854,7 @@ class _CenterHeader extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
-                              color: Colors.black,
+                              color: AppColors.neutral800,
                             ),
                           ),
                         ),
@@ -1971,7 +1971,7 @@ class _HeaderBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusPill,
         border: Border.all(color: AppColors.borderLight),
       ),
@@ -2095,7 +2095,7 @@ class _ThreadBubble extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     height: 1.5,
-                    color: Colors.black,
+                    color: AppColors.neutral800,
                   ),
                 ),
               if (message.displayText.isEmpty &&
@@ -2108,7 +2108,7 @@ class _ThreadBubble extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.5,
-                    color: Colors.black,
+                    color: AppColors.neutral800,
                   ),
                 ),
               const SizedBox(height: 8),
@@ -2178,7 +2178,7 @@ class _ConversationImagePreview extends StatelessWidget {
                   }
 
                   return const DecoratedBox(
-                    decoration: BoxDecoration(color: Color(0xFFEDEDED)),
+                    decoration: BoxDecoration(color: AppColors.borderDefault),
                     child: Center(
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
@@ -2189,7 +2189,7 @@ class _ConversationImagePreview extends StatelessWidget {
                 },
                 errorBuilder: (_, __, ___) {
                   return const DecoratedBox(
-                    decoration: BoxDecoration(color: Color(0xFFEDEDED)),
+                    decoration: BoxDecoration(color: AppColors.borderDefault),
                     child: Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -2363,7 +2363,7 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
         vertical: compact ? 8 : 10,
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.40),
+        color: AppColors.surfaceSecondary.withValues(alpha: 0.40),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
@@ -2375,7 +2375,7 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
               width: compact ? 36 : 42,
               height: compact ? 36 : 42,
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surfaceSecondary,
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -2452,7 +2452,7 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
               width: compact ? 32 : 36,
               height: compact ? 32 : 36,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.85),
+                color: AppColors.surfaceSecondary.withValues(alpha: 0.85),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -2484,7 +2484,7 @@ class _ConversationVideoCard extends StatefulWidget {
       width: width,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.40),
+        color: AppColors.surfaceSecondary.withValues(alpha: 0.40),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -2494,7 +2494,7 @@ class _ConversationVideoCard extends StatefulWidget {
             height: compact ? 120 : 160,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: const Color(0xFFEDEDED),
+              color: AppColors.borderDefault,
               borderRadius: AppRadii.borderRadiusMd,
             ),
             child: Stack(
@@ -2540,7 +2540,7 @@ class _ConversationVideoCard extends StatefulWidget {
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: AppColors.neutral800,
             ),
           ),
           if ((message.mimeType?.trim().isNotEmpty ?? false) ||
@@ -2568,7 +2568,7 @@ class _ConversationVideoCard extends StatefulWidget {
       width: width,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.40),
+        color: AppColors.surfaceSecondary.withValues(alpha: 0.40),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -2578,7 +2578,7 @@ class _ConversationVideoCard extends StatefulWidget {
             height: compact ? 120 : 160,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: const Color(0xFFEDEDED),
+              color: AppColors.borderDefault,
               borderRadius: AppRadii.borderRadiusMd,
             ),
             child: Stack(
@@ -2624,7 +2624,7 @@ class _ConversationVideoCard extends StatefulWidget {
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: AppColors.neutral800,
             ),
           ),
           if ((message.mimeType?.trim().isNotEmpty ?? false) ||
@@ -2747,7 +2747,7 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
       width: width,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.40),
+        color: AppColors.surfaceSecondary.withValues(alpha: 0.40),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -2758,7 +2758,7 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
             child: Container(
               width: double.infinity,
               height: height,
-              color: const Color(0xFFEDEDED),
+              color: AppColors.borderDefault,
               child: _buildVideoSurface(controller),
             ),
           ),
@@ -2772,7 +2772,7 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: AppColors.neutral800,
             ),
           ),
           if ((widget.message.mimeType?.trim().isNotEmpty ?? false) ||
@@ -3070,7 +3070,7 @@ class _ConversationDocumentCard extends StatelessWidget {
       width: width,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.40),
+        color: AppColors.surfaceSecondary.withValues(alpha: 0.40),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
@@ -3079,7 +3079,7 @@ class _ConversationDocumentCard extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFFEDEDED),
+              color: AppColors.borderDefault,
               borderRadius: AppRadii.borderRadiusMd,
             ),
             child: const Icon(
@@ -3098,7 +3098,7 @@ class _ConversationDocumentCard extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: Colors.black,
+                color: AppColors.neutral800,
               ),
             ),
           ),
@@ -3111,7 +3111,7 @@ class _ConversationDocumentCard extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.85),
+                color: AppColors.surfaceSecondary.withValues(alpha: 0.85),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -3239,7 +3239,7 @@ class _ActiveComposer extends StatelessWidget {
                   color: AppColors.neutral300,
                 ),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: AppColors.surfaceSecondary,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
                   borderSide: const BorderSide(
@@ -3315,7 +3315,7 @@ class _ComposerActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: AppColors.surfaceSecondary,
       borderRadius: AppRadii.borderRadiusPill,
       child: InkWell(
         onTap: onTap,
@@ -3346,7 +3346,7 @@ class _ComposerActionButton extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black87,
+                  color: AppColors.neutral800,
                 ),
               ),
             ],
@@ -3373,7 +3373,7 @@ class _ComposerIconButton extends StatelessWidget {
     return Tooltip(
       message: tooltip,
       child: Material(
-        color: Colors.white,
+        color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusPill,
         child: InkWell(
           onTap: onTap,
@@ -3485,7 +3485,7 @@ class _SendContactDialogState extends State<_SendContactDialog> {
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
-                      color: Colors.black,
+                      color: AppColors.neutral800,
                     ),
                   ),
                   const SizedBox(height: 8),

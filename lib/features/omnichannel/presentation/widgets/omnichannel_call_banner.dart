@@ -38,7 +38,7 @@ class OmnichannelCallBanner extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: <Color>[Colors.white, color.withValues(alpha: 0.08)],
+          colors: <Color>[AppColors.surfaceSecondary, color.withValues(alpha: 0.08)],
         ),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: color.withValues(alpha: 0.16)),
@@ -77,7 +77,7 @@ class OmnichannelCallBanner extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
-                    color: Colors.black,
+                    color: AppColors.neutral800,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -119,7 +119,7 @@ class OmnichannelCallBanner extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.surfaceSecondary,
                           borderRadius: AppRadii.borderRadiusPill,
                           border: Border.all(
                             color: AppColors.borderLight,
@@ -151,14 +151,14 @@ class OmnichannelCallBanner extends StatelessWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.85),
+                      color: AppColors.surfaceTertiary,
                       borderRadius: AppRadii.borderRadiusPill,
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                      border: Border.all(color: AppColors.borderLight),
                     ),
                     child: const Icon(
                       Icons.close_rounded,
                       size: 20,
-                      color: Color(0xFF667085),
+                      color: AppColors.neutral400,
                     ),
                   ),
                 ),

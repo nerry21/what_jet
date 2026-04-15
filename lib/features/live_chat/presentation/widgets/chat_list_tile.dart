@@ -29,9 +29,9 @@ class ChatListTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFFF0F0F0) : Colors.transparent,
+          color: selected ? AppColors.surfaceTertiary : Colors.transparent,
           border: Border(
-            bottom: const BorderSide(color: Color(0xFFF5F5F5)),
+            bottom: const BorderSide(color: AppColors.borderLight),
             left: selected
                 ? const BorderSide(color: AppColors.primary, width: 4)
                 : BorderSide.none,
@@ -54,7 +54,7 @@ class ChatListTile extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black,
+                            color: AppColors.neutral800,
                           ),
                         ),
                       ),
@@ -165,7 +165,7 @@ class _AvatarBubble extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.success,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 3),
+                border: Border.all(color: AppColors.surfaceSecondary, width: 3),
                 boxShadow: const <BoxShadow>[
                   BoxShadow(color: Color(0x4D31A24C), blurRadius: 4),
                 ],

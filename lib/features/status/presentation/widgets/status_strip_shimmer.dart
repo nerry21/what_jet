@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:what_jet/core/theme/app_colors.dart';
 import 'package:what_jet/core/theme/app_dimensions.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -14,15 +15,15 @@ class StatusStripShimmer extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemBuilder: (_, __) => Shimmer.fromColors(
-          baseColor: const Color(0xFFEAEAEA),
-          highlightColor: const Color(0xFFF8F8F8),
+          baseColor: AppColors.borderDefault,
+          highlightColor: AppColors.surfaceTertiary,
           child: Column(
             children: <Widget>[
               Container(
                 width: 74,
                 height: 74,
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surfaceSecondary,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -31,7 +32,7 @@ class StatusStripShimmer extends StatelessWidget {
                 width: 62,
                 height: 10,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surfaceSecondary,
                   borderRadius: AppRadii.borderRadiusPill,
                 ),
               ),

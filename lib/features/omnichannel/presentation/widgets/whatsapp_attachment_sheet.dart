@@ -111,7 +111,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         child: Material(
-          color: Colors.white,
+          color: AppColors.surfaceSecondary,
           borderRadius: AppRadii.borderRadiusXxl,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
@@ -122,7 +122,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
                   width: 42,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFD9D9D9),
+                    color: AppColors.borderDefault,
                     borderRadius: AppRadii.borderRadiusPill,
                   ),
                 ),

@@ -6,6 +6,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:video_player/video_player.dart';
 
+import 'package:what_jet/core/theme/app_colors.dart';
 import 'package:what_jet/core/theme/app_dimensions.dart';
 import '../../data/models/customer_status_group.dart';
 import '../../data/models/customer_status_item.dart';
@@ -479,7 +480,7 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
     final scale = 1 - (dragProgress * 0.08);
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.surfaceDark,
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTapUp: (details) async {
@@ -759,7 +760,7 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
 
     if (item.isAudio) {
       return Container(
-        color: const Color(0xFF121212),
+        color: AppColors.surfaceDark,
         child: const Center(
           child: Icon(Icons.graphic_eq, size: 100, color: Colors.white),
         ),
@@ -964,10 +965,10 @@ class _ViewerShimmerOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
-      color: Colors.black,
+      color: AppColors.surfaceDark,
       child: Shimmer.fromColors(
-        baseColor: const Color(0xFF222222),
-        highlightColor: const Color(0xFF3A3A3A),
+        baseColor: AppColors.surfaceSecondary,
+        highlightColor: AppColors.surfaceTertiary,
         child: const Center(
           child: Icon(Icons.image_outlined, size: 84, color: Colors.white),
         ),

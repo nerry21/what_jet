@@ -639,21 +639,21 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     final readiness = _callReadiness;
     final isReady = readiness?.ok == true;
     final statusText = readiness?.statusLabel ?? 'Checking...';
-    final chipBg = isReady ? const Color(0xFFEAFBF1) : const Color(0xFFFFEEEE);
-    final chipFg = isReady ? const Color(0xFF157F3D) : const Color(0xFFD92D20);
+    final chipBg = isReady ? AppColors.success50 : AppColors.error50;
+    final chipFg = isReady ? AppColors.success : AppColors.error;
     final borderColor = isReady
-        ? const Color(0xFFC7EFD6)
-        : const Color(0xFFF4C7C3);
+        ? AppColors.success.withValues(alpha: 0.28)
+        : AppColors.error.withValues(alpha: 0.28);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.96),
+        color: AppColors.surfaceSecondary,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: borderColor),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x12000000),
+            color: Color(0x40000000),
             blurRadius: 14,
             offset: Offset(0, 6),
           ),
@@ -733,21 +733,21 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     final statusText = readiness?.tierEligibleForCalling == false
         ? 'Not Ready • Tier Too Low'
         : (readiness?.statusLabel ?? 'Checking...');
-    final chipBg = isReady ? const Color(0xFFEAFBF1) : const Color(0xFFFFEEEE);
-    final chipFg = isReady ? const Color(0xFF157F3D) : const Color(0xFFD92D20);
+    final chipBg = isReady ? AppColors.success50 : AppColors.error50;
+    final chipFg = isReady ? AppColors.success : AppColors.error;
     final borderColor = isReady
-        ? const Color(0xFFC7EFD6)
-        : const Color(0xFFF4C7C3);
+        ? AppColors.success.withValues(alpha: 0.28)
+        : AppColors.error.withValues(alpha: 0.28);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.96),
+        color: AppColors.surfaceSecondary,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: borderColor),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x12000000),
+            color: Color(0x40000000),
             blurRadius: 14,
             offset: Offset(0, 6),
           ),
@@ -826,17 +826,17 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     final statusText = readiness?.statusLabel ?? 'Checking...';
     final isReady = readiness?.ok == true;
     final statusBg = isReady
-        ? const Color(0xFFEAFBF1)
-        : const Color(0xFFFFEEEE);
+        ? AppColors.success50
+        : AppColors.error50;
     final statusFg = isReady
-        ? const Color(0xFF157F3D)
-        : const Color(0xFFD92D20);
+        ? AppColors.success
+        : AppColors.error;
     final statusBorder = isReady
-        ? const Color(0xFFC7EFD6)
-        : const Color(0xFFF4C7C3);
+        ? AppColors.success.withValues(alpha: 0.28)
+        : AppColors.error.withValues(alpha: 0.28);
     final cardTopColor = isReady
-        ? const Color(0xFFF3FCF6)
-        : const Color(0xFFFFF7F7);
+        ? AppColors.surfaceSecondary
+        : AppColors.surfaceSecondary;
     final checksCount = readiness?.checks.length ?? 0;
     final hasMissingConfig = readiness?.missing.isNotEmpty == true;
 
@@ -846,12 +846,12 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [cardTopColor, Colors.white],
+          colors: [cardTopColor, AppColors.surfaceSecondary],
         ),
         border: Border.all(color: statusBorder),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x14000000),
+            color: Color(0x40000000),
             blurRadius: 22,
             offset: Offset(0, 10),
           ),
@@ -890,7 +890,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF101828),
+                          color: AppColors.neutral800,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -901,7 +901,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                         style: const TextStyle(
                           fontSize: 12.5,
                           height: 1.4,
-                          color: Color(0xFF667085),
+                          color: AppColors.neutral600,
                         ),
                       ),
                     ],
@@ -919,7 +919,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       vertical: 9,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF2F4F7),
+                      color: AppColors.surfaceTertiary,
                       borderRadius: AppRadii.borderRadiusPill,
                     ),
                     child: Text(
@@ -927,7 +927,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF344054),
+                        color: AppColors.neutral600,
                       ),
                     ),
                   ),
@@ -940,14 +940,14 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF9FAFB),
+                      color: AppColors.surfaceTertiary,
                       borderRadius: AppRadii.borderRadiusPill,
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                      border: Border.all(color: AppColors.borderLight),
                     ),
                     child: const Icon(
                       Icons.close_rounded,
                       size: 20,
-                      color: Color(0xFF667085),
+                      color: AppColors.neutral600,
                     ),
                   ),
                 ),
@@ -996,13 +996,13 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 padding: const EdgeInsets.all(13),
                 decoration: BoxDecoration(
                   color: isReady
-                      ? const Color(0xFFF5FBF7)
-                      : const Color(0xFFFFF8F2),
+                      ? AppColors.surfaceSecondary
+                      : AppColors.warning50,
                   borderRadius: AppRadii.borderRadiusLg,
                   border: Border.all(
                     color: isReady
-                        ? const Color(0xFFD6F0DE)
-                        : const Color(0xFFF5D9B8),
+                        ? AppColors.success.withValues(alpha: 0.28)
+                        : AppColors.warning.withValues(alpha: 0.28),
                   ),
                 ),
                 child: Column(
@@ -1019,10 +1019,10 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.surfaceSecondary,
                               borderRadius: AppRadii.borderRadiusPill,
                               border: Border.all(
-                                color: const Color(0xFFE5E7EB),
+                                color: AppColors.borderLight,
                               ),
                             ),
                             child: Text(
@@ -1032,7 +1032,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                               style: const TextStyle(
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w800,
-                                color: Color(0xFF344054),
+                                color: AppColors.neutral600,
                               ),
                             ),
                           ),
@@ -1044,10 +1044,10 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.surfaceSecondary,
                               borderRadius: AppRadii.borderRadiusPill,
                               border: Border.all(
-                                color: const Color(0xFFE5E7EB),
+                                color: AppColors.borderLight,
                               ),
                             ),
                             child: Text(
@@ -1055,7 +1055,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                               style: const TextStyle(
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w800,
-                                color: Color(0xFF344054),
+                                color: AppColors.neutral600,
                               ),
                             ),
                           ),
@@ -1067,10 +1067,10 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.surfaceSecondary,
                               borderRadius: AppRadii.borderRadiusPill,
                               border: Border.all(
-                                color: const Color(0xFFE5E7EB),
+                                color: AppColors.borderLight,
                               ),
                             ),
                             child: Text(
@@ -1078,7 +1078,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                               style: const TextStyle(
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w800,
-                                color: Color(0xFF344054),
+                                color: AppColors.neutral600,
                               ),
                             ),
                           ),
@@ -1093,7 +1093,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                           height: 1.45,
-                          color: Color(0xFF9A3412),
+                          color: AppColors.warning800,
                         ),
                       ),
                     ],
@@ -1107,23 +1107,23 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 style: TextStyle(
                   fontSize: 11.8,
                   height: 1.4,
-                  color: Color(0xFF667085),
+                  color: AppColors.neutral600,
                 ),
               ),
             ],
             if (readiness == null && _isLoadingCallReadiness)
               const Text(
                 'Sedang memeriksa backend dan pengaturan Meta...',
-                style: TextStyle(fontSize: 13, color: Color(0xFF667085)),
+                style: TextStyle(fontSize: 13, color: AppColors.neutral600),
               ),
             if (readiness != null && !_isCallReadinessExpanded)
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(13),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: AppColors.surfaceTertiary,
                   borderRadius: AppRadii.borderRadiusLg,
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                  border: Border.all(color: AppColors.borderLight),
                 ),
                 child: Text(
                   (readiness.eligibilityReason?.trim().isNotEmpty ?? false)
@@ -1134,7 +1134,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   style: const TextStyle(
                     fontSize: 12.5,
                     height: 1.45,
-                    color: Color(0xFF667085),
+                    color: AppColors.neutral600,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -1150,9 +1150,9 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       padding: const EdgeInsets.all(12),
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFFAEB),
+                        color: AppColors.warning50,
                         borderRadius: AppRadii.borderRadiusLg,
-                        border: Border.all(color: const Color(0xFFF7D79B)),
+                        border: Border.all(color: AppColors.warning.withValues(alpha: 0.28)),
                       ),
                       child: Text(
                         'Konfigurasi yang masih kurang: ${readiness.missing.join(', ')}',
@@ -1160,7 +1160,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                           height: 1.4,
-                          color: Color(0xFFB54708),
+                          color: AppColors.warning800,
                         ),
                       ),
                     ),
@@ -1168,14 +1168,14 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   if (readiness != null)
                     ...readiness.checks.map((check) {
                       final itemBg = check.ok
-                          ? const Color(0xFFF6FBF7)
-                          : const Color(0xFFFFF7F7);
+                          ? AppColors.surfaceSecondary
+                          : AppColors.surfaceSecondary;
                       final itemBorder = check.ok
-                          ? const Color(0xFFD6F0DE)
-                          : const Color(0xFFF4CCCC);
+                          ? AppColors.success.withValues(alpha: 0.28)
+                          : AppColors.error.withValues(alpha: 0.28);
                       final dotColor = check.ok
-                          ? const Color(0xFF157F3D)
-                          : const Color(0xFFD92D20);
+                          ? AppColors.success
+                          : AppColors.error;
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 10),
@@ -1207,7 +1207,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                                     style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w800,
-                                      color: Color(0xFF101828),
+                                      color: AppColors.neutral800,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -1216,7 +1216,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                                     style: const TextStyle(
                                       fontSize: 12,
                                       height: 1.4,
-                                      color: Color(0xFF667085),
+                                      color: AppColors.neutral600,
                                     ),
                                   ),
                                 ],
@@ -1248,7 +1248,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       shape: RoundedRectangleBorder(
                         borderRadius: AppRadii.borderRadiusLg,
                       ),
-                      foregroundColor: const Color(0xFF101828),
+                      foregroundColor: AppColors.neutral800,
                     ),
                     icon: const Icon(Icons.checklist_rounded),
                     label: const Text(
@@ -1270,11 +1270,11 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                         : () => unawaited(_clearCallEligibilityCacheNow()),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 13),
-                      side: const BorderSide(color: Color(0xFFF5D0D5)),
+                      side: BorderSide(color: AppColors.error.withValues(alpha: 0.18)),
                       shape: RoundedRectangleBorder(
                         borderRadius: AppRadii.borderRadiusLg,
                       ),
-                      foregroundColor: const Color(0xFFB42318),
+                      foregroundColor: AppColors.error,
                     ),
                     icon: Icon(
                       _isClearingCallEligibilityCache
@@ -1371,8 +1371,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                     onTap: _showCallReadinessCardAgain,
                     onPanUpdate: (delta) =>
                         _updateCallReadinessBubbleOffset(delta, viewportSize),
-                    accentColor: const Color(0xFFE53935),
-                    borderColor: const Color(0xFFF2B8B5),
+                    accentColor: AppColors.error,
+                    borderColor: AppColors.error.withValues(alpha: 0.28),
                     iconBg: const Color(0xFFFFF1F0),
                   ),
                 if (canRestoreActiveCallCard)
@@ -1386,7 +1386,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                     onPanUpdate: (delta) =>
                         _updateActiveCallBubbleOffset(delta, viewportSize),
                     accentColor: const Color(0xFF9A6700),
-                    borderColor: const Color(0xFFE7D7A5),
+                    borderColor: AppColors.warning.withValues(alpha: 0.28),
                     iconBg: const Color(0xFFFFF8E8),
                   ),
               ],
@@ -1422,12 +1422,12 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
               borderRadius: AppRadii.borderRadiusPill,
               child: Ink(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.97),
+                  color: AppColors.surfaceSecondary,
                   borderRadius: AppRadii.borderRadiusPill,
                   border: Border.all(color: borderColor),
                   boxShadow: const [
                     BoxShadow(
-                      color: Color(0x1F000000),
+                      color: Color(0x40000000),
                       blurRadius: 16,
                       offset: Offset(0, 8),
                     ),
@@ -1456,7 +1456,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                         style: const TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w800,
-                          color: Color(0xFF344054),
+                          color: AppColors.neutral600,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -2463,7 +2463,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.scaffoldBackground,
       body: SafeArea(
         bottom: false,
         child: AnimatedBuilder(
@@ -2502,7 +2502,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
               );
 
               if (isMobileShell) {
-                return ColoredBox(color: Colors.white, child: errorBody);
+                return ColoredBox(color: AppColors.surfaceSecondary, child: errorBody);
               }
 
               return Container(
@@ -2589,7 +2589,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
             );
 
             if (isMobileShell) {
-              return ColoredBox(color: Colors.white, child: layeredShellBody);
+              return ColoredBox(color: AppColors.surfaceSecondary, child: layeredShellBody);
             }
 
             return Container(
@@ -2628,7 +2628,7 @@ class _MobilePaneSelector extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceSecondary,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.borderLight),
         boxShadow: <BoxShadow>[

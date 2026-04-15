@@ -78,7 +78,7 @@ class OmnichannelLeftPane extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
-                          color: Colors.black,
+                          color: AppColors.neutral800,
                         ),
                       ),
                     ),
@@ -153,7 +153,7 @@ class OmnichannelLeftPane extends StatelessWidget {
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w700,
-                                            color: Colors.black,
+                                            color: AppColors.neutral800,
                                           ),
                                         ),
                                       ),
@@ -323,9 +323,9 @@ class _MetricTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.78),
+        color: AppColors.surfaceSecondary.withValues(alpha: 0.78),
         borderRadius: AppRadii.borderRadiusLg,
-        border: Border.all(color: Colors.white),
+        border: Border.all(color: AppColors.surfaceSecondary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,7 +343,7 @@ class _MetricTile extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
-                color: Colors.black,
+                color: AppColors.neutral800,
               ),
             ),
         ],
@@ -483,7 +483,7 @@ class _FilterChip extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: active
                       ? AppColors.primary.withValues(alpha: 0.14)
-                      : Colors.white,
+                      : AppColors.surfaceSecondary,
                   borderRadius: AppRadii.borderRadiusPill,
                 ),
                 child: Text(
@@ -596,7 +596,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
     final listBottomPadding = 102.0 + bottomInset;
 
     return ColoredBox(
-      color: Colors.white,
+      color: AppColors.surfaceSecondary,
       child: Stack(
         children: <Widget>[
           Column(
@@ -605,8 +605,8 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
                 decoration: const BoxDecoration(
-                  color: Colors.white,
-                  border: Border(bottom: BorderSide(color: Color(0xFFEDE6E2))),
+                  color: AppColors.surfaceSecondary,
+                  border: Border(bottom: BorderSide(color: AppColors.borderLight)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -638,7 +638,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                     const SizedBox(height: 10),
                     DecoratedBox(
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF4EFEC),
+                        color: AppColors.surfaceTertiary,
                         borderRadius: AppRadii.borderRadiusPill,
                       ),
                       child: TextField(
@@ -646,17 +646,17 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                         textInputAction: TextInputAction.search,
                         style: const TextStyle(
                           fontSize: 17,
-                          color: Colors.black87,
+                          color: AppColors.neutral800,
                         ),
                         decoration: const InputDecoration(
                           prefixIcon: Icon(
                             Icons.search_rounded,
                             size: 24,
-                            color: Color(0xFF7C7B7A),
+                            color: AppColors.neutral400,
                           ),
                           hintText: 'Tanya Meta AI atau cari',
                           hintStyle: TextStyle(
-                            color: Color(0xFF7C7B7A),
+                            color: AppColors.neutral400,
                             fontSize: 17,
                           ),
                           border: InputBorder.none,
@@ -815,7 +815,7 @@ class _MobileHeaderIcon extends StatelessWidget {
         child: SizedBox(
           width: 34,
           height: 34,
-          child: Icon(icon, color: Colors.black87, size: 23),
+          child: Icon(icon, color: AppColors.neutral800, size: 23),
         ),
       ),
     );
@@ -845,12 +845,12 @@ class _MobileScopeChip extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 9),
           decoration: BoxDecoration(
-            color: selected ? const Color(0xFFE1F7DD) : Colors.white,
+            color: selected ? AppColors.primary.withValues(alpha: 0.12) : AppColors.surfaceSecondary,
             borderRadius: AppRadii.borderRadiusPill,
             border: Border.all(
               color: selected
-                  ? const Color(0xFFBFE8C2)
-                  : const Color(0xFFE2DDDA),
+                  ? AppColors.primary.withValues(alpha: 0.28)
+                  : AppColors.borderLight,
             ),
           ),
           child: Text(
@@ -859,8 +859,8 @@ class _MobileScopeChip extends StatelessWidget {
               fontSize: 14,
               fontWeight: FontWeight.w700,
               color: selected
-                  ? const Color(0xFF2F7D4B)
-                  : const Color(0xFF4A4A4A),
+                  ? AppColors.primary
+                  : AppColors.neutral400,
             ),
           ),
         ),
@@ -891,7 +891,7 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Container(
-          color: selected ? const Color(0xFFEAF6EE) : Colors.white,
+          color: selected ? AppColors.primary.withValues(alpha: 0.12) : AppColors.surfaceSecondary,
           padding: const EdgeInsets.fromLTRB(16, 11, 14, 11),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -933,7 +933,7 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: Colors.black,
+                              color: AppColors.neutral800,
                             ),
                           ),
                         ),
@@ -943,7 +943,7 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF848484),
+                            color: AppColors.neutral400,
                           ),
                         ),
                       ],
@@ -954,7 +954,7 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                         const Icon(
                           Icons.done_all_rounded,
                           size: 18,
-                          color: Color(0xFF8A8A8A),
+                          color: AppColors.neutral400,
                         ),
                         const SizedBox(width: 6),
                         Expanded(
@@ -965,7 +965,7 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w400,
-                              color: Color(0xFF6E6E6E),
+                              color: AppColors.neutral400,
                             ),
                           ),
                         ),
@@ -1015,8 +1015,8 @@ class _MobileWhatsAppBottomBar extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
         decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Color(0xFFEDE6E2))),
+          color: AppColors.surfaceSecondary,
+          border: Border(top: BorderSide(color: AppColors.borderLight)),
         ),
         child: const Row(
           children: <Widget>[
@@ -1068,7 +1068,7 @@ class _MobileBottomNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = selected ? AppColors.primary : Colors.black87;
+    final iconColor = selected ? AppColors.primary : AppColors.neutral800;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -1087,7 +1087,7 @@ class _MobileBottomNavItem extends StatelessWidget {
                   height: 28,
                   decoration: BoxDecoration(
                     color: selected
-                        ? const Color(0xFFDFF5E6)
+                        ? AppColors.primary.withValues(alpha: 0.12)
                         : Colors.transparent,
                     borderRadius: AppRadii.borderRadiusLg,
                   ),
@@ -1127,7 +1127,7 @@ class _MobileBottomNavItem extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-            color: Colors.black87,
+            color: AppColors.neutral800,
           ),
         ),
       ],

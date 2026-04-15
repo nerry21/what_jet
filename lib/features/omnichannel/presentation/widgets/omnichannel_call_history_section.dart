@@ -75,7 +75,7 @@ class _HistorySummaryCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(color: AppColors.borderLight),
       ),
@@ -155,7 +155,7 @@ class _HistoryRow extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(color: AppColors.borderLight),
       ),
@@ -189,7 +189,7 @@ class _HistoryRow extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
-                    color: Colors.black87,
+                    color: AppColors.neutral800,
                   ),
                 ),
                 const SizedBox(height: 4),

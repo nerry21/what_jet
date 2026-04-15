@@ -52,7 +52,7 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
       child: Container(
         height: pickerHeight,
         decoration: const BoxDecoration(
-          color: Color(0xFFF7F7F7),
+          color: AppColors.surfaceSecondary,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           boxShadow: <BoxShadow>[
             BoxShadow(
@@ -72,7 +72,7 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
                     width: 44,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFD7D7D7),
+                      color: AppColors.borderDefault,
                       borderRadius: AppRadii.borderRadiusPill,
                     ),
                   ),
@@ -102,7 +102,7 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF1F1F1F),
+                      color: AppColors.neutral800,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -179,7 +179,7 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
                       return Tooltip(
                         message: emoji,
                         child: Material(
-                          color: Colors.white,
+                          color: AppColors.surfaceTertiary,
                           borderRadius: AppRadii.borderRadiusMd,
                           child: InkWell(
                             onTap: () => widget.onEmojiSelected(emoji),

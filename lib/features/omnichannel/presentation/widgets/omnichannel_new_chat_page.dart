@@ -126,7 +126,7 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
   @override
   Widget build(BuildContext context) {
     final page = Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceSecondary,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -138,7 +138,7 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.arrow_back_rounded),
-                    color: Colors.black87,
+                    color: AppColors.neutral800,
                     iconSize: 28,
                   ),
                   const Expanded(
@@ -147,14 +147,14 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w500,
-                        color: Colors.black87,
+                        color: AppColors.neutral800,
                       ),
                     ),
                   ),
                   IconButton(
                     onPressed: () => _showComingSoon('Menu obrolan'),
                     icon: const Icon(Icons.more_vert_rounded),
-                    color: Colors.black87,
+                    color: AppColors.neutral800,
                     iconSize: 26,
                   ),
                 ],
@@ -164,22 +164,22 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
               child: Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF5F2EF),
+                  color: AppColors.surfaceTertiary,
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: TextField(
                   controller: _searchController,
                   onChanged: (_) => setState(() {}),
-                  style: const TextStyle(fontSize: 17, color: Colors.black87),
+                  style: const TextStyle(fontSize: 17, color: AppColors.neutral800),
                   decoration: const InputDecoration(
                     hintText: 'Cari nama atau nomor',
                     hintStyle: TextStyle(
                       fontSize: 17,
-                      color: Color(0xFF707070),
+                      color: AppColors.neutral400,
                     ),
                     prefixIcon: Icon(
                       Icons.search_rounded,
-                      color: Color(0xFF707070),
+                      color: AppColors.neutral400,
                       size: 24,
                     ),
                     border: InputBorder.none,
@@ -202,7 +202,7 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
               trailing: const Icon(
                 Icons.qr_code_2_rounded,
                 size: 24,
-                color: Colors.black87,
+                color: AppColors.neutral800,
               ),
               onTap: _openCreateContactPage,
             ),
@@ -221,7 +221,7 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF646464),
+                    color: AppColors.neutral400,
                   ),
                 ),
               ),
@@ -249,7 +249,7 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F2F1),
+      backgroundColor: AppColors.scaffoldBackground,
       body: Center(child: SizedBox(width: 392, child: page.body)),
     );
   }
@@ -337,7 +337,7 @@ class _OmnichannelCreateContactPageState
   @override
   Widget build(BuildContext context) {
     final page = Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceSecondary,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -349,7 +349,7 @@ class _OmnichannelCreateContactPageState
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.arrow_back_rounded),
-                    color: Colors.black87,
+                    color: AppColors.neutral800,
                     iconSize: 28,
                   ),
                   const Expanded(
@@ -358,14 +358,14 @@ class _OmnichannelCreateContactPageState
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w500,
-                        color: Colors.black87,
+                        color: AppColors.neutral800,
                       ),
                     ),
                   ),
                   IconButton(
                     onPressed: () {},
                     icon: const Icon(Icons.qr_code_2_rounded),
-                    color: Colors.black87,
+                    color: AppColors.neutral800,
                     iconSize: 24,
                   ),
                 ],
@@ -426,7 +426,7 @@ class _OmnichannelCreateContactPageState
                             child: Icon(
                               Icons.sync_rounded,
                               size: 24,
-                              color: Color(0xFF666666),
+                              color: AppColors.neutral400,
                             ),
                           ),
                         ),
@@ -437,7 +437,7 @@ class _OmnichannelCreateContactPageState
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: Colors.black87,
+                              color: AppColors.neutral800,
                               height: 1.35,
                             ),
                           ),
@@ -445,8 +445,8 @@ class _OmnichannelCreateContactPageState
                         Switch(
                           value: _syncToPhone,
                           activeThumbColor: Colors.white,
-                          activeTrackColor: const Color(0xFF19B15B),
-                          inactiveTrackColor: const Color(0xFFD7D7D7),
+                          activeTrackColor: AppColors.primary,
+                          inactiveTrackColor: AppColors.borderDefault,
                           onChanged: (value) {
                             setState(() => _syncToPhone = value);
                           },
@@ -464,7 +464,7 @@ class _OmnichannelCreateContactPageState
                               'Sinkronkan ke',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Color(0xFF7E7E7E),
+                                color: AppColors.neutral400,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -476,7 +476,7 @@ class _OmnichannelCreateContactPageState
                                 decoration: const BoxDecoration(
                                   border: Border(
                                     bottom: BorderSide(
-                                      color: Color(0xFFBDBDBD),
+                                      color: AppColors.borderDefault,
                                     ),
                                   ),
                                 ),
@@ -487,13 +487,13 @@ class _OmnichannelCreateContactPageState
                                         _selectedAccount,
                                         style: const TextStyle(
                                           fontSize: 16,
-                                          color: Colors.black87,
+                                          color: AppColors.neutral800,
                                         ),
                                       ),
                                     ),
                                     const Icon(
                                       Icons.arrow_drop_down_rounded,
-                                      color: Color(0xFF7E7E7E),
+                                      color: AppColors.neutral400,
                                     ),
                                   ],
                                 ),
@@ -516,7 +516,7 @@ class _OmnichannelCreateContactPageState
                   child: FilledButton(
                     onPressed: _save,
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF24B15E),
+                      backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
@@ -544,7 +544,7 @@ class _OmnichannelCreateContactPageState
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F2F1),
+      backgroundColor: AppColors.scaffoldBackground,
       body: Center(child: SizedBox(width: 392, child: page.body)),
     );
   }
@@ -565,7 +565,7 @@ class _CreateContactInputRow extends StatelessWidget {
           width: 32,
           child: icon == null
               ? const SizedBox.shrink()
-              : Icon(icon, color: const Color(0xFF666666), size: 24),
+              : Icon(icon, color: AppColors.neutral400, size: 24),
         ),
         const SizedBox(width: 8),
         Expanded(child: child),
@@ -590,17 +590,17 @@ class _OutlinedField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
-      style: const TextStyle(fontSize: 16, color: Colors.black87),
+      style: const TextStyle(fontSize: 16, color: AppColors.neutral800),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(fontSize: 16, color: Color(0xFF6B6B6B)),
+        hintStyle: const TextStyle(fontSize: 16, color: AppColors.neutral400),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 14,
           vertical: 15,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFB7B7B7)),
+          borderSide: const BorderSide(color: AppColors.borderDefault),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -626,14 +626,14 @@ class _CountryCodeField extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(12, 6, 12, 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFB7B7B7)),
+          border: Border.all(color: AppColors.borderDefault),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             const Text(
               'Negara',
-              style: TextStyle(fontSize: 12, color: Color(0xFF777777)),
+              style: TextStyle(fontSize: 12, color: AppColors.neutral400),
             ),
             const SizedBox(height: 4),
             Row(
@@ -641,12 +641,12 @@ class _CountryCodeField extends StatelessWidget {
                 Expanded(
                   child: Text(
                     value,
-                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+                    style: const TextStyle(fontSize: 16, color: AppColors.neutral800),
                   ),
                 ),
                 const Icon(
                   Icons.arrow_drop_down_rounded,
-                  color: Color(0xFF777777),
+                  color: AppColors.neutral400,
                 ),
               ],
             ),
@@ -699,7 +699,7 @@ class _NewChatActionTile extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
-                      color: Colors.black87,
+                      color: AppColors.neutral800,
                     ),
                   ),
                   if (subtitle != null)
@@ -707,7 +707,7 @@ class _NewChatActionTile extends StatelessWidget {
                       subtitle!,
                       style: const TextStyle(
                         fontSize: 14,
-                        color: Color(0xFF6D6D6D),
+                        color: AppColors.neutral400,
                       ),
                     ),
                 ],
@@ -768,7 +768,7 @@ class _NewChatContactTile extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w500,
-                      color: Colors.black87,
+                      color: AppColors.neutral800,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -778,7 +778,7 @@ class _NewChatContactTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF6B6B6B),
+                      color: AppColors.neutral400,
                     ),
                   ),
                 ],
@@ -790,7 +790,7 @@ class _NewChatContactTile extends StatelessWidget {
               height: 26,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF9F9F9F)),
+                border: Border.all(color: AppColors.borderDefault),
               ),
             ),
           ],

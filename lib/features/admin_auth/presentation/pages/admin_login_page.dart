@@ -113,11 +113,11 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                     padding: const EdgeInsets.all(24),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.surfaceSecondary,
                         borderRadius: AppRadii.borderRadiusXxl,
                         boxShadow: const <BoxShadow>[
                           BoxShadow(
-                            color: Color(0x14000000),
+                            color: Color(0x40000000),
                             blurRadius: 32,
                             offset: Offset(0, 8),
                           ),
@@ -130,14 +130,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                             width: double.infinity,
                             padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
                             decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: <Color>[
-                                  AppColors.primary,
-                                  AppColors.primary200,
-                                ],
-                              ),
+                              gradient: AppColors.primaryGradient,
                               borderRadius: BorderRadius.vertical(
                                 top: Radius.circular(24),
                               ),
@@ -218,18 +211,11 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                                   width: double.infinity,
                                   child: DecoratedBox(
                                     decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: <Color>[
-                                          AppColors.primary,
-                                          AppColors.primary200,
-                                        ],
-                                      ),
+                                      gradient: AppColors.primaryGradient,
                                       borderRadius: AppRadii.borderRadiusMd,
                                       boxShadow: const <BoxShadow>[
                                         BoxShadow(
-                                          color: Color(0x3300A884),
+                                          color: AppColors.primaryGlow,
                                           blurRadius: 12,
                                           offset: Offset(0, 4),
                                         ),
@@ -307,10 +293,10 @@ class _AdminAuthBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final foregroundColor = isOffline
-        ? const Color(0xFF9A6700)
+        ? AppColors.warning800
         : AppColors.error;
     final backgroundColor = isOffline
-        ? const Color(0xFFFFF4E5)
+        ? AppColors.warning50
         : AppColors.error.withValues(alpha: 0.08);
 
     return Container(
@@ -354,7 +340,7 @@ class _FieldLabel extends StatelessWidget {
       style: const TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
-        color: Colors.black,
+        color: AppColors.neutral800,
       ),
     );
   }
@@ -385,7 +371,7 @@ class _AdminInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: const Color(0xFFF0F0F0),
+        color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusLg,
       ),
       child: TextField(

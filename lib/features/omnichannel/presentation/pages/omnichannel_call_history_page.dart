@@ -136,7 +136,7 @@ class _OmnichannelCallHistoryPageState
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: Colors.black,
+                  color: AppColors.neutral800,
                 ),
               ),
               const SizedBox(height: 6),
@@ -184,7 +184,7 @@ class _OmnichannelCallHistoryPageState
                             selectedColor: AppColors.primary.withValues(
                               alpha: 0.14,
                             ),
-                            backgroundColor: Colors.white,
+                            backgroundColor: AppColors.surfaceSecondary,
                             side: BorderSide(
                               color: selected
                                   ? AppColors.primary.withValues(alpha: 0.28)
@@ -195,7 +195,7 @@ class _OmnichannelCallHistoryPageState
                               fontWeight: FontWeight.w700,
                               color: selected
                                   ? AppColors.primary
-                                  : Colors.black87,
+                                  : AppColors.neutral800,
                             ),
                           );
                         }).toList(),
@@ -263,7 +263,7 @@ class _OmnichannelCallHistoryPageState
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: Colors.black87,
+                color: AppColors.neutral800,
               ),
             ),
             const SizedBox(height: 6),
@@ -331,7 +331,7 @@ class _OmnichannelCallHistoryPageState
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w800,
-                              color: Colors.black87,
+                              color: AppColors.neutral800,
                             ),
                           ),
                         ),

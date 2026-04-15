@@ -41,7 +41,7 @@ class OmnichannelRightPane extends StatelessWidget {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,
-              color: Colors.black,
+              color: AppColors.neutral800,
             ),
           ),
           const SizedBox(height: 16),
@@ -156,7 +156,7 @@ class _ProfileCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black,
+                    color: AppColors.neutral800,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -272,7 +272,7 @@ class _QuickDetailsCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: Colors.black,
+                            color: AppColors.neutral800,
                           ),
                         ),
                       ),

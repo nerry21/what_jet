@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:what_jet/core/theme/app_colors.dart';
 import 'package:what_jet/core/theme/app_dimensions.dart';
 
 class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
@@ -11,16 +12,16 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
     required String title,
     required String description,
     required IconData icon,
-    Color iconBg = const Color(0xFFF5EFE2),
-    Color iconColor = const Color(0xFFB8891D),
+    Color iconBg = AppColors.surfaceTertiary,
+    Color iconColor = AppColors.warning800,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
+        color: AppColors.surfaceTertiary,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFEAECEF)),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,7 +45,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF101828),
+                    color: AppColors.neutral800,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -53,7 +54,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 12.5,
                     height: 1.45,
-                    color: Color(0xFF667085),
+                    color: AppColors.neutral600,
                   ),
                 ),
               ],
@@ -68,7 +69,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
-        color: const Color(0xFFF2F4F7),
+        color: AppColors.surfaceTertiary,
         borderRadius: AppRadii.borderRadiusPill,
       ),
       child: Text(
@@ -76,7 +77,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
         style: const TextStyle(
           fontSize: 11.5,
           fontWeight: FontWeight.w700,
-          color: Color(0xFF344054),
+          color: AppColors.neutral600,
         ),
       ),
     );
@@ -93,7 +94,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
       top: false,
       child: Container(
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceSecondary,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(
@@ -104,7 +105,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
               width: 52,
               height: 5,
               decoration: BoxDecoration(
-                color: const Color(0xFFD0D5DD),
+                color: AppColors.borderDefault,
                 borderRadius: AppRadii.borderRadiusPill,
               ),
             ),
@@ -121,7 +122,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
-                            color: Color(0xFF101828),
+                            color: AppColors.neutral800,
                           ),
                         ),
                         SizedBox(height: 6),
@@ -130,7 +131,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             height: 1.45,
-                            color: Color(0xFF667085),
+                            color: AppColors.neutral600,
                           ),
                         ),
                       ],
@@ -144,13 +145,13 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF2F4F7),
+                        color: AppColors.surfaceTertiary,
                         borderRadius: AppRadii.borderRadiusPill,
                       ),
                       child: const Icon(
                         Icons.close_rounded,
                         size: 20,
-                        color: Color(0xFF344054),
+                        color: AppColors.neutral600,
                       ),
                     ),
                   ),
@@ -223,7 +224,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
                       child: FilledButton.icon(
                         onPressed: () => _close(context),
                         style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFF101828),
+                          backgroundColor: AppColors.surfaceTertiary,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
