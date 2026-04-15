@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_call_session_model.dart';
 import '../utils/omnichannel_call_status_ui.dart';
 import 'omnichannel_call_status_chip.dart';
@@ -57,7 +58,7 @@ class OmnichannelCallBanner extends StatelessWidget {
             height: 44,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: AppRadii.borderRadiusMd,
             ),
             alignment: Alignment.center,
             child: Icon(
@@ -119,7 +120,7 @@ class OmnichannelCallBanner extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(999),
+                          borderRadius: AppRadii.borderRadiusPill,
                           border: Border.all(
                             color: AppColors.borderLight,
                           ),
@@ -145,13 +146,13 @@ class OmnichannelCallBanner extends StatelessWidget {
               if (onClose != null) ...<Widget>[
                 InkWell(
                   onTap: onClose,
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: AppRadii.borderRadiusPill,
                   child: Container(
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.85),
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: AppRadii.borderRadiusPill,
                       border: Border.all(color: const Color(0xFFE5E7EB)),
                     ),
                     child: const Icon(

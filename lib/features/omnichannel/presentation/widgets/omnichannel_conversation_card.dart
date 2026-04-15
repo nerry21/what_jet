@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../../live_chat/presentation/widgets/channel_badge.dart';
 import '../../data/models/omnichannel_conversation_list_model.dart';
 import 'omnichannel_surface.dart';
@@ -26,14 +27,14 @@ class OmnichannelConversationCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: AppRadii.borderRadiusXl,
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: selected
                 ? AppColors.primary.withValues(alpha: 0.08)
                 : AppColors.scaffoldBackground.withValues(alpha: 0.72),
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: AppRadii.borderRadiusXl,
             border: Border.all(
               color: selected
                   ? AppColors.primary.withValues(alpha: 0.28)
@@ -153,7 +154,7 @@ class OmnichannelConversationCard extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(999),
+                        borderRadius: AppRadii.borderRadiusPill,
                       ),
                       child: Text(
                         '${item.unreadCount}',
@@ -186,7 +187,7 @@ class _MiniStatusChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadii.borderRadiusPill,
         border: Border.all(color: color.withValues(alpha: 0.18)),
       ),
       child: Text(

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 class OmnichannelPaneCard extends StatelessWidget {
   const OmnichannelPaneCard({
@@ -19,7 +20,7 @@ class OmnichannelPaneCard extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: AppRadii.borderRadiusXxxl,
         border: Border.all(
           color: AppColors.borderLight.withValues(alpha: 0.9),
         ),
@@ -55,7 +56,7 @@ class OmnichannelSectionCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.scaffoldBackground.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadii.borderRadiusXl,
         border: Border.all(
           color: AppColors.borderLight.withValues(alpha: 0.85),
         ),
@@ -103,7 +104,7 @@ class OmnichannelInlineBanner extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.error.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadii.borderRadiusLg,
       ),
       child: Row(
         children: <Widget>[
@@ -252,7 +253,7 @@ class OmnichannelErrorState extends StatelessWidget {
                         end: Alignment.bottomRight,
                         colors: <Color>[AppColors.primary, AppColors.primary200],
                       ),
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: AppRadii.borderRadiusMd,
                     ),
                     child: TextButton(
                       onPressed: () => unawaited(onRetry()),

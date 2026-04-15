@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../data/repositories/admin_auth_repository.dart';
 import '../controllers/admin_auth_controller.dart';
 
@@ -113,7 +114,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: AppRadii.borderRadiusXxl,
                         boxShadow: const <BoxShadow>[
                           BoxShadow(
                             color: Color(0x14000000),
@@ -225,7 +226,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                                           AppColors.primary200,
                                         ],
                                       ),
-                                      borderRadius: BorderRadius.circular(14),
+                                      borderRadius: AppRadii.borderRadiusMd,
                                       boxShadow: const <BoxShadow>[
                                         BoxShadow(
                                           color: Color(0x3300A884),
@@ -242,9 +243,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                                           vertical: 14,
                                         ),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            14,
-                                          ),
+                                          borderRadius: AppRadii.borderRadiusMd,
                                         ),
                                       ),
                                       child: Text(
@@ -319,7 +318,7 @@ class _AdminAuthBanner extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppRadii.borderRadiusMd,
       ),
       child: Row(
         children: <Widget>[
@@ -387,7 +386,7 @@ class _AdminInput extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: const Color(0xFFF0F0F0),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadii.borderRadiusLg,
       ),
       child: TextField(
         controller: controller,

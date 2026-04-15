@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_call_history_item_model.dart';
 import '../utils/omnichannel_call_status_ui.dart';
 import 'omnichannel_surface.dart';
@@ -75,7 +76,7 @@ class _HistorySummaryCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
@@ -97,7 +98,7 @@ class _HistorySummaryCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                 decoration: BoxDecoration(
                   color: outcomeColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: AppRadii.borderRadiusPill,
                 ),
                 child: Text(
                   summary.lastCallLabel ??
@@ -155,7 +156,7 @@ class _HistoryRow extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Row(
@@ -166,7 +167,7 @@ class _HistoryRow extends StatelessWidget {
             height: 38,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppRadii.borderRadiusMd,
             ),
             alignment: Alignment.center,
             child: Icon(
@@ -229,7 +230,7 @@ class _MetaPill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.scaffoldBackground,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppRadii.borderRadiusMd,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

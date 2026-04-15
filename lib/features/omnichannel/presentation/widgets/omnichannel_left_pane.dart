@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_conversation_list_model.dart';
 import '../../data/models/omnichannel_workspace_model.dart';
 import 'omnichannel_conversation_card.dart';
@@ -88,7 +89,7 @@ class OmnichannelLeftPane extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(999),
+                        borderRadius: AppRadii.borderRadiusPill,
                       ),
                       child: Text(
                         '${workspace.unreadTotal} unread',
@@ -264,7 +265,7 @@ class _SummaryStrip extends StatelessWidget {
             AppColors.primary200.withValues(alpha: 0.12),
           ],
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: AppRadii.borderRadiusXxl,
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.12)),
       ),
       child: Column(
@@ -323,7 +324,7 @@ class _MetricTile extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.78),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(color: Colors.white),
       ),
       child: Column(
@@ -362,7 +363,7 @@ class _SearchField extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.scaffoldBackground.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadii.borderRadiusXl,
         border: Border.all(color: AppColors.borderLight),
       ),
       child: TextField(
@@ -451,14 +452,14 @@ class _FilterChip extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadii.borderRadiusPill,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             color: active
                 ? AppColors.primary.withValues(alpha: 0.12)
                 : AppColors.scaffoldBackground.withValues(alpha: 0.9),
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: AppRadii.borderRadiusPill,
             border: Border.all(
               color: active
                   ? AppColors.primary.withValues(alpha: 0.18)
@@ -483,7 +484,7 @@ class _FilterChip extends StatelessWidget {
                   color: active
                       ? AppColors.primary.withValues(alpha: 0.14)
                       : Colors.white,
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: AppRadii.borderRadiusPill,
                 ),
                 child: Text(
                   '$count',
@@ -519,7 +520,7 @@ class _ConversationListSkeleton extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: AppColors.scaffoldBackground.withValues(alpha: 0.75),
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: AppRadii.borderRadiusXl,
             border: Border.all(color: AppColors.borderLight),
           ),
           child: Column(
@@ -638,7 +639,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                     DecoratedBox(
                       decoration: BoxDecoration(
                         color: const Color(0xFFF4EFEC),
-                        borderRadius: BorderRadius.circular(999),
+                        borderRadius: AppRadii.borderRadiusPill,
                       ),
                       child: TextField(
                         controller: searchController,
@@ -810,7 +811,7 @@ class _MobileHeaderIcon extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadii.borderRadiusPill,
         child: SizedBox(
           width: 34,
           height: 34,
@@ -840,12 +841,12 @@ class _MobileScopeChip extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadii.borderRadiusPill,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 9),
           decoration: BoxDecoration(
             color: selected ? const Color(0xFFE1F7DD) : Colors.white,
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: AppRadii.borderRadiusPill,
             border: Border.all(
               color: selected
                   ? const Color(0xFFBFE8C2)
@@ -978,7 +979,7 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(999),
+                              borderRadius: AppRadii.borderRadiusPill,
                             ),
                             alignment: Alignment.center,
                             child: Text(
@@ -1088,7 +1089,7 @@ class _MobileBottomNavItem extends StatelessWidget {
                     color: selected
                         ? const Color(0xFFDFF5E6)
                         : Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: AppRadii.borderRadiusLg,
                   ),
                   alignment: Alignment.center,
                   child: Icon(icon, size: 24, color: iconColor),
@@ -1105,7 +1106,7 @@ class _MobileBottomNavItem extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: AppRadii.borderRadiusPill,
                     ),
                     child: Text(
                       '$badgeCount',

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 Future<void> showWhatsAppAttachmentSheet({
   required BuildContext context,
@@ -111,7 +112,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         child: Material(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: AppRadii.borderRadiusXxl,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
             child: Column(
@@ -122,7 +123,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
                   height: 4,
                   decoration: BoxDecoration(
                     color: const Color(0xFFD9D9D9),
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: AppRadii.borderRadiusPill,
                   ),
                 ),
                 const SizedBox(height: 18),

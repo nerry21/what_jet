@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:record/record.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_status_update_model.dart';
 import '../../data/repositories/omnichannel_repository.dart';
 
@@ -456,7 +457,7 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 color: const Color(0xFFF7F7F7),
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: AppRadii.borderRadiusXl,
                 border: Border.all(color: const Color(0xFFE8E8E8)),
               ),
               child: const Text(
@@ -520,7 +521,7 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: AppRadii.borderRadiusXxl,
         border: Border.all(color: const Color(0xFFE9E9E9)),
         boxShadow: const <BoxShadow>[
           BoxShadow(
@@ -589,7 +590,7 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
             ),
           if (item.isImage && (item.mediaUrl ?? '').isNotEmpty)
             ClipRRect(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: AppRadii.borderRadiusXxl,
               child: Image.network(
                 item.mediaUrl!,
                 fit: BoxFit.cover,
@@ -748,14 +749,14 @@ class _ComposerActionCard extends StatelessWidget {
       width: 106,
       child: Material(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: AppRadii.borderRadiusXl,
         child: InkWell(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: AppRadii.borderRadiusXl,
           onTap: onTap,
           child: Ink(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: AppRadii.borderRadiusXl,
               border: Border.all(color: const Color(0xFFE5E5E5)),
             ),
             child: Column(

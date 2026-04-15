@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/storage/token_storage.dart';
 import '../../data/models/conversation_model.dart';
@@ -465,7 +466,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
                             AppColors.primary200,
                           ],
                         ),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: AppRadii.borderRadiusMd,
                       ),
                       child: TextButton(
                         onPressed: () {
@@ -477,7 +478,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: AppRadii.borderRadiusMd,
                           ),
                         ),
                         child: const Text(
@@ -654,7 +655,7 @@ class _SearchInput extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: const Color(0xFFF0F0F0),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadii.borderRadiusXl,
       ),
       child: TextField(
         controller: controller,
@@ -710,14 +711,14 @@ class _FilterChipButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadii.borderRadiusPill,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: active
                 ? AppColors.primary.withValues(alpha: 0.12)
                 : const Color(0xFFF0F0F0),
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: AppRadii.borderRadiusPill,
           ),
           child: Text(
             label,
@@ -755,7 +756,7 @@ class _SidebarInlineBanner extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppRadii.borderRadiusMd,
       ),
       child: Row(
         children: <Widget>[
@@ -843,7 +844,7 @@ class _SidebarEmptyState extends StatelessWidget {
                 end: Alignment.bottomRight,
                 colors: <Color>[AppColors.primary, AppColors.primary200],
               ),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppRadii.borderRadiusMd,
             ),
             child: TextButton.icon(
               onPressed: onStartConversation,
@@ -940,7 +941,7 @@ class _ShellErrorState extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: AppRadii.borderRadiusXxl,
               boxShadow: const <BoxShadow>[
                 BoxShadow(
                   color: Color(0x14000000),
@@ -1039,7 +1040,7 @@ class _ShellErrorState extends StatelessWidget {
                                 AppColors.primary200,
                               ],
                             ),
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: AppRadii.borderRadiusMd,
                             boxShadow: const <BoxShadow>[
                               BoxShadow(
                                 color: Color(0x3300A884),
@@ -1054,7 +1055,7 @@ class _ShellErrorState extends StatelessWidget {
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: AppRadii.borderRadiusMd,
                               ),
                             ),
                             child: Text(
@@ -1097,7 +1098,7 @@ class _GreyInput extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: const Color(0xFFF0F0F0),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadii.borderRadiusLg,
       ),
       child: TextField(
         controller: controller,

@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_call_history_item_model.dart';
 import '../../../live_chat/presentation/widgets/channel_badge.dart';
 import '../../data/models/omnichannel_call_session_model.dart';
@@ -1018,7 +1019,7 @@ class _MobileAppBarIconButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadii.borderRadiusPill,
         child: SizedBox(
           width: 40,
           height: 40,
@@ -1057,7 +1058,7 @@ class _BotControlBanner extends StatelessWidget {
         color: isEnabled
             ? AppColors.primary.withValues(alpha: 0.08)
             : const Color(0xFFFFF4EA),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(
           color: isEnabled
               ? AppColors.primary.withValues(alpha: 0.20)
@@ -1123,7 +1124,7 @@ class _BotToggleAction extends StatelessWidget {
         backgroundColor: isEnabled ? const Color(0xFFF38A22) : AppColors.primary,
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        shape: RoundedRectangleBorder(borderRadius: AppRadii.borderRadiusMd),
       ),
       icon: isBusy
           ? const SizedBox(
@@ -1158,7 +1159,7 @@ class _MobileDateSeparator extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.75),
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: AppRadii.borderRadiusPill,
         ),
         child: Text(
           label,
@@ -1421,7 +1422,7 @@ class _MobileConversationComposerState
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(28),
+                    borderRadius: AppRadii.borderRadiusXxxl,
                   ),
                   child: Row(
                     children: <Widget>[
@@ -1457,10 +1458,10 @@ class _MobileConversationComposerState
               const SizedBox(width: 10),
               Material(
                 color: AppColors.primary,
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: AppRadii.borderRadiusPill,
                 child: InkWell(
                   onTap: widget.isSending ? null : widget.onVoiceNoteTap,
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: AppRadii.borderRadiusPill,
                   child: SizedBox(
                     width: 54,
                     height: 54,
@@ -1571,14 +1572,14 @@ class _MobileConversationComposerState
                 const SizedBox(width: 8),
                 Material(
                   color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: AppRadii.borderRadiusPill,
                   child: InkWell(
                     onTap: widget.isSending
                         ? null
                         : hasText
                         ? () => widget.onSubmit()
                         : widget.onVoiceNoteTap,
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: AppRadii.borderRadiusPill,
                     child: SizedBox(
                       width: 54,
                       height: 54,
@@ -1659,7 +1660,7 @@ class _VoiceNoteWaveform extends StatelessWidget {
                 height: height,
                 decoration: BoxDecoration(
                   color: const Color(0xFF3F3F3F),
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: AppRadii.borderRadiusPill,
                 ),
               ),
             ),
@@ -1771,7 +1772,7 @@ class _CenterHeader extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.scaffoldBackground.withValues(alpha: 0.72),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: AppRadii.borderRadiusXl,
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
@@ -1785,15 +1786,15 @@ class _CenterHeader extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 10),
                   child: Material(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: AppRadii.borderRadiusPill,
                     child: InkWell(
                       onTap: onOpenInbox,
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: AppRadii.borderRadiusPill,
                       child: Container(
                         width: 42,
                         height: 42,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(999),
+                          borderRadius: AppRadii.borderRadiusPill,
                           border: Border.all(
                             color: AppColors.borderLight,
                           ),
@@ -1971,7 +1972,7 @@ class _HeaderBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadii.borderRadiusPill,
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Text(
@@ -2003,7 +2004,7 @@ class _DateSeparator extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: AppColors.scaffoldBackground.withValues(alpha: 0.85),
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: AppRadii.borderRadiusPill,
           ),
           child: Text(
             label,
@@ -2047,7 +2048,7 @@ class _ThreadBubble extends StatelessWidget {
                   )
                 : null,
             color: message.isMine ? null : AppColors.bubbleIncoming,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppRadii.borderRadiusXl,
             boxShadow: <BoxShadow>[
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.05),
@@ -2163,7 +2164,7 @@ class _ConversationImagePreview extends StatelessWidget {
       child: Stack(
         children: <Widget>[
           ClipRRect(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: AppRadii.borderRadiusLg,
             child: SizedBox(
               width: previewWidth,
               height: previewWidth,
@@ -2218,10 +2219,10 @@ class _ConversationImagePreview extends StatelessWidget {
             right: 8,
             child: Material(
               color: Colors.black.withValues(alpha: 0.45),
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: AppRadii.borderRadiusPill,
               child: InkWell(
                 onTap: () => _downloadMediaUrl(downloadUrl ?? imageUrl),
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: AppRadii.borderRadiusPill,
                 child: const Padding(
                   padding: EdgeInsets.all(8),
                   child: Icon(
@@ -2369,7 +2370,7 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
         children: <Widget>[
           InkWell(
             onTap: _togglePlay,
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: AppRadii.borderRadiusPill,
             child: Container(
               width: compact ? 36 : 42,
               height: compact ? 36 : 42,
@@ -2446,7 +2447,7 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
           InkWell(
             onTap: () =>
                 _downloadMediaUrl(widget.message.preferredAudioDownloadUrl),
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: AppRadii.borderRadiusPill,
             child: Container(
               width: compact ? 32 : 36,
               height: compact ? 32 : 36,
@@ -2494,7 +2495,7 @@ class _ConversationVideoCard extends StatefulWidget {
             width: double.infinity,
             decoration: BoxDecoration(
               color: const Color(0xFFEDEDED),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: AppRadii.borderRadiusMd,
             ),
             child: Stack(
               children: <Widget>[
@@ -2510,11 +2511,11 @@ class _ConversationVideoCard extends StatefulWidget {
                   right: 8,
                   child: Material(
                     color: Colors.black.withValues(alpha: 0.45),
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: AppRadii.borderRadiusPill,
                     child: InkWell(
                       onTap: () =>
                           _downloadMediaUrl(message.preferredVideoDownloadUrl),
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: AppRadii.borderRadiusPill,
                       child: const Padding(
                         padding: EdgeInsets.all(8),
                         child: Icon(
@@ -2578,7 +2579,7 @@ class _ConversationVideoCard extends StatefulWidget {
             width: double.infinity,
             decoration: BoxDecoration(
               color: const Color(0xFFEDEDED),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: AppRadii.borderRadiusMd,
             ),
             child: Stack(
               children: <Widget>[
@@ -2594,11 +2595,11 @@ class _ConversationVideoCard extends StatefulWidget {
                   right: 8,
                   child: Material(
                     color: Colors.black.withValues(alpha: 0.45),
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: AppRadii.borderRadiusPill,
                     child: InkWell(
                       onTap: () =>
                           _downloadMediaUrl(message.preferredVideoDownloadUrl),
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: AppRadii.borderRadiusPill,
                       child: const Padding(
                         padding: EdgeInsets.all(8),
                         child: Icon(
@@ -2753,7 +2754,7 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           ClipRRect(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: AppRadii.borderRadiusMd,
             child: Container(
               width: double.infinity,
               height: height,
@@ -2864,12 +2865,12 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
                   top: 8,
                   child: Material(
                     color: Colors.black.withValues(alpha: 0.45),
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: AppRadii.borderRadiusPill,
                     child: InkWell(
                       onTap: () => _downloadMediaUrl(
                         widget.message.preferredVideoDownloadUrl,
                       ),
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: AppRadii.borderRadiusPill,
                       child: const Padding(
                         padding: EdgeInsets.all(8),
                         child: Icon(
@@ -2911,11 +2912,11 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
           top: 8,
           child: Material(
             color: Colors.black.withValues(alpha: 0.45),
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: AppRadii.borderRadiusPill,
             child: InkWell(
               onTap: () =>
                   _downloadMediaUrl(widget.message.preferredVideoDownloadUrl),
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: AppRadii.borderRadiusPill,
               child: const Padding(
                 padding: EdgeInsets.all(8),
                 child: Icon(
@@ -2943,11 +2944,11 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
           top: 8,
           child: Material(
             color: Colors.black.withValues(alpha: 0.45),
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: AppRadii.borderRadiusPill,
             child: InkWell(
               onTap: () =>
                   _downloadMediaUrl(widget.message.preferredVideoDownloadUrl),
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: AppRadii.borderRadiusPill,
               child: const Padding(
                 padding: EdgeInsets.all(8),
                 child: Icon(
@@ -2976,7 +2977,7 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
                 ),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.45),
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: AppRadii.borderRadiusPill,
                 ),
                 child: const Text(
                   'Buka video',
@@ -3015,7 +3016,7 @@ class _VideoProgressBar extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             ClipRRect(
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: AppRadii.borderRadiusPill,
               child: LinearProgressIndicator(
                 value: progress.isNaN ? 0.0 : progress,
                 minHeight: 4,
@@ -3079,7 +3080,7 @@ class _ConversationDocumentCard extends StatelessWidget {
             height: 44,
             decoration: BoxDecoration(
               color: const Color(0xFFEDEDED),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppRadii.borderRadiusMd,
             ),
             child: const Icon(
               Icons.description_outlined,
@@ -3105,7 +3106,7 @@ class _ConversationDocumentCard extends StatelessWidget {
           InkWell(
             onTap: () =>
                 _downloadMediaUrl(message.preferredDocumentDownloadUrl),
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: AppRadii.borderRadiusPill,
             child: Container(
               width: 36,
               height: 36,
@@ -3186,7 +3187,7 @@ class _ActiveComposer extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.scaffoldBackground.withValues(alpha: 0.8),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: AppRadii.borderRadiusXl,
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Row(
@@ -3267,10 +3268,10 @@ class _ActiveComposer extends StatelessWidget {
           const SizedBox(width: 10),
           Material(
             color: isSending ? AppColors.neutral300 : AppColors.primary,
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: AppRadii.borderRadiusPill,
             child: InkWell(
               onTap: isSending ? null : onSubmit,
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: AppRadii.borderRadiusPill,
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: isSending
@@ -3315,14 +3316,14 @@ class _ComposerActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(999),
+      borderRadius: AppRadii.borderRadiusPill,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadii.borderRadiusPill,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: AppRadii.borderRadiusPill,
             border: Border.all(color: AppColors.borderLight),
           ),
           child: Row(
@@ -3373,15 +3374,15 @@ class _ComposerIconButton extends StatelessWidget {
       message: tooltip,
       child: Material(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadii.borderRadiusPill,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: AppRadii.borderRadiusPill,
           child: Container(
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: AppRadii.borderRadiusPill,
               border: Border.all(color: AppColors.borderLight),
             ),
             child: Icon(
@@ -3467,7 +3468,7 @@ class _SendContactDialogState extends State<_SendContactDialog> {
 
     return Dialog(
       insetPadding: const EdgeInsets.all(24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      shape: RoundedRectangleBorder(borderRadius: AppRadii.borderRadiusXxl),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 560),
         child: Padding(
@@ -3607,15 +3608,15 @@ class _DialogField extends StatelessWidget {
             filled: true,
             fillColor: AppColors.scaffoldBackground,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: AppRadii.borderRadiusLg,
               borderSide: const BorderSide(color: AppColors.borderLight),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: AppRadii.borderRadiusLg,
               borderSide: const BorderSide(color: AppColors.borderLight),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: AppRadii.borderRadiusLg,
               borderSide: const BorderSide(color: AppColors.primary),
             ),
             contentPadding: const EdgeInsets.symmetric(
@@ -3641,7 +3642,7 @@ class _CenterPaneSkeleton extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: AppColors.scaffoldBackground.withValues(alpha: 0.72),
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: AppRadii.borderRadiusXl,
             border: Border.all(color: AppColors.borderLight),
           ),
           child: const Row(

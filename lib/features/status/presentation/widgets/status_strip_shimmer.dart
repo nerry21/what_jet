@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../../../core/theme/app_dimensions.dart';
 import 'package:shimmer/shimmer.dart';
 
 class StatusStripShimmer extends StatelessWidget {
@@ -30,7 +32,7 @@ class StatusStripShimmer extends StatelessWidget {
                 height: 10,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: AppRadii.borderRadiusPill,
                 ),
               ),
             ],

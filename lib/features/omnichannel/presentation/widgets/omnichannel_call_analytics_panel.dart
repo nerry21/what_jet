@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_call_analytics_summary_model.dart';
 import '../../data/models/omnichannel_call_daily_trend_item_model.dart';
 import '../../data/models/omnichannel_call_history_item_model.dart';
@@ -146,7 +147,7 @@ class _SummaryTile extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
@@ -269,7 +270,7 @@ class _OutcomeRow extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           ClipRRect(
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: AppRadii.borderRadiusPill,
             child: LinearProgressIndicator(
               minHeight: 6,
               value: ((item.percentage / 100).clamp(0, 1)).toDouble(),
@@ -416,7 +417,7 @@ class _RecentCallRow extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
@@ -441,7 +442,7 @@ class _RecentCallRow extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                 decoration: BoxDecoration(
                   color: outcomeColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: AppRadii.borderRadiusPill,
                 ),
                 child: Text(
                   omnichannelCallOutcomeLabel(
@@ -509,7 +510,7 @@ class _CapabilityCard extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
@@ -581,7 +582,7 @@ class _CapabilityChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadii.borderRadiusPill,
       ),
       child: Text(
         label,
@@ -608,7 +609,7 @@ class _PanelNotice extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.error.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppRadii.borderRadiusMd,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -699,7 +700,7 @@ class _AnalyticsSkeleton extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: AppRadii.borderRadiusLg,
                 border: Border.all(color: AppColors.borderLight),
               ),
               child: const Column(

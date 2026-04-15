@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_call_session_model.dart';
 import '../../data/models/omnichannel_call_timeline_item_model.dart';
 import '../utils/omnichannel_call_status_ui.dart';
@@ -50,7 +51,7 @@ class OmnichannelCallTimelineSection extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: containerColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadii.borderRadiusXl,
         border: Border.all(color: borderColor),
       ),
       child: Column(
@@ -141,7 +142,7 @@ class _CallSummaryCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(color: border),
       ),
       child: Column(
@@ -188,7 +189,7 @@ class _TimelineRow extends StatelessWidget {
           height: 36,
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppRadii.borderRadiusMd,
           ),
           alignment: Alignment.center,
           child: Icon(omnichannelCallTimelineIcon(item), size: 18, color: color),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 class ChannelBadge extends StatelessWidget {
   const ChannelBadge({super.key, required this.channel, this.compact = false});
@@ -30,7 +31,7 @@ class ChannelBadge extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadii.borderRadiusPill,
         border: Border.all(color: foregroundColor.withValues(alpha: 0.18)),
       ),
       child: Text(

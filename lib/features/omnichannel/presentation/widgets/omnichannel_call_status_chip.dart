@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_call_session_model.dart';
 import '../utils/omnichannel_call_status_ui.dart';
 
@@ -26,7 +27,7 @@ class OmnichannelCallStatusChip extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: background,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadii.borderRadiusPill,
         border: Border.all(color: color.withValues(alpha: 0.18)),
       ),
       child: Row(

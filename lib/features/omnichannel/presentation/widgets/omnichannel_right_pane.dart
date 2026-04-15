@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_call_analytics_summary_model.dart';
 import '../../data/models/omnichannel_conversation_detail_model.dart';
 import '../../data/models/omnichannel_insight_model.dart';
@@ -119,7 +120,7 @@ class _ProfileCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.scaffoldBackground.withValues(alpha: 0.72),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: AppRadii.borderRadiusXl,
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Row(
@@ -218,7 +219,7 @@ class _TagChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadii.borderRadiusPill,
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.18)),
       ),
       child: Text(
@@ -348,7 +349,7 @@ class _RightPaneSkeleton extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: AppColors.scaffoldBackground.withValues(alpha: 0.72),
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: AppRadii.borderRadiusXl,
             border: Border.all(color: AppColors.borderLight),
           ),
           child: const Row(

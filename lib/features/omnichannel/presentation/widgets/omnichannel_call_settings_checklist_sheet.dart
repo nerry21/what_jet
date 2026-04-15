@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_dimensions.dart';
+
 class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
   final VoidCallback? onClose;
 
@@ -28,7 +30,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
             height: 42,
             decoration: BoxDecoration(
               color: iconBg,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: AppRadii.borderRadiusMd,
             ),
             child: Icon(icon, color: iconColor, size: 20),
           ),
@@ -67,7 +69,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
         color: const Color(0xFFF2F4F7),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadii.borderRadiusPill,
       ),
       child: Text(
         text,
@@ -103,7 +105,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
               height: 5,
               decoration: BoxDecoration(
                 color: const Color(0xFFD0D5DD),
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: AppRadii.borderRadiusPill,
               ),
             ),
             Padding(
@@ -137,13 +139,13 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
                   const SizedBox(width: 12),
                   InkWell(
                     onTap: () => _close(context),
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: AppRadii.borderRadiusPill,
                     child: Container(
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
                         color: const Color(0xFFF2F4F7),
-                        borderRadius: BorderRadius.circular(999),
+                        borderRadius: AppRadii.borderRadiusPill,
                       ),
                       child: const Icon(
                         Icons.close_rounded,
@@ -225,7 +227,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: AppRadii.borderRadiusLg,
                           ),
                         ),
                         icon: const Icon(Icons.close_rounded),

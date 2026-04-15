@@ -39,7 +39,7 @@ void main() {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: AppRadii.borderRadiusXxl,
                     border: Border.all(color: const Color(0xFFE8E8E8)),
                     boxShadow: const <BoxShadow>[
                       BoxShadow(
@@ -84,7 +84,7 @@ void main() {
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
                               color: const Color(0xFFFFF5F5),
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: AppRadii.borderRadiusLg,
                               border: Border.all(
                                 color: const Color(0xFFFFD6D6),
                               ),

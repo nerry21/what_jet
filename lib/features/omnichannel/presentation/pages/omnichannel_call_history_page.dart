@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/network/api_client.dart';
 import '../../data/models/omnichannel_call_history_item_model.dart';
 import '../../data/repositories/omnichannel_repository.dart';
@@ -207,7 +208,7 @@ class _OmnichannelCallHistoryPageState
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: AppColors.error.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: AppRadii.borderRadiusMd,
                           ),
                           child: Row(
                             children: <Widget>[
@@ -304,7 +305,7 @@ class _OmnichannelCallHistoryPageState
                 height: 42,
                 decoration: BoxDecoration(
                   color: outcomeColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: AppRadii.borderRadiusMd,
                 ),
                 alignment: Alignment.center,
                 child: Icon(

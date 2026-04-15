@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 Future<void> showWhatsAppEmojiPicker({
   required BuildContext context,
@@ -72,7 +73,7 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
                     height: 4,
                     decoration: BoxDecoration(
                       color: const Color(0xFFD7D7D7),
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: AppRadii.borderRadiusPill,
                     ),
                   ),
                   const Spacer(),
@@ -130,12 +131,12 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
                     color: isSelected
                         ? AppColors.primary.withValues(alpha: 0.12)
                         : Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: AppRadii.borderRadiusLg,
                     child: InkWell(
                       onTap: () {
                         setState(() => _selectedCategoryIndex = index);
                       },
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: AppRadii.borderRadiusLg,
                       child: Container(
                         width: 44,
                         height: 44,
@@ -179,10 +180,10 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
                         message: emoji,
                         child: Material(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: AppRadii.borderRadiusMd,
                           child: InkWell(
                             onTap: () => widget.onEmojiSelected(emoji),
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: AppRadii.borderRadiusMd,
                             child: Center(
                               child: Text(
                                 emoji,

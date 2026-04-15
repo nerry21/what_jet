@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../data/models/chat_message_model.dart';
 
 class MessageBubble extends StatelessWidget {
@@ -108,7 +109,7 @@ class _StatusIcon extends StatelessWidget {
     if (message.isFailed) {
       return InkWell(
         onTap: onRetry,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadii.borderRadiusXl,
         child: const Padding(
           padding: EdgeInsets.all(2),
           child: Icon(Icons.refresh_rounded, size: 16, color: AppColors.error),

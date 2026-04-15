@@ -6,6 +6,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../../core/theme/app_dimensions.dart';
 import '../../data/models/customer_status_group.dart';
 import '../../data/models/customer_status_item.dart';
 import '../../data/repositories/customer_status_repository.dart';
@@ -624,7 +625,7 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
                           ),
                           decoration: BoxDecoration(
                             color: Colors.black54,
-                            borderRadius: BorderRadius.circular(999),
+                            borderRadius: AppRadii.borderRadiusPill,
                           ),
                           child: const Text(
                             'Geser ke bawah untuk menutup',
@@ -778,7 +779,7 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.36),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadii.borderRadiusXl,
       ),
       child: StreamBuilder<PlayerState>(
         stream: _audioPlayer?.playerStateStream,
@@ -859,7 +860,7 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
         margin: const EdgeInsets.symmetric(horizontal: 2),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: AppRadii.borderRadiusPill,
         ),
       ),
     );
@@ -872,7 +873,7 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
         margin: const EdgeInsets.symmetric(horizontal: 2),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.28),
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: AppRadii.borderRadiusPill,
         ),
       ),
     );
@@ -885,7 +886,7 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
         margin: const EdgeInsets.symmetric(horizontal: 2),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.28),
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: AppRadii.borderRadiusPill,
         ),
         child: AnimatedBuilder(
           animation: _progressController,
@@ -897,7 +898,7 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: AppRadii.borderRadiusPill,
                   ),
                 ),
               ),

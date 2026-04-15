@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_call_session_model.dart';
 import '../../data/services/omnichannel_call_media_service.dart';
 import '../controllers/omnichannel_call_controller.dart';
@@ -416,7 +417,7 @@ class _FallbackNoticeCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: const Color(0xFFF0C24A).withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: AppRadii.borderRadiusXl,
         border: Border.all(
           color: const Color(0xFFF0C24A).withValues(alpha: 0.18),
         ),
@@ -480,7 +481,7 @@ class _InlineNoticeCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Text(
@@ -504,7 +505,7 @@ class _CallInfoCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: AppRadii.borderRadiusXl,
         border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
@@ -587,7 +588,7 @@ class _MediaStatusCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: AppRadii.borderRadiusXl,
         border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
@@ -600,7 +601,7 @@ class _MediaStatusCard extends StatelessWidget {
                 height: 42,
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: AppRadii.borderRadiusMd,
                 ),
                 alignment: Alignment.center,
                 child: Icon(
@@ -661,7 +662,7 @@ class _MediaStatusCard extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: const Color(0x33FFB3B3),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: AppRadii.borderRadiusMd,
                 border: Border.all(color: const Color(0x44FFB3B3)),
               ),
               child: Text(

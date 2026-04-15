@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 class ChatInputBar extends StatelessWidget {
   const ChatInputBar({
@@ -42,7 +43,7 @@ class ChatInputBar extends StatelessWidget {
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: const Color(0xFFF0F0F0),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: AppRadii.borderRadiusXl,
                     ),
                     child: TextField(
                       controller: controller,

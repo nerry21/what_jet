@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:record/record.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../admin_auth/data/models/admin_user_model.dart';
@@ -689,12 +690,12 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
           const SizedBox(width: 8),
           InkWell(
             onTap: _toggleCallReadinessExpanded,
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: AppRadii.borderRadiusPill,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: chipBg,
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: AppRadii.borderRadiusPill,
                 border: Border.all(color: borderColor),
               ),
               child: Row(
@@ -783,12 +784,12 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
           const SizedBox(width: 8),
           InkWell(
             onTap: _toggleCallReadinessExpanded,
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: AppRadii.borderRadiusPill,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: chipBg,
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: AppRadii.borderRadiusPill,
                 border: Border.all(color: borderColor),
               ),
               child: Row(
@@ -841,7 +842,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: AppRadii.borderRadiusXxl,
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -869,7 +870,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   height: 48,
                   decoration: BoxDecoration(
                     color: statusBg,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: AppRadii.borderRadiusLg,
                   ),
                   child: Icon(
                     isReady
@@ -911,7 +912,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   onTap: _isLoadingCallReadiness
                       ? null
                       : () => unawaited(_loadCallReadiness(forceRefresh: true)),
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: AppRadii.borderRadiusPill,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -919,7 +920,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                     ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF2F4F7),
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: AppRadii.borderRadiusPill,
                     ),
                     child: Text(
                       _isLoadingCallReadiness ? 'Checking...' : 'Refresh',
@@ -934,13 +935,13 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 const SizedBox(width: 8),
                 InkWell(
                   onTap: _hideCallReadinessCard,
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: AppRadii.borderRadiusPill,
                   child: Container(
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
                       color: const Color(0xFFF9FAFB),
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: AppRadii.borderRadiusPill,
                       border: Border.all(color: const Color(0xFFE5E7EB)),
                     ),
                     child: const Icon(
@@ -957,7 +958,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 color: statusBg,
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: AppRadii.borderRadiusPill,
                 border: Border.all(color: statusBorder),
               ),
               child: Row(
@@ -997,7 +998,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   color: isReady
                       ? const Color(0xFFF5FBF7)
                       : const Color(0xFFFFF8F2),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: AppRadii.borderRadiusLg,
                   border: Border.all(
                     color: isReady
                         ? const Color(0xFFD6F0DE)
@@ -1019,7 +1020,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                             ),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(999),
+                              borderRadius: AppRadii.borderRadiusPill,
                               border: Border.all(
                                 color: const Color(0xFFE5E7EB),
                               ),
@@ -1044,7 +1045,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                             ),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(999),
+                              borderRadius: AppRadii.borderRadiusPill,
                               border: Border.all(
                                 color: const Color(0xFFE5E7EB),
                               ),
@@ -1067,7 +1068,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                             ),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(999),
+                              borderRadius: AppRadii.borderRadiusPill,
                               border: Border.all(
                                 color: const Color(0xFFE5E7EB),
                               ),
@@ -1121,7 +1122,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 padding: const EdgeInsets.all(13),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: AppRadii.borderRadiusLg,
                   border: Border.all(color: const Color(0xFFE5E7EB)),
                 ),
                 child: Text(
@@ -1150,7 +1151,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFFFAEB),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: AppRadii.borderRadiusLg,
                         border: Border.all(color: const Color(0xFFF7D79B)),
                       ),
                       child: Text(
@@ -1245,7 +1246,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       padding: const EdgeInsets.symmetric(vertical: 13),
                       side: BorderSide(color: statusBorder),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: AppRadii.borderRadiusLg,
                       ),
                       foregroundColor: const Color(0xFF101828),
                     ),
@@ -1271,7 +1272,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       padding: const EdgeInsets.symmetric(vertical: 13),
                       side: const BorderSide(color: Color(0xFFF5D0D5)),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: AppRadii.borderRadiusLg,
                       ),
                       foregroundColor: const Color(0xFFB42318),
                     ),
@@ -1418,11 +1419,11 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
             color: Colors.transparent,
             child: InkWell(
               onTap: onTap,
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: AppRadii.borderRadiusPill,
               child: Ink(
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.97),
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: AppRadii.borderRadiusPill,
                   border: Border.all(color: borderColor),
                   boxShadow: const [
                     BoxShadow(
@@ -1445,7 +1446,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                         height: 26,
                         decoration: BoxDecoration(
                           color: iconBg,
-                          borderRadius: BorderRadius.circular(999),
+                          borderRadius: AppRadii.borderRadiusPill,
                         ),
                         child: Icon(icon, size: 15, color: accentColor),
                       ),
@@ -2697,7 +2698,7 @@ class _MobilePaneButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppRadii.borderRadiusMd,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
@@ -2706,7 +2707,7 @@ class _MobilePaneButton extends StatelessWidget {
             color: selected
                 ? AppColors.primary.withValues(alpha: 0.12)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: AppRadii.borderRadiusMd,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
