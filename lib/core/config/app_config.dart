@@ -58,7 +58,19 @@ class AppConfig {
     }
 
     if (defaultTargetPlatform == TargetPlatform.android) {
+      // In release/profile mode, always use production URL.
+      // The emulator-only 10.0.2.2 address is only useful during debug.
+      if (kReleaseMode) {
+        return chatbotAiProductionBaseUrl;
+      }
       return chatbotAiAndroidBaseUrl;
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      if (kReleaseMode) {
+        return chatbotAiProductionBaseUrl;
+      }
+      return chatbotAiLocalBaseUrl;
     }
 
     return chatbotAiLocalBaseUrl;

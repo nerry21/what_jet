@@ -297,7 +297,9 @@ class ApiClient {
   }
 
   String _errorMessageFromPayload(Map<String, dynamic> payload) {
-    final errors = payload['errors'];
+    // Laravel wraps validation errors inside "data.errors", so check both
+    // locations: payload['errors'] (flat) and payload['data']['errors'] (nested).
+    final errors = payload['errors'] ?? _nestedErrors(payload);
     final firstError = _extractFirstError(errors);
 
     final directMessage = payload['message'];
@@ -343,6 +345,18 @@ class ApiClient {
       }
     }
 
+    return null;
+  }
+
+  /// Laravel's mobile exception handler nests validation errors inside
+  /// `{"data": {"errors": {…}}}`. This helper digs into that structure so
+  /// [_extractFirstError] can surface the real validation message instead
+  /// of the generic "Validasi request gagal." envelope.
+  Object? _nestedErrors(Map<String, dynamic> payload) {
+    final data = payload['data'];
+    if (data is Map<String, dynamic>) {
+      return data['errors'];
+    }
     return null;
   }
 
