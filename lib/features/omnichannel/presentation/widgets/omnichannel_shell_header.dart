@@ -21,8 +21,8 @@ class OmnichannelShellHeader extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
-      decoration: const BoxDecoration(
+      padding: EdgeInsets.fromLTRB(16, 16, 16, 18),
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -33,11 +33,11 @@ class OmnichannelShellHeader extends StatelessWidget {
         builder: (context, constraints) {
           final isCompact = constraints.maxWidth < 880;
           final identityCard = Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.16),
+              color: AppColors.white.withValues(alpha: 0.16),
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: Colors.white24),
+              border: Border.all(color: AppColors.white.withValues(alpha: 0.24)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -45,17 +45,17 @@ class OmnichannelShellHeader extends StatelessWidget {
                 Container(
                   width: 42,
                   height: 42,
-                  decoration: const BoxDecoration(
-                    color: Colors.white24,
+                  decoration: BoxDecoration(
+                    color: AppColors.white.withValues(alpha: 0.24),
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
                   child: Text(
                     adminInitial,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                      color: AppColors.surfacePrimary,
                     ),
                   ),
                 ),
@@ -65,10 +65,10 @@ class OmnichannelShellHeader extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       _safeText(currentUser?.displayName, fallback: 'Admin'),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: AppColors.surfacePrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -90,9 +90,9 @@ class OmnichannelShellHeader extends StatelessWidget {
             icon: const Icon(Icons.logout_rounded),
             label: Text(isLoggingOut ? 'Keluar...' : 'Logout'),
             style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white,
-              side: const BorderSide(color: Colors.white38),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              foregroundColor: AppColors.white,
+              side: BorderSide(color: AppColors.white.withValues(alpha: 0.38)),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             ),
           );
 
@@ -106,7 +106,7 @@ class OmnichannelShellHeader extends StatelessWidget {
                     fontSize: 24,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.4,
-                    color: Colors.white,
+                    color: AppColors.surfacePrimary,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -138,7 +138,7 @@ class OmnichannelShellHeader extends StatelessWidget {
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.4,
-                        color: Colors.white,
+                        color: AppColors.surfacePrimary,
                       ),
                     ),
                     SizedBox(height: 6),

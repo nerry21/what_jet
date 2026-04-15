@@ -27,13 +27,13 @@ class ChatListTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: selected ? AppColors.surfaceTertiary : Colors.transparent,
           border: Border(
-            bottom: const BorderSide(color: AppColors.borderLight),
+            bottom: BorderSide(color: AppColors.borderLight),
             left: selected
-                ? const BorderSide(color: AppColors.primary, width: 4)
+                ? BorderSide(color: AppColors.primary, width: 4)
                 : BorderSide.none,
           ),
         ),
@@ -51,7 +51,7 @@ class ChatListTile extends StatelessWidget {
                         child: Text(
                           title,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                             color: AppColors.neutral800,
@@ -72,7 +72,7 @@ class ChatListTile extends StatelessWidget {
                         child: Text(
                           subtitle,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             color: AppColors.neutral500,
                           ),
@@ -84,16 +84,16 @@ class ChatListTile extends StatelessWidget {
                           width: 20,
                           height: 20,
                           alignment: Alignment.center,
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             color: AppColors.primary,
                             shape: BoxShape.circle,
                           ),
                           child: Text(
                             conversation.unreadCount.toString(),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              color: AppColors.surfacePrimary,
                             ),
                           ),
                         ),
@@ -106,7 +106,7 @@ class ChatListTile extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               timeLabel,
-              style: const TextStyle(fontSize: 12, color: AppColors.neutral300),
+              style: TextStyle(fontSize: 12, color: AppColors.neutral300),
             ),
           ],
         ),
@@ -133,7 +133,7 @@ class _AvatarBubble extends StatelessWidget {
             height: 56,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: <Color>[AppColors.primary, AppColors.primary200],
@@ -149,10 +149,10 @@ class _AvatarBubble extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: AppColors.surfacePrimary,
               ),
             ),
           ),
@@ -166,7 +166,7 @@ class _AvatarBubble extends StatelessWidget {
                 color: AppColors.success,
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.surfaceSecondary, width: 3),
-                boxShadow: const <BoxShadow>[
+                boxShadow: <BoxShadow>[
                   BoxShadow(color: Color(0x4D31A24C), blurRadius: 4),
                 ],
               ),

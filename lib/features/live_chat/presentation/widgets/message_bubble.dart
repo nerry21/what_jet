@@ -40,11 +40,11 @@ class MessageBubble extends StatelessWidget {
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxWidth),
           child: Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            margin: EdgeInsets.only(bottom: 8),
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               gradient: message.isMine
-                  ? const LinearGradient(
+                  ? LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: <Color>[
@@ -55,9 +55,9 @@ class MessageBubble extends StatelessWidget {
                   : null,
               color: message.isMine ? null : AppColors.bubbleIncoming,
               borderRadius: BorderRadius.circular(18),
-              boxShadow: const <BoxShadow>[
+              boxShadow: <BoxShadow>[
                 BoxShadow(
-                  color: Color(0x14000000),
+                  color: Color(0x40000000),
                   blurRadius: 2,
                   offset: Offset(0, 1),
                 ),
@@ -70,7 +70,7 @@ class MessageBubble extends StatelessWidget {
                 Flexible(
                   child: Text(
                     message.text,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       height: 1.4,
                       color: AppColors.neutral800,
@@ -80,10 +80,7 @@ class MessageBubble extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   timeLabel,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.neutral400,
-                  ),
+                  style: TextStyle(fontSize: 11, color: AppColors.neutral400),
                 ),
                 if (message.isMine) ...<Widget>[
                   const SizedBox(width: 4),
@@ -141,6 +138,6 @@ class _StatusIcon extends StatelessWidget {
       );
     }
 
-    return const Icon(Icons.done_rounded, size: 14, color: AppColors.primary);
+    return Icon(Icons.done_rounded, size: 14, color: AppColors.primary);
   }
 }

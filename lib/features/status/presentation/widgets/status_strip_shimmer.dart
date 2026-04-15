@@ -13,7 +13,7 @@ class StatusStripShimmer extends StatelessWidget {
       height: 120,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: 16),
         itemBuilder: (_, __) => Shimmer.fromColors(
           baseColor: AppColors.borderDefault,
           highlightColor: AppColors.surfaceTertiary,
@@ -22,7 +22,7 @@ class StatusStripShimmer extends StatelessWidget {
               Container(
                 width: 74,
                 height: 74,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColors.surfaceSecondary,
                   shape: BoxShape.circle,
                 ),

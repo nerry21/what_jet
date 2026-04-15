@@ -148,7 +148,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -185,7 +185,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
               }
 
               return Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColors.surfaceSecondary,
                   boxShadow: <BoxShadow>[
                     BoxShadow(
@@ -218,7 +218,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
     final conversations = _visibleConversations;
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surfaceSecondary,
         border: Border(right: BorderSide(color: AppColors.borderLight)),
         boxShadow: <BoxShadow>[
@@ -240,7 +240,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
                 ? null
                 : () => unawaited(_controller.refresh()),
             menuBuilder: (context) => PopupMenuButton<_SidebarMenuAction>(
-              icon: const Icon(Icons.more_vert, color: Colors.white),
+              icon: Icon(Icons.more_vert, color: AppColors.white),
               onSelected: (value) => unawaited(_handleSidebarMenu(value)),
               itemBuilder: (context) =>
                   const <PopupMenuEntry<_SidebarMenuAction>>[
@@ -256,11 +256,11 @@ class _LiveChatPageState extends State<LiveChatPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+            padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
             child: _SearchInput(controller: _searchController),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: 16),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -291,14 +291,14 @@ class _LiveChatPageState extends State<LiveChatPage> {
           ),
           if (_controller.errorMessage != null)
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: _SidebarInlineBanner(
                 label: _controller.errorMessage!,
                 actionLabel: _controller.isUnauthorized
                     ? 'Sambungkan lagi'
                     : 'Retry',
                 foregroundColor: _controller.isOffline
-                    ? AppColors.warning800
+                    ? const Color(0xFFFFCF73)
                     : AppColors.error,
                 backgroundColor: _controller.isOffline
                     ? AppColors.warning50
@@ -399,7 +399,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
             bottom: MediaQuery.viewInsetsOf(context).bottom,
           ),
           child: Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.surfaceSecondary,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               boxShadow: <BoxShadow>[
@@ -410,7 +410,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
                 ),
               ],
             ),
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+            padding: EdgeInsets.fromLTRB(24, 24, 24, 28),
             child: SafeArea(
               top: false,
               child: Column(
@@ -468,8 +468,8 @@ class _LiveChatPageState extends State<LiveChatPage> {
                           ).pop(openingMessageController.text.trim());
                         },
                         style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          foregroundColor: AppColors.white,
+                          padding: EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: AppRadii.borderRadiusMd,
                           ),
@@ -566,7 +566,7 @@ class _LiveChatPageState extends State<LiveChatPage> {
       SnackBar(
         content: Text(message),
         behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        margin: EdgeInsets.fromLTRB(20, 0, 20, 20),
         backgroundColor: isError ? AppColors.error : AppColors.success,
       ),
     );
@@ -589,8 +589,8 @@ class _SidebarHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -609,7 +609,7 @@ class _SidebarHeader extends StatelessWidget {
                     fontSize: 32,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.5,
-                    color: Colors.white,
+                    color: AppColors.surfacePrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -706,7 +706,7 @@ class _FilterChipButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: AppRadii.borderRadiusPill,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: active
                 ? AppColors.primary.withValues(alpha: 0.12)
@@ -746,7 +746,7 @@ class _SidebarInlineBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: AppRadii.borderRadiusMd,
@@ -787,7 +787,7 @@ class _SidebarEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(24),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -840,11 +840,8 @@ class _SidebarEmptyState extends StatelessWidget {
               icon: const Icon(Icons.add_comment_outlined),
               label: const Text('Mulai Percakapan'),
               style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 14,
-                ),
+                foregroundColor: AppColors.white,
+                padding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               ),
             ),
           ),
@@ -863,7 +860,7 @@ class _DesktopPlaceholder extends StatelessWidget {
       color: AppColors.surfaceSecondary,
       child: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -926,12 +923,12 @@ class _ShellErrorState extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 460),
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(24),
           child: Container(
             decoration: BoxDecoration(
               color: AppColors.surfaceSecondary,
               borderRadius: AppRadii.borderRadiusXxl,
-              boxShadow: const <BoxShadow>[
+              boxShadow: <BoxShadow>[
                 BoxShadow(
                   color: Color(0x40000000),
                   blurRadius: 32,
@@ -944,8 +941,8 @@ class _ShellErrorState extends StatelessWidget {
               children: <Widget>[
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
-                  decoration: const BoxDecoration(
+                  padding: EdgeInsets.fromLTRB(24, 24, 24, 20),
+                  decoration: BoxDecoration(
                     gradient: AppColors.primaryGradient,
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(24),
@@ -960,7 +957,7 @@ class _ShellErrorState extends StatelessWidget {
                           fontSize: 32,
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.5,
-                          color: Colors.white,
+                          color: AppColors.surfacePrimary,
                         ),
                       ),
                       SizedBox(height: 8),
@@ -976,7 +973,7 @@ class _ShellErrorState extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+                  padding: EdgeInsets.fromLTRB(24, 24, 24, 24),
                   child: Column(
                     children: <Widget>[
                       Container(
@@ -996,7 +993,7 @@ class _ShellErrorState extends StatelessWidget {
                       Text(
                         title,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
                           color: AppColors.neutral800,
@@ -1006,7 +1003,7 @@ class _ShellErrorState extends StatelessWidget {
                       Text(
                         message,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           height: 1.5,
                           color: AppColors.neutral500,
@@ -1019,7 +1016,7 @@ class _ShellErrorState extends StatelessWidget {
                           decoration: BoxDecoration(
                             gradient: AppColors.primaryGradient,
                             borderRadius: AppRadii.borderRadiusMd,
-                            boxShadow: const <BoxShadow>[
+                            boxShadow: <BoxShadow>[
                               BoxShadow(
                                 color: AppColors.primaryGlow,
                                 blurRadius: 12,
@@ -1030,8 +1027,8 @@ class _ShellErrorState extends StatelessWidget {
                           child: TextButton(
                             onPressed: () => unawaited(onRetry()),
                             style: TextButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              foregroundColor: AppColors.white,
+                              padding: EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
                                 borderRadius: AppRadii.borderRadiusMd,
                               ),
@@ -1084,7 +1081,7 @@ class _GreyInput extends StatelessWidget {
         maxLines: maxLines,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: const TextStyle(color: AppColors.neutral300),
+          hintStyle: TextStyle(color: AppColors.neutral300),
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(
             horizontal: 16,
@@ -1112,7 +1109,7 @@ class _HeaderIconButton extends StatelessWidget {
         child: SizedBox(
           width: 36,
           height: 36,
-          child: Icon(icon, color: Colors.white),
+          child: Icon(icon, color: AppColors.white),
         ),
       ),
     );

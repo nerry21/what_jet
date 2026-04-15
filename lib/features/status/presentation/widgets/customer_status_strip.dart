@@ -64,7 +64,7 @@ class _CustomerStatusStripState extends State<CustomerStatusStrip> {
         height: 120,
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: 16),
             child: Text(_error!, textAlign: TextAlign.center),
           ),
         ),
@@ -82,7 +82,7 @@ class _CustomerStatusStripState extends State<CustomerStatusStrip> {
       height: 120,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: 16),
         itemCount: _items.length,
         separatorBuilder: (_, __) => const SizedBox(width: 14),
         itemBuilder: (context, index) {

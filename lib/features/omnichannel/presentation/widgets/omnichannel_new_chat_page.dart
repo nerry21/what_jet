@@ -132,7 +132,7 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
         child: Column(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.fromLTRB(4, 6, 4, 0),
+              padding: EdgeInsets.fromLTRB(4, 6, 4, 0),
               child: Row(
                 children: <Widget>[
                   IconButton(
@@ -161,7 +161,7 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 14),
               child: Container(
                 decoration: BoxDecoration(
                   color: AppColors.surfaceTertiary,
@@ -170,7 +170,7 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
                 child: TextField(
                   controller: _searchController,
                   onChanged: (_) => setState(() {}),
-                  style: const TextStyle(fontSize: 17, color: AppColors.neutral800),
+                  style: TextStyle(fontSize: 17, color: AppColors.neutral800),
                   decoration: const InputDecoration(
                     hintText: 'Cari nama atau nomor',
                     hintStyle: TextStyle(
@@ -228,7 +228,7 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
             ),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.only(bottom: 18),
+                padding: EdgeInsets.only(bottom: 18),
                 itemCount: _filteredContacts.length,
                 itemBuilder: (context, index) {
                   final entry = _filteredContacts[index];
@@ -343,7 +343,7 @@ class _OmnichannelCreateContactPageState
         child: Column(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.fromLTRB(4, 6, 4, 0),
+              padding: EdgeInsets.fromLTRB(4, 6, 4, 0),
               child: Row(
                 children: <Widget>[
                   IconButton(
@@ -373,7 +373,7 @@ class _OmnichannelCreateContactPageState
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+                padding: EdgeInsets.fromLTRB(16, 20, 16, 24),
                 child: Column(
                   children: <Widget>[
                     _CreateContactInputRow(
@@ -444,7 +444,7 @@ class _OmnichannelCreateContactPageState
                         ),
                         Switch(
                           value: _syncToPhone,
-                          activeThumbColor: Colors.white,
+                          activeThumbColor: AppColors.white,
                           activeTrackColor: AppColors.primary,
                           inactiveTrackColor: AppColors.borderDefault,
                           onChanged: (value) {
@@ -456,7 +456,7 @@ class _OmnichannelCreateContactPageState
                     if (_syncToPhone) ...<Widget>[
                       const SizedBox(height: 18),
                       Padding(
-                        padding: const EdgeInsets.only(left: 40),
+                        padding: EdgeInsets.only(left: 40),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
@@ -472,8 +472,8 @@ class _OmnichannelCreateContactPageState
                               onTap: _pickAccount,
                               child: Container(
                                 width: double.infinity,
-                                padding: const EdgeInsets.only(bottom: 8),
-                                decoration: const BoxDecoration(
+                                padding: EdgeInsets.only(bottom: 8),
+                                decoration: BoxDecoration(
                                   border: Border(
                                     bottom: BorderSide(
                                       color: AppColors.borderDefault,
@@ -485,7 +485,7 @@ class _OmnichannelCreateContactPageState
                                     Expanded(
                                       child: Text(
                                         _selectedAccount,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 16,
                                           color: AppColors.neutral800,
                                         ),
@@ -510,15 +510,15 @@ class _OmnichannelCreateContactPageState
             SafeArea(
               top: false,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 18),
                 child: SizedBox(
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: _save,
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      foregroundColor: AppColors.white,
+                      padding: EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: AppRadii.borderRadiusXxxl,
                       ),
@@ -590,21 +590,18 @@ class _OutlinedField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
-      style: const TextStyle(fontSize: 16, color: AppColors.neutral800),
+      style: TextStyle(fontSize: 16, color: AppColors.neutral800),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(fontSize: 16, color: AppColors.neutral400),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 15,
-        ),
+        hintStyle: TextStyle(fontSize: 16, color: AppColors.neutral400),
+        contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 15),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.borderDefault),
+          borderSide: BorderSide(color: AppColors.borderDefault),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.4),
+          borderSide: BorderSide(color: AppColors.primary, width: 1.4),
         ),
       ),
     );
@@ -623,7 +620,7 @@ class _CountryCodeField extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(12, 6, 12, 10),
+        padding: EdgeInsets.fromLTRB(12, 6, 12, 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: AppColors.borderDefault),
@@ -641,7 +638,7 @@ class _CountryCodeField extends StatelessWidget {
                 Expanded(
                   child: Text(
                     value,
-                    style: const TextStyle(fontSize: 16, color: AppColors.neutral800),
+                    style: TextStyle(fontSize: 16, color: AppColors.neutral800),
                   ),
                 ),
                 const Icon(
@@ -677,17 +674,17 @@ class _NewChatActionTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
         child: Row(
           children: <Widget>[
             Container(
               width: 38,
               height: 38,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.primary,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: Colors.white, size: 21),
+              child: Icon(icon, color: AppColors.surfacePrimary, size: 21),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -696,7 +693,7 @@ class _NewChatActionTile extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
                       color: AppColors.neutral800,
@@ -705,7 +702,7 @@ class _NewChatActionTile extends StatelessWidget {
                   if (subtitle != null)
                     Text(
                       subtitle!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         color: AppColors.neutral400,
                       ),
@@ -732,7 +729,7 @@ class _NewChatContactTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+        padding: EdgeInsets.fromLTRB(16, 10, 16, 10),
         child: Row(
           children: <Widget>[
             Container(
@@ -749,10 +746,10 @@ class _NewChatContactTile extends StatelessWidget {
               alignment: Alignment.center,
               child: Text(
                 entry.avatarLabel,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: AppColors.surfacePrimary,
                 ),
               ),
             ),
@@ -765,7 +762,7 @@ class _NewChatContactTile extends StatelessWidget {
                     entry.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w500,
                       color: AppColors.neutral800,
@@ -776,10 +773,7 @@ class _NewChatContactTile extends StatelessWidget {
                     entry.subtitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.neutral400,
-                    ),
+                    style: TextStyle(fontSize: 14, color: AppColors.neutral400),
                   ),
                 ],
               ),

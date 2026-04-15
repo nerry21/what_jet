@@ -157,11 +157,14 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
             ),
             Expanded(
               child: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: <Color>[AppColors.surfacePrimary, AppColors.surfaceSecondary],
+                    colors: <Color>[
+                      AppColors.surfacePrimary,
+                      AppColors.surfaceSecondary,
+                    ],
                   ),
                 ),
                 child: Column(
@@ -183,7 +186,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                         label: _controller.connectionMessage!,
                         actionLabel: 'Coba lagi',
                         color: AppColors.warning50,
-                        foregroundColor: AppColors.warning800,
+                        foregroundColor: const Color(0xFFFFCF73),
                         onTap: _controller.refresh,
                       ),
                     if (_controller.errorMessage != null &&
@@ -265,7 +268,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           child: ListView.separated(
             controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+            padding: EdgeInsets.fromLTRB(16, 20, 16, 16),
             itemCount: _controller.messages.length,
             separatorBuilder: (_, __) => const SizedBox(height: 4),
             itemBuilder: (context, index) {
@@ -328,10 +331,8 @@ class _ConversationHeader extends StatelessWidget {
     final channel = conversation?.channel ?? 'mobile_live_chat';
 
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
-      ),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(gradient: AppColors.primaryGradient),
       child: Row(
         children: <Widget>[
           if (showBackButton) ...<Widget>[
@@ -353,7 +354,7 @@ class _ConversationHeader extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: AppColors.surfacePrimary,
                         ),
                       ),
                     ),
@@ -413,7 +414,7 @@ class _ConversationBanner extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: color,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
         children: <Widget>[
           Expanded(
@@ -430,7 +431,7 @@ class _ConversationBanner extends StatelessWidget {
             onPressed: onTap,
             style: TextButton.styleFrom(
               foregroundColor: foregroundColor,
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: EdgeInsets.symmetric(horizontal: 10),
             ),
             child: Text(actionLabel),
           ),
@@ -449,7 +450,7 @@ class _ConversationEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -492,7 +493,7 @@ class _ConversationEmptyState extends StatelessWidget {
               label: const Text('Refresh'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.primary,
-                side: const BorderSide(color: AppColors.primary),
+                side: BorderSide(color: AppColors.primary),
               ),
             ),
           ],
@@ -519,7 +520,7 @@ class _ConversationErrorState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -549,7 +550,7 @@ class _ConversationErrorState extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 height: 1.5,
                 color: AppColors.neutral500,
@@ -562,7 +563,7 @@ class _ConversationErrorState extends StatelessWidget {
               label: Text(actionLabel),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.white,
               ),
             ),
           ],
@@ -588,7 +589,7 @@ class _HeaderIconButton extends StatelessWidget {
         child: SizedBox(
           width: 36,
           height: 36,
-          child: Icon(icon, color: Colors.white),
+          child: Icon(icon, color: AppColors.white),
         ),
       ),
     );
@@ -608,20 +609,20 @@ class _ContactAvatar extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: <Color>[Colors.white24, Colors.white38],
+            colors: <Color>[AppColors.white.withValues(alpha: 0.24), AppColors.white.withValues(alpha: 0.38)],
           ),
-          border: Border.all(color: Colors.white24),
+          border: Border.all(color: AppColors.white.withValues(alpha: 0.24)),
         ),
         child: Center(
           child: Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: AppColors.surfacePrimary,
             ),
           ),
         ),
@@ -670,7 +671,7 @@ class _DummyCallScreenState extends State<_DummyCallScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -687,7 +688,7 @@ class _DummyCallScreenState extends State<_DummyCallScreen> {
                   onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(
                     Icons.chevron_left,
-                    color: Colors.white,
+                    color: AppColors.surfacePrimary,
                     size: 32,
                   ),
                 ),
@@ -700,30 +701,30 @@ class _DummyCallScreenState extends State<_DummyCallScreen> {
                       width: 140,
                       height: 140,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
+                        color: AppColors.white.withValues(alpha: 0.15),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.35),
+                          color: AppColors.white.withValues(alpha: 0.35),
                           width: 4,
                         ),
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         widget.contactLabel.characters.first.toUpperCase(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 56,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: AppColors.surfacePrimary,
                         ),
                       ),
                     ),
                     const SizedBox(height: 24),
                     Text(
                       widget.contactLabel,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: AppColors.surfacePrimary,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -749,12 +750,12 @@ class _DummyCallScreenState extends State<_DummyCallScreen> {
                       children: <Widget>[
                         _CallControlButton(
                           icon: Icons.mic_none_rounded,
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: AppColors.white.withValues(alpha: 0.2),
                         ),
                         const SizedBox(width: 20),
                         _CallControlButton(
                           icon: Icons.volume_up_outlined,
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: AppColors.white.withValues(alpha: 0.2),
                         ),
                         const SizedBox(width: 20),
                         _CallControlButton(
@@ -807,7 +808,7 @@ class _CallControlButton extends StatelessWidget {
           width: 64,
           height: 64,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          child: Icon(icon, color: Colors.white, size: 28),
+          child: Icon(icon, color: AppColors.surfacePrimary, size: 28),
         ),
       ),
     );

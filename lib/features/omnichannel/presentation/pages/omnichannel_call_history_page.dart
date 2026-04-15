@@ -125,7 +125,7 @@ class _OmnichannelCallHistoryPageState
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -133,7 +133,7 @@ class _OmnichannelCallHistoryPageState
                 widget.conversationTitle.trim().isEmpty
                     ? 'Conversation'
                     : widget.conversationTitle.trim(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                   color: AppColors.neutral800,
@@ -204,8 +204,8 @@ class _OmnichannelCallHistoryPageState
                       if (_errorMessage?.trim().isNotEmpty ?? false)
                         Container(
                           width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.all(12),
+                          margin: EdgeInsets.only(bottom: 12),
+                          padding: EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: AppColors.error.withValues(alpha: 0.08),
                             borderRadius: AppRadii.borderRadiusMd,
@@ -221,7 +221,7 @@ class _OmnichannelCallHistoryPageState
                               Expanded(
                                 child: Text(
                                   _errorMessage!,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     color: AppColors.error,
                                   ),
@@ -272,7 +272,7 @@ class _OmnichannelCallHistoryPageState
                   ? 'Riwayat panggilan untuk conversation ini belum tersedia.'
                   : 'Tidak ada panggilan dengan filter ${_filters.firstWhere((item) => item.key == _selectedFilter).label.toLowerCase()}.',
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 height: 1.45,
                 color: AppColors.neutral500,
@@ -291,7 +291,7 @@ class _OmnichannelCallHistoryPageState
         final outcomeColor = omnichannelCallOutcomeColor(item.finalStatus);
 
         return Container(
-          padding: const EdgeInsets.all(14),
+          padding: EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: AppColors.scaffoldBackground,
             borderRadius: BorderRadius.circular(18),
@@ -328,7 +328,7 @@ class _OmnichannelCallHistoryPageState
                               fallback:
                                   item.finalStatusLabel ?? 'Sedang berlangsung',
                             ),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w800,
                               color: AppColors.neutral800,
@@ -341,7 +341,7 @@ class _OmnichannelCallHistoryPageState
                             durationSeconds: item.durationSeconds,
                             durationHuman: item.durationHuman,
                           ),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
@@ -357,7 +357,7 @@ class _OmnichannelCallHistoryPageState
                         if ((item.customerContact).trim().isNotEmpty)
                           item.customerContact,
                       ].join(' | '),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         height: 1.4,
                         color: AppColors.neutral500,
@@ -367,7 +367,7 @@ class _OmnichannelCallHistoryPageState
                       const SizedBox(height: 6),
                       Text(
                         'WA Call ID: ${item.waCallId}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           color: AppColors.neutral300,
                         ),

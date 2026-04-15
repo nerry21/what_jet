@@ -51,7 +51,7 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
       alignment: Alignment.bottomCenter,
       child: Container(
         height: pickerHeight,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.surfaceSecondary,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           boxShadow: <BoxShadow>[
@@ -65,7 +65,7 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
         child: Column(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 8, 4),
+              padding: EdgeInsets.fromLTRB(16, 12, 8, 4),
               child: Row(
                 children: <Widget>[
                   Container(
@@ -88,13 +88,13 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
                   IconButton(
                     tooltip: 'Tutup',
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close, color: AppColors.neutral500),
+                    icon: Icon(Icons.close, color: AppColors.neutral500),
                   ),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: <Widget>[
                   const Text(
@@ -108,7 +108,7 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
                   const SizedBox(width: 10),
                   Text(
                     selectedCategory.label,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: AppColors.neutral300,
@@ -121,7 +121,7 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
             SizedBox(
               height: 44,
               child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: EdgeInsets.symmetric(horizontal: 12),
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
                   final category = _emojiCategories[index];
@@ -163,7 +163,7 @@ class _WhatsAppEmojiPickerSheetState extends State<_WhatsAppEmojiPickerSheet> {
                   final crossAxisCount = constraints.maxWidth >= 380 ? 8 : 7;
 
                   return GridView.builder(
-                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 18),
+                    padding: EdgeInsets.fromLTRB(14, 0, 14, 18),
                     physics: const BouncingScrollPhysics(
                       parent: AlwaysScrollableScrollPhysics(),
                     ),

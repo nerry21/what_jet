@@ -18,9 +18,7 @@ class StatusRingAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ringColor = hasUnviewed
-        ? AppColors.primary
-        : AppColors.neutral400;
+    final ringColor = hasUnviewed ? AppColors.primary : AppColors.neutral400;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -28,7 +26,7 @@ class StatusRingAvatar extends StatelessWidget {
         Container(
           width: size,
           height: size,
-          padding: const EdgeInsets.all(3),
+          padding: EdgeInsets.all(3),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: LinearGradient(
@@ -36,11 +34,11 @@ class StatusRingAvatar extends StatelessWidget {
             ),
           ),
           child: Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: AppColors.surfaceSecondary,
             ),
-            padding: const EdgeInsets.all(3),
+            padding: EdgeInsets.all(3),
             child: CircleAvatar(
               backgroundColor: AppColors.surfaceTertiary,
               backgroundImage: imageUrl != null && imageUrl!.isNotEmpty
@@ -49,7 +47,7 @@ class StatusRingAvatar extends StatelessWidget {
               child: imageUrl == null || imageUrl!.isEmpty
                   ? Text(
                       label.isNotEmpty ? label[0].toUpperCase() : 'A',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w800,
                         color: AppColors.primary,
                       ),

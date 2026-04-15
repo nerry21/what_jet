@@ -579,7 +579,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
                           ),
                           keyboardDismissBehavior:
                               ScrollViewKeyboardDismissBehavior.onDrag,
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, 12),
                           children: <Widget>[
                             if (callHistorySection != null) ...<Widget>[
                               callHistorySection,
@@ -742,7 +742,7 @@ class _MobileConversationScaffold extends StatelessWidget {
                 physics: const BouncingScrollPhysics(
                   parent: AlwaysScrollableScrollPhysics(),
                 ),
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 18),
+                padding: EdgeInsets.fromLTRB(12, 12, 12, 18),
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
                 children: <Widget>[
@@ -809,7 +809,7 @@ class _MobileConversationScaffold extends StatelessWidget {
                     children: <Widget>[
                       if (callBanner != null)
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                          padding: EdgeInsets.fromLTRB(12, 12, 12, 0),
                           child: callBanner!,
                         ),
                       Expanded(child: threadBody),
@@ -869,8 +869,8 @@ class _MobileConversationAppBar extends StatelessWidget {
     final initial = _safeInitial(conversation?.customerName, fallback: 'C');
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-      decoration: const BoxDecoration(
+      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+      decoration: BoxDecoration(
         color: AppColors.surfaceSecondary,
         border: Border(bottom: BorderSide(color: AppColors.borderLight)),
       ),
@@ -904,10 +904,10 @@ class _MobileConversationAppBar extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   initial,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: AppColors.surfacePrimary,
                   ),
                 ),
               ),
@@ -920,7 +920,7 @@ class _MobileConversationAppBar extends StatelessWidget {
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: AppColors.neutral800,
@@ -934,7 +934,7 @@ class _MobileConversationAppBar extends StatelessWidget {
                             subtitle,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               color: AppColors.neutral500,
                             ),
@@ -1053,7 +1053,7 @@ class _BotControlBanner extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: isEnabled
             ? AppColors.primary.withValues(alpha: 0.08)
@@ -1073,7 +1073,7 @@ class _BotControlBanner extends StatelessWidget {
               children: <Widget>[
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
                     color: AppColors.neutral800,
@@ -1084,7 +1084,7 @@ class _BotControlBanner extends StatelessWidget {
                   description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     height: 1.3,
                     color: AppColors.neutral500,
@@ -1121,9 +1121,11 @@ class _BotToggleAction extends StatelessWidget {
     return FilledButton.icon(
       onPressed: isBusy ? null : () async => onPressed(),
       style: FilledButton.styleFrom(
-        backgroundColor: isEnabled ? const Color(0xFFF38A22) : AppColors.primary,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+        backgroundColor: isEnabled
+            ? const Color(0xFFF38A22)
+            : AppColors.primary,
+        foregroundColor: AppColors.white,
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 11),
         shape: RoundedRectangleBorder(borderRadius: AppRadii.borderRadiusMd),
       ),
       icon: isBusy
@@ -1132,7 +1134,7 @@ class _BotToggleAction extends StatelessWidget {
               height: 14,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: Colors.white,
+                color: AppColors.surfacePrimary,
               ),
             )
           : Icon(
@@ -1156,14 +1158,14 @@ class _MobileDateSeparator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: AppColors.surfaceSecondary.withValues(alpha: 0.75),
           borderRadius: AppRadii.borderRadiusPill,
         ),
         child: Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
             color: AppColors.neutral500,
@@ -1193,10 +1195,12 @@ class _MobileConversationBubble extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth),
         child: Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.fromLTRB(12, 9, 12, 8),
+          margin: EdgeInsets.only(bottom: 8),
+          padding: EdgeInsets.fromLTRB(12, 9, 12, 8),
           decoration: BoxDecoration(
-            color: message.isMine ? AppColors.bubbleOutgoing : AppColors.bubbleIncoming,
+            color: message.isMine
+                ? AppColors.bubbleOutgoing
+                : AppColors.bubbleIncoming,
             borderRadius: BorderRadius.only(
               topLeft: const Radius.circular(18),
               topRight: const Radius.circular(18),
@@ -1205,7 +1209,7 @@ class _MobileConversationBubble extends StatelessWidget {
             ),
             boxShadow: <BoxShadow>[
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
+                color: const Color(0x18000000),
                 blurRadius: 4,
                 offset: const Offset(0, 1),
               ),
@@ -1237,7 +1241,7 @@ class _MobileConversationBubble extends StatelessWidget {
               if (message.displayText.isNotEmpty)
                 Text(
                   message.displayText,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     height: 1.35,
                     color: AppColors.neutral800,
@@ -1400,7 +1404,7 @@ class _MobileConversationComposerState
   Widget build(BuildContext context) {
     if (widget.isRecordingVoiceNote) {
       return Container(
-        padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+        padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
         color: AppColors.surfaceTertiary,
         child: SafeArea(
           top: false,
@@ -1419,7 +1423,7 @@ class _MobileConversationComposerState
               Expanded(
                 child: Container(
                   height: 58,
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  padding: EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
                     color: AppColors.surfaceSecondary,
                     borderRadius: AppRadii.borderRadiusXxxl,
@@ -1428,7 +1432,7 @@ class _MobileConversationComposerState
                     children: <Widget>[
                       Text(
                         _formatDuration(_recordingSeconds),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: AppColors.neutral800,
@@ -1440,7 +1444,7 @@ class _MobileConversationComposerState
                       Container(
                         width: 34,
                         height: 34,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           color: AppColors.error50,
                           shape: BoxShape.circle,
                         ),
@@ -1472,12 +1476,12 @@ class _MobileConversationComposerState
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Colors.white,
+                                color: AppColors.surfacePrimary,
                               ),
                             )
                           : const Icon(
                               Icons.send_rounded,
-                              color: Colors.white,
+                              color: AppColors.surfacePrimary,
                               size: 24,
                             ),
                     ),
@@ -1491,7 +1495,7 @@ class _MobileConversationComposerState
     }
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+      padding: EdgeInsets.fromLTRB(10, 8, 10, 10),
       color: AppColors.surfaceTertiary,
       child: SafeArea(
         top: false,
@@ -1590,14 +1594,14 @@ class _MobileConversationComposerState
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: AppColors.surfacePrimary,
                                 ),
                               )
                             : Icon(
                                 hasText
                                     ? Icons.send_rounded
                                     : Icons.mic_rounded,
-                                color: Colors.white,
+                                color: AppColors.surfacePrimary,
                                 size: 24,
                               ),
                       ),
@@ -1654,7 +1658,7 @@ class _VoiceNoteWaveform extends StatelessWidget {
       children: bars
           .map(
             (height) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 1.5),
+              padding: EdgeInsets.symmetric(horizontal: 1.5),
               child: Container(
                 width: 3,
                 height: height,
@@ -1679,7 +1683,7 @@ class _MobileConversationLoadingBody extends StatelessWidget {
       physics: const BouncingScrollPhysics(
         parent: AlwaysScrollableScrollPhysics(),
       ),
-      padding: const EdgeInsets.fromLTRB(12, 14, 12, 18),
+      padding: EdgeInsets.fromLTRB(12, 14, 12, 18),
       children: const <Widget>[
         _MobileDateSeparator(label: 'Memuat chat'),
         SizedBox(height: 12),
@@ -1769,7 +1773,7 @@ class _CenterHeader extends StatelessWidget {
     }.where((badge) => badge.isNotEmpty).toList();
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.scaffoldBackground.withValues(alpha: 0.72),
         borderRadius: AppRadii.borderRadiusXl,
@@ -1783,7 +1787,7 @@ class _CenterHeader extends StatelessWidget {
             children: <Widget>[
               if (onOpenInbox != null)
                 Padding(
-                  padding: const EdgeInsets.only(right: 10),
+                  padding: EdgeInsets.only(right: 10),
                   child: Material(
                     color: AppColors.surfaceSecondary,
                     borderRadius: AppRadii.borderRadiusPill,
@@ -1795,9 +1799,7 @@ class _CenterHeader extends StatelessWidget {
                         height: 42,
                         decoration: BoxDecoration(
                           borderRadius: AppRadii.borderRadiusPill,
-                          border: Border.all(
-                            color: AppColors.borderLight,
-                          ),
+                          border: Border.all(color: AppColors.borderLight),
                         ),
                         child: const Icon(
                           Icons.arrow_back_rounded,
@@ -1829,10 +1831,10 @@ class _CenterHeader extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   initial,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: AppColors.surfacePrimary,
                   ),
                 ),
               ),
@@ -1851,7 +1853,7 @@ class _CenterHeader extends StatelessWidget {
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
                               color: AppColors.neutral800,
@@ -1867,7 +1869,7 @@ class _CenterHeader extends StatelessWidget {
                       _safeText(conversation.subtitle, fallback: '-'),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         height: 1.35,
                         color: AppColors.neutral500,
@@ -1934,15 +1936,12 @@ class _CenterHeader extends StatelessWidget {
           ),
           if (conversation.botAutoResumeEnabled)
             Padding(
-              padding: const EdgeInsets.only(top: 8),
+              padding: EdgeInsets.only(top: 8),
               child: Text(
                 _buildBotResumeLabel(conversation),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.neutral500,
-                ),
+                style: TextStyle(fontSize: 12, color: AppColors.neutral500),
               ),
             ),
           if (badges.isNotEmpty) ...<Widget>[
@@ -1969,7 +1968,7 @@ class _HeaderBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusPill,
@@ -1979,7 +1978,7 @@ class _HeaderBadge extends StatelessWidget {
         label,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w700,
           color: AppColors.neutral500,
@@ -2000,15 +1999,15 @@ class _DateSeparator extends StatelessWidget {
       children: <Widget>[
         const Expanded(child: Divider(color: AppColors.borderLight)),
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 10),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          margin: EdgeInsets.symmetric(horizontal: 10),
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: AppColors.scaffoldBackground.withValues(alpha: 0.85),
             borderRadius: AppRadii.borderRadiusPill,
           ),
           child: Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: AppColors.neutral500,
@@ -2034,11 +2033,11 @@ class _ThreadBubble extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth),
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+          margin: EdgeInsets.only(bottom: 10),
+          padding: EdgeInsets.fromLTRB(14, 12, 14, 10),
           decoration: BoxDecoration(
             gradient: message.isMine
-                ? const LinearGradient(
+                ? LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: <Color>[
@@ -2051,7 +2050,7 @@ class _ThreadBubble extends StatelessWidget {
             borderRadius: AppRadii.borderRadiusXl,
             boxShadow: <BoxShadow>[
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: AppColors.neutral800.withValues(alpha: 0.05),
                 blurRadius: 4,
                 offset: const Offset(0, 1),
               ),
@@ -2065,7 +2064,9 @@ class _ThreadBubble extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: message.isMine ? AppColors.primary : AppColors.neutral500,
+                  color: message.isMine
+                      ? AppColors.primary
+                      : AppColors.neutral500,
                 ),
               ),
               const SizedBox(height: 5),
@@ -2092,7 +2093,7 @@ class _ThreadBubble extends StatelessWidget {
               if (message.displayText.isNotEmpty)
                 Text(
                   message.displayText,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     height: 1.5,
                     color: AppColors.neutral800,
@@ -2117,16 +2118,13 @@ class _ThreadBubble extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     formatOmnichannelThreadTime(message.sentAt),
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: AppColors.neutral300,
-                    ),
+                    style: TextStyle(fontSize: 11, color: AppColors.neutral300),
                   ),
                   if (message.statusLabel != null) ...<Widget>[
                     const SizedBox(width: 8),
                     Text(
                       message.statusLabel!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primary,
@@ -2218,7 +2216,7 @@ class _ConversationImagePreview extends StatelessWidget {
             top: 8,
             right: 8,
             child: Material(
-              color: Colors.black.withValues(alpha: 0.45),
+              color: AppColors.neutral800.withValues(alpha: 0.45),
               borderRadius: AppRadii.borderRadiusPill,
               child: InkWell(
                 onTap: () => _downloadMediaUrl(downloadUrl ?? imageUrl),
@@ -2228,7 +2226,7 @@ class _ConversationImagePreview extends StatelessWidget {
                   child: Icon(
                     Icons.download_rounded,
                     size: 18,
-                    color: Colors.white,
+                    color: AppColors.surfacePrimary,
                   ),
                 ),
               ),
@@ -2374,7 +2372,7 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
             child: Container(
               width: compact ? 36 : 42,
               height: compact ? 36 : 42,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.surfaceSecondary,
                 shape: BoxShape.circle,
               ),
@@ -2419,7 +2417,7 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
                   children: <Widget>[
                     Text(
                       _formatDuration(_position),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         color: AppColors.neutral500,
                       ),
@@ -2432,7 +2430,7 @@ class _ConversationAudioBubbleState extends State<_ConversationAudioBubble> {
                           widget.message.originalName!,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             color: AppColors.neutral500,
                           ),
@@ -2482,7 +2480,7 @@ class _ConversationVideoCard extends StatefulWidget {
 
     return Container(
       width: width,
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondary.withValues(alpha: 0.40),
         borderRadius: BorderRadius.circular(18),
@@ -2510,7 +2508,7 @@ class _ConversationVideoCard extends StatefulWidget {
                   top: 8,
                   right: 8,
                   child: Material(
-                    color: Colors.black.withValues(alpha: 0.45),
+                    color: AppColors.neutral800.withValues(alpha: 0.45),
                     borderRadius: AppRadii.borderRadiusPill,
                     child: InkWell(
                       onTap: () =>
@@ -2521,7 +2519,7 @@ class _ConversationVideoCard extends StatefulWidget {
                         child: Icon(
                           Icons.download_rounded,
                           size: 18,
-                          color: Colors.white,
+                          color: AppColors.surfacePrimary,
                         ),
                       ),
                     ),
@@ -2537,7 +2535,7 @@ class _ConversationVideoCard extends StatefulWidget {
                 : 'Video',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
               color: AppColors.neutral800,
@@ -2553,7 +2551,7 @@ class _ConversationVideoCard extends StatefulWidget {
                 if (message.sizeBytes != null)
                   _formatFileSize(message.sizeBytes!),
               ].join(' â€¢ '),
-              style: const TextStyle(fontSize: 12, color: AppColors.neutral500),
+              style: TextStyle(fontSize: 12, color: AppColors.neutral500),
             ),
           ],
         ],
@@ -2566,7 +2564,7 @@ class _ConversationVideoCard extends StatefulWidget {
 
     return Container(
       width: width,
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondary.withValues(alpha: 0.40),
         borderRadius: BorderRadius.circular(18),
@@ -2594,7 +2592,7 @@ class _ConversationVideoCard extends StatefulWidget {
                   top: 8,
                   right: 8,
                   child: Material(
-                    color: Colors.black.withValues(alpha: 0.45),
+                    color: AppColors.neutral800.withValues(alpha: 0.45),
                     borderRadius: AppRadii.borderRadiusPill,
                     child: InkWell(
                       onTap: () =>
@@ -2605,7 +2603,7 @@ class _ConversationVideoCard extends StatefulWidget {
                         child: Icon(
                           Icons.download_rounded,
                           size: 18,
-                          color: Colors.white,
+                          color: AppColors.surfacePrimary,
                         ),
                       ),
                     ),
@@ -2621,7 +2619,7 @@ class _ConversationVideoCard extends StatefulWidget {
                 : 'Video',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
               color: AppColors.neutral800,
@@ -2637,7 +2635,7 @@ class _ConversationVideoCard extends StatefulWidget {
                 if (message.sizeBytes != null)
                   _formatFileSize(message.sizeBytes!),
               ].join(' • '),
-              style: const TextStyle(fontSize: 12, color: AppColors.neutral500),
+              style: TextStyle(fontSize: 12, color: AppColors.neutral500),
             ),
           ],
         ],
@@ -2745,7 +2743,7 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
 
     return Container(
       width: width,
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondary.withValues(alpha: 0.40),
         borderRadius: BorderRadius.circular(18),
@@ -2769,7 +2767,7 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
                 : 'Video',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
               color: AppColors.neutral800,
@@ -2785,7 +2783,7 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
                 if (widget.message.sizeBytes != null)
                   _formatFileSize(widget.message.sizeBytes!),
               ].join(' • '),
-              style: const TextStyle(fontSize: 12, color: AppColors.neutral500),
+              style: TextStyle(fontSize: 12, color: AppColors.neutral500),
             ),
           ],
         ],
@@ -2846,13 +2844,15 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
                             width: 58,
                             height: 58,
                             decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.45),
+                              color: AppColors.neutral800.withValues(
+                                alpha: 0.45,
+                              ),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
                               Icons.play_arrow_rounded,
                               size: 34,
-                              color: Colors.white,
+                              color: AppColors.surfacePrimary,
                             ),
                           ),
                         ),
@@ -2864,7 +2864,7 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
                   right: 8,
                   top: 8,
                   child: Material(
-                    color: Colors.black.withValues(alpha: 0.45),
+                    color: AppColors.neutral800.withValues(alpha: 0.45),
                     borderRadius: AppRadii.borderRadiusPill,
                     child: InkWell(
                       onTap: () => _downloadMediaUrl(
@@ -2876,7 +2876,7 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
                         child: Icon(
                           Icons.download_rounded,
                           size: 18,
-                          color: Colors.white,
+                          color: AppColors.surfacePrimary,
                         ),
                       ),
                     ),
@@ -2911,7 +2911,7 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
           right: 8,
           top: 8,
           child: Material(
-            color: Colors.black.withValues(alpha: 0.45),
+            color: AppColors.neutral800.withValues(alpha: 0.45),
             borderRadius: AppRadii.borderRadiusPill,
             child: InkWell(
               onTap: () =>
@@ -2922,7 +2922,7 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
                 child: Icon(
                   Icons.download_rounded,
                   size: 18,
-                  color: Colors.white,
+                  color: AppColors.surfacePrimary,
                 ),
               ),
             ),
@@ -2937,13 +2937,17 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
       fit: StackFit.expand,
       children: <Widget>[
         const Center(
-          child: Icon(Icons.videocam_rounded, size: 52, color: AppColors.primary),
+          child: Icon(
+            Icons.videocam_rounded,
+            size: 52,
+            color: AppColors.primary,
+          ),
         ),
         Positioned(
           right: 8,
           top: 8,
           child: Material(
-            color: Colors.black.withValues(alpha: 0.45),
+            color: AppColors.neutral800.withValues(alpha: 0.45),
             borderRadius: AppRadii.borderRadiusPill,
             child: InkWell(
               onTap: () =>
@@ -2954,7 +2958,7 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
                 child: Icon(
                   Icons.download_rounded,
                   size: 18,
-                  color: Colors.white,
+                  color: AppColors.surfacePrimary,
                 ),
               ),
             ),
@@ -2971,18 +2975,15 @@ class _ConversationVideoCardState extends State<_ConversationVideoCard> {
                     widget.message.preferredVideoDownloadUrl,
               ),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.45),
+                  color: AppColors.neutral800.withValues(alpha: 0.45),
                   borderRadius: AppRadii.borderRadiusPill,
                 ),
                 child: const Text(
                   'Buka video',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.surfacePrimary,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -3020,8 +3021,12 @@ class _VideoProgressBar extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: progress.isNaN ? 0.0 : progress,
                 minHeight: 4,
-                backgroundColor: Colors.white.withValues(alpha: 0.35),
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                backgroundColor: AppColors.surfacePrimary.withValues(
+                  alpha: 0.35,
+                ),
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                  AppColors.white,
+                ),
               ),
             ),
             const SizedBox(height: 4),
@@ -3030,16 +3035,16 @@ class _VideoProgressBar extends StatelessWidget {
               children: <Widget>[
                 Text(
                   _formatDuration(value.position),
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppColors.surfacePrimary,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   _formatDuration(value.duration),
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppColors.surfacePrimary,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
@@ -3068,7 +3073,7 @@ class _ConversationDocumentCard extends StatelessWidget {
 
     return Container(
       width: width,
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondary.withValues(alpha: 0.40),
         borderRadius: BorderRadius.circular(18),
@@ -3095,7 +3100,7 @@ class _ConversationDocumentCard extends StatelessWidget {
                   : 'Dokumen',
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
                 color: AppColors.neutral800,
@@ -3184,7 +3189,7 @@ class _ActiveComposer extends StatelessWidget {
     final isWhatsApp = channel == 'whatsapp';
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.scaffoldBackground.withValues(alpha: 0.8),
         borderRadius: AppRadii.borderRadiusXl,
@@ -3234,31 +3239,22 @@ class _ActiveComposer extends StatelessWidget {
                 hintText: isWhatsApp
                     ? 'Tulis balasan admin untuk WhatsApp...'
                     : 'Tulis balasan admin untuk live chat...',
-                hintStyle: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.neutral300,
-                ),
+                hintStyle: TextStyle(fontSize: 13, color: AppColors.neutral300),
                 filled: true,
                 fillColor: AppColors.surfaceSecondary,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
-                  borderSide: const BorderSide(
-                    color: AppColors.borderLight,
-                  ),
+                  borderSide: const BorderSide(color: AppColors.borderLight),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
-                  borderSide: const BorderSide(
-                    color: AppColors.borderLight,
-                  ),
+                  borderSide: const BorderSide(color: AppColors.borderLight),
                 ),
                 disabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
-                  borderSide: const BorderSide(
-                    color: AppColors.borderLight,
-                  ),
+                  borderSide: const BorderSide(color: AppColors.borderLight),
                 ),
-                contentPadding: const EdgeInsets.symmetric(
+                contentPadding: EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 14,
                 ),
@@ -3273,19 +3269,19 @@ class _ActiveComposer extends StatelessWidget {
               onTap: isSending ? null : onSubmit,
               borderRadius: AppRadii.borderRadiusPill,
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(12),
                 child: isSending
                     ? const SizedBox(
                         width: 18,
                         height: 18,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: AppColors.surfacePrimary,
                         ),
                       )
                     : const Icon(
                         Icons.send_rounded,
-                        color: Colors.white,
+                        color: AppColors.surfacePrimary,
                         size: 18,
                       ),
               ),
@@ -3321,7 +3317,7 @@ class _ComposerActionButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: AppRadii.borderRadiusPill,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
             borderRadius: AppRadii.borderRadiusPill,
             border: Border.all(color: AppColors.borderLight),
@@ -3343,7 +3339,7 @@ class _ComposerActionButton extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: AppColors.neutral800,
@@ -3387,7 +3383,9 @@ class _ComposerIconButton extends StatelessWidget {
             ),
             child: Icon(
               icon,
-              color: onTap == null ? AppColors.neutral300 : AppColors.neutral500,
+              color: onTap == null
+                  ? AppColors.neutral300
+                  : AppColors.neutral500,
               size: 18,
             ),
           ),
@@ -3467,12 +3465,12 @@ class _SendContactDialogState extends State<_SendContactDialog> {
     final busy = widget.isSubmitting || _isSubmittingLocal;
 
     return Dialog(
-      insetPadding: const EdgeInsets.all(24),
+      insetPadding: EdgeInsets.all(24),
       shape: RoundedRectangleBorder(borderRadius: AppRadii.borderRadiusXxl),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 560),
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(24),
           child: Form(
             key: _formKey,
             child: SingleChildScrollView(
@@ -3552,7 +3550,7 @@ class _SendContactDialogState extends State<_SendContactDialog> {
                                 height: 16,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: AppColors.surfacePrimary,
                                 ),
                               )
                             : const Icon(Icons.person_add_alt_1_rounded),
@@ -3592,7 +3590,7 @@ class _DialogField extends StatelessWidget {
       children: <Widget>[
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
             color: AppColors.neutral500,
@@ -3609,20 +3607,17 @@ class _DialogField extends StatelessWidget {
             fillColor: AppColors.scaffoldBackground,
             border: OutlineInputBorder(
               borderRadius: AppRadii.borderRadiusLg,
-              borderSide: const BorderSide(color: AppColors.borderLight),
+              borderSide: BorderSide(color: AppColors.borderLight),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: AppRadii.borderRadiusLg,
-              borderSide: const BorderSide(color: AppColors.borderLight),
+              borderSide: BorderSide(color: AppColors.borderLight),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: AppRadii.borderRadiusLg,
-              borderSide: const BorderSide(color: AppColors.primary),
+              borderSide: BorderSide(color: AppColors.primary),
             ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 14,
-            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           ),
         ),
       ],
@@ -3639,7 +3634,7 @@ class _CenterPaneSkeleton extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: AppColors.scaffoldBackground.withValues(alpha: 0.72),
             borderRadius: AppRadii.borderRadiusXl,

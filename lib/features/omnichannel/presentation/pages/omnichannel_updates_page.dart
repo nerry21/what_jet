@@ -141,7 +141,7 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
                                   child: backgroundColor == color
                                       ? const Icon(
                                           Icons.check,
-                                          color: Colors.white,
+                                          color: AppColors.surfacePrimary,
                                           size: 18,
                                         )
                                       : null,
@@ -398,7 +398,7 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
     if (_errorMessage != null && _statuses.isEmpty) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -427,7 +427,7 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
     return RefreshIndicator(
       onRefresh: () => _loadStatuses(silent: true),
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
+        padding: EdgeInsets.fromLTRB(16, 16, 16, 120),
         children: <Widget>[
           const Text(
             'Pembaharuan',
@@ -454,7 +454,7 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
           const SizedBox(height: 14),
           if (_statuses.isEmpty)
             Container(
-              padding: const EdgeInsets.all(18),
+              padding: EdgeInsets.all(18),
               decoration: BoxDecoration(
                 color: AppColors.surfaceTertiary,
                 borderRadius: AppRadii.borderRadiusXl,
@@ -518,12 +518,12 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
     final fgColor = _hexToColor(item.textColor ?? '#111111');
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusXxl,
         border: Border.all(color: AppColors.borderLight),
-        boxShadow: const <BoxShadow>[
+        boxShadow: <BoxShadow>[
           BoxShadow(
             color: Color(0x40000000),
             blurRadius: 18,
@@ -537,7 +537,7 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
           if (item.isText || item.isMusic)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: bgColor,
                 borderRadius: const BorderRadius.vertical(
@@ -613,13 +613,13 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
               label: item.mediaOriginalName ?? 'Status suara',
             ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
+            padding: EdgeInsets.fromLTRB(18, 14, 18, 18),
             child: Row(
               children: <Widget>[
                 Expanded(
                   child: Text(
                     _formatDate(item.postedAt),
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.neutral500,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -634,7 +634,7 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
                 const SizedBox(width: 6),
                 Text(
                   '${item.viewCount}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.neutral500,
                     fontWeight: FontWeight.w700,
                   ),
@@ -654,7 +654,7 @@ class _OmnichannelUpdatesPageState extends State<OmnichannelUpdatesPage> {
     return Container(
       width: double.infinity,
       height: 190,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surfaceTertiary,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -754,7 +754,7 @@ class _ComposerActionCard extends StatelessWidget {
           borderRadius: AppRadii.borderRadiusXl,
           onTap: onTap,
           child: Ink(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 16),
             decoration: BoxDecoration(
               borderRadius: AppRadii.borderRadiusXl,
               border: Border.all(color: AppColors.borderLight),

@@ -13,11 +13,11 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
     required String description,
     required IconData icon,
     Color iconBg = AppColors.surfaceTertiary,
-    Color iconColor = AppColors.warning800,
+    Color iconColor = const Color(0xFFFFCF73),
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.surfaceTertiary,
         borderRadius: BorderRadius.circular(18),
@@ -42,7 +42,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: AppColors.neutral800,
@@ -51,7 +51,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12.5,
                     height: 1.45,
                     color: AppColors.neutral600,
@@ -67,14 +67,14 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
 
   Widget _buildStepChip(String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
         color: AppColors.surfaceTertiary,
         borderRadius: AppRadii.borderRadiusPill,
       ),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 11.5,
           fontWeight: FontWeight.w700,
           color: AppColors.neutral600,
@@ -93,7 +93,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.surfaceSecondary,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
@@ -110,7 +110,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(18, 18, 18, 12),
+              padding: EdgeInsets.fromLTRB(18, 18, 18, 12),
               child: Row(
                 children: [
                   const Expanded(
@@ -160,7 +160,7 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
             ),
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+                padding: EdgeInsets.fromLTRB(18, 0, 18, 18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -225,8 +225,8 @@ class OmnichannelCallSettingsChecklistSheet extends StatelessWidget {
                         onPressed: () => _close(context),
                         style: FilledButton.styleFrom(
                           backgroundColor: AppColors.surfaceTertiary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          foregroundColor: AppColors.white,
+                          padding: EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: AppRadii.borderRadiusLg,
                           ),

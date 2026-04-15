@@ -88,10 +88,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
-          textStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-          ),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
         ),
       ),
 
@@ -104,10 +101,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(12),
           ),
           side: const BorderSide(color: AppColors.borderDefault, width: 1.5),
-          textStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
       ),
 
@@ -119,10 +113,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          textStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ),
 
@@ -144,25 +135,17 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: AppColors.primary400,
-            width: 1.5,
-          ),
+          borderSide: const BorderSide(color: AppColors.primary400, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: AppColors.error.withValues(alpha: 0.5),
-          ),
+          borderSide: BorderSide(color: AppColors.error.withValues(alpha: 0.5)),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.error, width: 1.5),
         ),
-        hintStyle: const TextStyle(
-          fontSize: 14,
-          color: AppColors.neutral300,
-        ),
+        hintStyle: const TextStyle(fontSize: 14, color: AppColors.neutral300),
         labelStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
@@ -191,9 +174,7 @@ class AppTheme {
       // ─── Dialog ──────────────────────────────────────────────────────
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.surfaceSecondary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         elevation: 0,
         titleTextStyle: const TextStyle(
           fontSize: 20,
@@ -206,13 +187,8 @@ class AppTheme {
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.surfaceTertiary,
-        contentTextStyle: const TextStyle(
-          fontSize: 14,
-          color: AppColors.white,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        contentTextStyle: const TextStyle(fontSize: 14, color: AppColors.white),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 0,
         insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
@@ -222,9 +198,7 @@ class AppTheme {
         backgroundColor: AppColors.surfaceSecondary,
         selectedColor: AppColors.primary800,
         side: const BorderSide(color: AppColors.borderLight),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         labelStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w500,
@@ -240,10 +214,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: AppColors.borderLight),
         ),
-        textStyle: const TextStyle(
-          fontSize: 12,
-          color: AppColors.white,
-        ),
+        textStyle: const TextStyle(fontSize: 12, color: AppColors.white),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
 

@@ -83,7 +83,7 @@ class OmnichannelLeftPane extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(
+                      padding: EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 7,
                       ),
@@ -93,7 +93,7 @@ class OmnichannelLeftPane extends StatelessWidget {
                       ),
                       child: Text(
                         '${workspace.unreadTotal} unread',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w800,
                           color: AppColors.primary,
@@ -159,7 +159,7 @@ class OmnichannelLeftPane extends StatelessWidget {
                                       ),
                                       Text(
                                         '${items.length}',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w700,
                                           color: AppColors.neutral300,
@@ -196,7 +196,7 @@ class OmnichannelLeftPane extends StatelessWidget {
                                 itemBuilder: (context, index) {
                                   if (index >= items.length) {
                                     return Padding(
-                                      padding: const EdgeInsets.only(
+                                      padding: EdgeInsets.only(
                                         top: 6,
                                         bottom: 10,
                                       ),
@@ -255,7 +255,7 @@ class _SummaryStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -321,7 +321,7 @@ class _MetricTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondary.withValues(alpha: 0.78),
         borderRadius: AppRadii.borderRadiusLg,
@@ -332,7 +332,7 @@ class _MetricTile extends StatelessWidget {
         children: <Widget>[
           Text(
             label,
-            style: const TextStyle(fontSize: 12, color: AppColors.neutral500),
+            style: TextStyle(fontSize: 12, color: AppColors.neutral500),
           ),
           const SizedBox(height: 8),
           if (value == null)
@@ -340,7 +340,7 @@ class _MetricTile extends StatelessWidget {
           else
             Text(
               value!,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
                 color: AppColors.neutral800,
@@ -404,7 +404,7 @@ class _FilterGroup extends StatelessWidget {
       children: <Widget>[
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
             color: AppColors.neutral500,
@@ -454,7 +454,7 @@ class _FilterChip extends StatelessWidget {
         onTap: onTap,
         borderRadius: AppRadii.borderRadiusPill,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             color: active
                 ? AppColors.primary.withValues(alpha: 0.12)
@@ -479,7 +479,7 @@ class _FilterChip extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                padding: EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                 decoration: BoxDecoration(
                   color: active
                       ? AppColors.primary.withValues(alpha: 0.14)
@@ -517,7 +517,7 @@ class _ConversationListSkeleton extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         return Container(
-          padding: const EdgeInsets.all(14),
+          padding: EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: AppColors.scaffoldBackground.withValues(alpha: 0.75),
             borderRadius: AppRadii.borderRadiusXl,
@@ -603,10 +603,12 @@ class _MobileWhatsAppInbox extends StatelessWidget {
             children: <Widget>[
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-                decoration: const BoxDecoration(
+                padding: EdgeInsets.fromLTRB(16, 10, 16, 10),
+                decoration: BoxDecoration(
                   color: AppColors.surfaceSecondary,
-                  border: Border(bottom: BorderSide(color: AppColors.borderLight)),
+                  border: Border(
+                    bottom: BorderSide(color: AppColors.borderLight),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -644,7 +646,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                       child: TextField(
                         controller: searchController,
                         textInputAction: TextInputAction.search,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 17,
                           color: AppColors.neutral800,
                         ),
@@ -674,7 +676,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                         children: workspace.filters
                             .map(
                               (option) => Padding(
-                                padding: const EdgeInsets.only(right: 10),
+                                padding: EdgeInsets.only(right: 10),
                                 child: _MobileScopeChip(
                                   label: option.label,
                                   count: option.count,
@@ -722,7 +724,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                         itemBuilder: (context, index) {
                           if (index >= items.length) {
                             return Padding(
-                              padding: const EdgeInsets.symmetric(
+                              padding: EdgeInsets.symmetric(
                                 horizontal: 20,
                                 vertical: 18,
                               ),
@@ -768,7 +770,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
               color: AppColors.primary,
               borderRadius: BorderRadius.circular(18),
               elevation: 5,
-              shadowColor: Colors.black.withValues(alpha: 0.24),
+              shadowColor: AppColors.neutral800.withValues(alpha: 0.24),
               child: InkWell(
                 onTap: () {
                   Navigator.of(context).push(
@@ -786,7 +788,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                   height: 58,
                   child: Icon(
                     Icons.person_add_alt_1_rounded,
-                    color: Colors.white,
+                    color: AppColors.surfacePrimary,
                     size: 28,
                   ),
                 ),
@@ -843,9 +845,11 @@ class _MobileScopeChip extends StatelessWidget {
         onTap: onTap,
         borderRadius: AppRadii.borderRadiusPill,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 9),
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 9),
           decoration: BoxDecoration(
-            color: selected ? AppColors.primary.withValues(alpha: 0.12) : AppColors.surfaceSecondary,
+            color: selected
+                ? AppColors.primary.withValues(alpha: 0.12)
+                : AppColors.surfaceSecondary,
             borderRadius: AppRadii.borderRadiusPill,
             border: Border.all(
               color: selected
@@ -858,9 +862,7 @@ class _MobileScopeChip extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: selected
-                  ? AppColors.primary
-                  : AppColors.neutral400,
+              color: selected ? AppColors.primary : AppColors.neutral400,
             ),
           ),
         ),
@@ -891,8 +893,10 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Container(
-          color: selected ? AppColors.primary.withValues(alpha: 0.12) : AppColors.surfaceSecondary,
-          padding: const EdgeInsets.fromLTRB(16, 11, 14, 11),
+          color: selected
+              ? AppColors.primary.withValues(alpha: 0.12)
+              : AppColors.surfaceSecondary,
+          padding: EdgeInsets.fromLTRB(16, 11, 14, 11),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -910,10 +914,10 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   initial,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: AppColors.surfacePrimary,
                   ),
                 ),
               ),
@@ -930,7 +934,7 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                             displayName.isEmpty ? item.title : displayName,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: AppColors.neutral800,
@@ -940,7 +944,7 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           formatOmnichannelListTime(item.lastActivityAt),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                             color: AppColors.neutral400,
@@ -962,7 +966,7 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                             item.preview,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w400,
                               color: AppColors.neutral400,
@@ -973,7 +977,7 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                           const SizedBox(width: 8),
                           Container(
                             constraints: const BoxConstraints(minWidth: 22),
-                            padding: const EdgeInsets.symmetric(
+                            padding: EdgeInsets.symmetric(
                               horizontal: 7,
                               vertical: 3,
                             ),
@@ -984,10 +988,10 @@ class _MobileWhatsAppConversationTile extends StatelessWidget {
                             alignment: Alignment.center,
                             child: Text(
                               '${item.unreadCount}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                                color: AppColors.surfacePrimary,
                               ),
                             ),
                           ),
@@ -1013,8 +1017,8 @@ class _MobileWhatsAppBottomBar extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
-        decoration: const BoxDecoration(
+        padding: EdgeInsets.fromLTRB(8, 6, 8, 8),
+        decoration: BoxDecoration(
           color: AppColors.surfaceSecondary,
           border: Border(top: BorderSide(color: AppColors.borderLight)),
         ),
@@ -1100,20 +1104,17 @@ class _MobileBottomNavItem extends StatelessWidget {
                   right: 4,
                   top: -1,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 5,
-                      vertical: 1,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: AppRadii.borderRadiusPill,
                     ),
                     child: Text(
                       '$badgeCount',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: AppColors.surfacePrimary,
                       ),
                     ),
                   ),
@@ -1142,7 +1143,7 @@ class _MobileWhatsAppListSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.separated(
       physics: const ClampingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(0, 2, 0, 110),
+      padding: EdgeInsets.fromLTRB(0, 2, 0, 110),
       itemCount: 6,
       separatorBuilder: (_, __) => const SizedBox.shrink(),
       itemBuilder: (context, index) {

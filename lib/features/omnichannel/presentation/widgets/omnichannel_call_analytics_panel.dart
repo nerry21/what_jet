@@ -144,7 +144,7 @@ class _SummaryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusLg,
@@ -155,7 +155,7 @@ class _SummaryTile extends StatelessWidget {
         children: <Widget>[
           Text(
             data.label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
               color: AppColors.neutral300,
@@ -198,7 +198,7 @@ class _OutcomeBreakdown extends StatelessWidget {
         const SizedBox(height: 10),
         Text(
           'Completion rate ${summary.completionRate.toStringAsFixed(1)}% | Missed rate ${summary.missedRate.toStringAsFixed(1)}%',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             height: 1.4,
             color: AppColors.neutral300,
@@ -229,7 +229,7 @@ class _OutcomeRow extends StatelessWidget {
     final color = omnichannelCallOutcomeColor(item.finalStatus);
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.only(bottom: 10),
       child: Column(
         children: <Widget>[
           Row(
@@ -243,7 +243,7 @@ class _OutcomeRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   item.label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: AppColors.neutral800,
@@ -252,7 +252,7 @@ class _OutcomeRow extends StatelessWidget {
               ),
               Text(
                 '${item.count}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: AppColors.neutral800,
@@ -261,10 +261,7 @@ class _OutcomeRow extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 '${item.percentage.toStringAsFixed(1)}%',
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppColors.neutral300,
-                ),
+                style: TextStyle(fontSize: 11, color: AppColors.neutral300),
               ),
             ],
           ),
@@ -331,13 +328,13 @@ class _DailyTrendRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.only(bottom: 10),
       child: Row(
         children: <Widget>[
           Expanded(
             child: Text(
               omnichannelFormatTrendDate(item.date) ?? item.date,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: AppColors.neutral800,
@@ -346,14 +343,14 @@ class _DailyTrendRow extends StatelessWidget {
           ),
           Text(
             '${item.totalCalls} call',
-            style: const TextStyle(fontSize: 12, color: AppColors.neutral500),
+            style: TextStyle(fontSize: 12, color: AppColors.neutral500),
           ),
           const SizedBox(width: 10),
           Text(
             omnichannelCallDurationText(
               durationSeconds: item.totalDurationSeconds,
             ),
-            style: const TextStyle(fontSize: 11, color: AppColors.neutral300),
+            style: TextStyle(fontSize: 11, color: AppColors.neutral300),
           ),
         ],
       ),
@@ -413,8 +410,8 @@ class _RecentCallRow extends StatelessWidget {
     final outcomeColor = omnichannelCallOutcomeColor(item.finalStatus);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusLg,
@@ -430,7 +427,7 @@ class _RecentCallRow extends StatelessWidget {
                   item.customerLabel,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
                     color: AppColors.neutral800,
@@ -439,7 +436,7 @@ class _RecentCallRow extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                 decoration: BoxDecoration(
                   color: outcomeColor.withValues(alpha: 0.12),
                   borderRadius: AppRadii.borderRadiusPill,
@@ -461,7 +458,7 @@ class _RecentCallRow extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             item.customerContact,
-            style: const TextStyle(fontSize: 11, color: AppColors.neutral300),
+            style: TextStyle(fontSize: 11, color: AppColors.neutral300),
           ),
           const SizedBox(height: 8),
           Text(
@@ -472,7 +469,7 @@ class _RecentCallRow extends StatelessWidget {
                 durationHuman: item.durationHuman,
               ),
             ].join(' | '),
-            style: const TextStyle(fontSize: 11, color: AppColors.neutral500),
+            style: TextStyle(fontSize: 11, color: AppColors.neutral500),
           ),
           if (item.conversationId != null &&
               onOpenConversation != null) ...<Widget>[
@@ -507,7 +504,7 @@ class _CapabilityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusLg,
@@ -529,7 +526,7 @@ class _CapabilityCard extends StatelessWidget {
             capabilities.supportsLiveAudio
                 ? 'Audio live tersedia pada build ini.'
                 : 'Audio live belum aktif. Analytics dan status panggilan tetap memakai data backend yang nyata.',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               height: 1.45,
               color: AppColors.neutral300,
@@ -579,7 +576,7 @@ class _CapabilityChip extends StatelessWidget {
     final color = enabled ? AppColors.success : AppColors.neutral300;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: AppRadii.borderRadiusPill,
@@ -606,7 +603,7 @@ class _PanelNotice extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.error.withValues(alpha: 0.08),
         borderRadius: AppRadii.borderRadiusMd,
@@ -626,7 +623,7 @@ class _PanelNotice extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 height: 1.4,
                 color: AppColors.error,
@@ -697,7 +694,7 @@ class _AnalyticsSkeleton extends StatelessWidget {
             6,
             (_) => Container(
               width: 122,
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: AppColors.surfaceSecondary,
                 borderRadius: AppRadii.borderRadiusLg,

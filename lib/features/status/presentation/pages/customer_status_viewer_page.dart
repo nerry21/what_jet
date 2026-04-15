@@ -557,8 +557,8 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
                             color: Colors.transparent,
                             child: CircleAvatar(
                               radius: 18,
-                              backgroundColor: Colors.white24,
-                              child: Icon(Icons.person, color: Colors.white),
+                              backgroundColor: AppColors.surfacePrimary,
+                              child: Icon(Icons.person, color: AppColors.white),
                             ),
                           ),
                         ),
@@ -569,8 +569,8 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
                             children: <Widget>[
                               Text(
                                 widget.group.authorName,
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: TextStyle(
+                                  color: AppColors.surfacePrimary,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
                                 ),
@@ -579,7 +579,9 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
                               Text(
                                 _formatTime(_currentItem.postedAt),
                                 style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.78),
+                                  color: AppColors.white.withValues(
+                                    alpha: 0.78,
+                                  ),
                                   fontSize: 12,
                                 ),
                               ),
@@ -593,7 +595,7 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
                               _isVideoMuted
                                   ? Icons.volume_off
                                   : Icons.volume_up,
-                              color: Colors.white,
+                              color: AppColors.surfacePrimary,
                             ),
                           ),
                         IconButton(
@@ -601,7 +603,7 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
                             unawaited(_trackAction('status_close_button'));
                             Navigator.of(context).pop();
                           },
-                          icon: const Icon(Icons.close, color: Colors.white),
+                          icon: Icon(Icons.close, color: AppColors.white),
                         ),
                       ],
                     ),
@@ -620,18 +622,18 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
                       right: 0,
                       child: Center(
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
+                          padding: EdgeInsets.symmetric(
                             horizontal: 14,
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.black54,
+                            color: AppColors.neutral800.withValues(alpha: 0.54),
                             borderRadius: AppRadii.borderRadiusPill,
                           ),
                           child: const Text(
                             'Geser ke bawah untuk menutup',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.surfacePrimary,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -654,13 +656,17 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
 
       return Container(
         color: backgroundColor,
-        padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 120),
+        padding: EdgeInsets.symmetric(horizontal: 26, vertical: 120),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               if ((item.musicTitle ?? '').isNotEmpty) ...<Widget>[
-                const Icon(Icons.music_note, color: Colors.white, size: 42),
+                Icon(
+                  Icons.music_note,
+                  color: AppColors.surfacePrimary,
+                  size: 42,
+                ),
                 const SizedBox(height: 12),
                 Text(
                   item.musicTitle!,
@@ -719,13 +725,13 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
                 children: <Widget>[
                   const Icon(
                     Icons.error_outline,
-                    color: Colors.white,
+                    color: AppColors.surfacePrimary,
                     size: 44,
                   ),
                   const SizedBox(height: 10),
                   const Text(
                     'Gambar gagal dimuat',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: AppColors.white),
                   ),
                   const SizedBox(height: 14),
                   FilledButton(
@@ -762,7 +768,7 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
       return Container(
         color: AppColors.surfaceDark,
         child: const Center(
-          child: Icon(Icons.graphic_eq, size: 100, color: Colors.white),
+          child: Icon(Icons.graphic_eq, size: 100, color: AppColors.white),
         ),
       );
     }
@@ -770,16 +776,16 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
     return const Center(
       child: Text(
         'Status tidak didukung',
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: AppColors.white),
       ),
     );
   }
 
   Widget _buildAudioOverlay() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.36),
+        color: AppColors.neutral800.withValues(alpha: 0.36),
         borderRadius: AppRadii.borderRadiusXl,
       ),
       child: StreamBuilder<PlayerState>(
@@ -811,7 +817,7 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
                   isPlaying
                       ? Icons.pause_circle_filled
                       : Icons.play_circle_fill,
-                  color: Colors.white,
+                  color: AppColors.surfacePrimary,
                   size: 34,
                 ),
               ),
@@ -832,15 +838,15 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
                         LinearProgressIndicator(
                           value: progress.clamp(0, 1),
                           minHeight: 4,
-                          backgroundColor: Colors.white24,
+                          backgroundColor: AppColors.surfacePrimary,
                           valueColor: const AlwaysStoppedAnimation<Color>(
-                            Colors.white,
+                            AppColors.white,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           '${_formatDuration(position)} / ${_formatDuration(total)}',
-                          style: const TextStyle(color: Colors.white),
+                          style: TextStyle(color: AppColors.white),
                         ),
                       ],
                     );
@@ -858,9 +864,9 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
     return Expanded(
       child: Container(
         height: 3.5,
-        margin: const EdgeInsets.symmetric(horizontal: 2),
+        margin: EdgeInsets.symmetric(horizontal: 2),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfacePrimary,
           borderRadius: AppRadii.borderRadiusPill,
         ),
       ),
@@ -871,9 +877,9 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
     return Expanded(
       child: Container(
         height: 3.5,
-        margin: const EdgeInsets.symmetric(horizontal: 2),
+        margin: EdgeInsets.symmetric(horizontal: 2),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.28),
+          color: AppColors.white.withValues(alpha: 0.28),
           borderRadius: AppRadii.borderRadiusPill,
         ),
       ),
@@ -884,9 +890,9 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
     return Expanded(
       child: Container(
         height: 3.5,
-        margin: const EdgeInsets.symmetric(horizontal: 2),
+        margin: EdgeInsets.symmetric(horizontal: 2),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.28),
+          color: AppColors.white.withValues(alpha: 0.28),
           borderRadius: AppRadii.borderRadiusPill,
         ),
         child: AnimatedBuilder(
@@ -898,7 +904,7 @@ class _CustomerStatusViewerPageState extends State<CustomerStatusViewerPage>
                 widthFactor: _progressController.value.clamp(0, 1),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.surfacePrimary,
                     borderRadius: AppRadii.borderRadiusPill,
                   ),
                 ),
@@ -970,7 +976,7 @@ class _ViewerShimmerOverlay extends StatelessWidget {
         baseColor: AppColors.surfaceSecondary,
         highlightColor: AppColors.surfaceTertiary,
         child: const Center(
-          child: Icon(Icons.image_outlined, size: 84, color: Colors.white),
+          child: Icon(Icons.image_outlined, size: 84, color: AppColors.white),
         ),
       ),
     );

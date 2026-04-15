@@ -126,7 +126,8 @@ class DeviceContactsService {
       if (status != PermissionStatus.granted) {
         return const DeviceContactSaveResult(
           success: false,
-          message: 'Izin kontak belum diberikan. Aktifkan izin kontak agar sinkron ke phonebook berjalan.',
+          message:
+              'Izin kontak belum diberikan. Aktifkan izin kontak agar sinkron ke phonebook berjalan.',
         );
       }
 
@@ -136,9 +137,7 @@ class DeviceContactsService {
           ContactProperty.phone,
           ContactProperty.email,
         },
-        filter: ContactFilter.phone(
-          normalizedPhone.replaceAll('+', ''),
-        ),
+        filter: ContactFilter.phone(normalizedPhone.replaceAll('+', '')),
         limit: 20,
       );
 
@@ -156,15 +155,9 @@ class DeviceContactsService {
       }
 
       final newContact = Contact(
-        name: Name(
-          first: firstName.trim(),
-          last: lastName.trim(),
-        ),
+        name: Name(first: firstName.trim(), last: lastName.trim()),
         phones: <Phone>[
-          Phone(
-            number: normalizedPhone,
-            label: const Label(PhoneLabel.mobile),
-          ),
+          Phone(number: normalizedPhone, label: const Label(PhoneLabel.mobile)),
         ],
         emails: email?.trim().isNotEmpty == true
             ? <Email>[

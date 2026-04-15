@@ -30,15 +30,13 @@ class OmnichannelCallTimelineSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final containerColor = dark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Colors.white;
+        ? AppColors.white.withValues(alpha: 0.08)
+        : AppColors.white;
     final borderColor = dark
-        ? Colors.white.withValues(alpha: 0.08)
+        ? AppColors.white.withValues(alpha: 0.08)
         : AppColors.borderLight;
-    final titleColor = dark ? Colors.white : Colors.black87;
-    final subtitleColor = dark
-        ? const Color(0xFFB8C7C2)
-        : AppColors.neutral500;
+    final titleColor = dark ? AppColors.white : AppColors.neutral800;
+    final subtitleColor = dark ? const Color(0xFFB8C7C2) : AppColors.neutral500;
     final visibleItems = items.length > maxItems
         ? items.sublist(items.length - maxItems)
         : items;
@@ -48,7 +46,7 @@ class OmnichannelCallTimelineSection extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: containerColor,
         borderRadius: AppRadii.borderRadiusXl,
@@ -69,38 +67,44 @@ class OmnichannelCallTimelineSection extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               subtitle!,
-              style: TextStyle(fontSize: 12, height: 1.45, color: subtitleColor),
+              style: TextStyle(
+                fontSize: 12,
+                height: 1.45,
+                color: subtitleColor,
+              ),
             ),
           ],
           if (showSummary) ...<Widget>[
             const SizedBox(height: 14),
-            _CallSummaryCard(
-              session: session,
-              items: visibleItems,
-              dark: dark,
-            ),
+            _CallSummaryCard(session: session, items: visibleItems, dark: dark),
           ],
           const SizedBox(height: 14),
           if (visibleItems.isEmpty)
             Text(
               emptyMessage,
-              style: TextStyle(fontSize: 12, height: 1.45, color: subtitleColor),
+              style: TextStyle(
+                fontSize: 12,
+                height: 1.45,
+                color: subtitleColor,
+              ),
             )
           else
             Column(
               children: <Widget>[
-                for (var index = 0; index < visibleItems.length; index++) ...<
-                  Widget
-                >[
+                for (
+                  var index = 0;
+                  index < visibleItems.length;
+                  index++
+                ) ...<Widget>[
                   _TimelineRow(item: visibleItems[index], dark: dark),
                   if (index != visibleItems.length - 1)
                     Padding(
-                      padding: const EdgeInsets.only(left: 18),
+                      padding: EdgeInsets.only(left: 18),
                       child: Container(
                         height: 14,
                         width: 1.5,
                         color: dark
-                            ? Colors.white.withValues(alpha: 0.12)
+                            ? AppColors.white.withValues(alpha: 0.12)
                             : AppColors.borderLight,
                       ),
                     ),
@@ -127,19 +131,17 @@ class _CallSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final surface = dark
-        ? Colors.white.withValues(alpha: 0.06)
+        ? AppColors.white.withValues(alpha: 0.06)
         : AppColors.scaffoldBackground;
     final border = dark
-        ? Colors.white.withValues(alpha: 0.08)
+        ? AppColors.white.withValues(alpha: 0.08)
         : AppColors.borderLight;
-    final titleColor = dark ? Colors.white : Colors.black87;
-    final detailColor = dark
-        ? const Color(0xFFB8C7C2)
-        : AppColors.neutral500;
+    final titleColor = dark ? AppColors.white : AppColors.neutral800;
+    final detailColor = dark ? const Color(0xFFB8C7C2) : AppColors.neutral500;
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: surface,
         borderRadius: AppRadii.borderRadiusLg,
@@ -176,10 +178,8 @@ class _TimelineRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = omnichannelCallTimelineColor(item);
-    final labelColor = dark ? Colors.white : Colors.black87;
-    final detailColor = dark
-        ? const Color(0xFFB8C7C2)
-        : AppColors.neutral500;
+    final labelColor = dark ? AppColors.white : AppColors.neutral800;
+    final detailColor = dark ? const Color(0xFFB8C7C2) : AppColors.neutral500;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,12 +192,16 @@ class _TimelineRow extends StatelessWidget {
             borderRadius: AppRadii.borderRadiusMd,
           ),
           alignment: Alignment.center,
-          child: Icon(omnichannelCallTimelineIcon(item), size: 18, color: color),
+          child: Icon(
+            omnichannelCallTimelineIcon(item),
+            size: 18,
+            color: color,
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.only(top: 2),
+            padding: EdgeInsets.only(top: 2),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[

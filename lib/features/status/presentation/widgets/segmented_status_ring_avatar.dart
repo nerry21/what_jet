@@ -40,13 +40,13 @@ class SegmentedStatusRingAvatar extends StatelessWidget {
                   viewedSegments: viewedSegments.clamp(0, segments),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(6),
+                  padding: EdgeInsets.all(6),
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: AppColors.surfaceSecondary,
                     ),
-                    padding: const EdgeInsets.all(3),
+                    padding: EdgeInsets.all(3),
                     child: CircleAvatar(
                       backgroundColor: AppColors.surfaceTertiary,
                       backgroundImage: imageUrl != null && imageUrl!.isNotEmpty
@@ -55,7 +55,7 @@ class SegmentedStatusRingAvatar extends StatelessWidget {
                       child: imageUrl == null || imageUrl!.isEmpty
                           ? Text(
                               label.isNotEmpty ? label[0].toUpperCase() : 'A',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.primary,
                               ),
@@ -111,9 +111,7 @@ class _SegmentedRingPainter extends CustomPainter {
 
     for (var i = 0; i < totalSegments; i++) {
       final isViewed = i < viewedSegments;
-      basePaint.color = isViewed
-          ? AppColors.neutral400
-          : AppColors.primary;
+      basePaint.color = isViewed ? AppColors.neutral400 : AppColors.primary;
 
       canvas.drawArc(
         rect.deflate(strokeWidth / 2),

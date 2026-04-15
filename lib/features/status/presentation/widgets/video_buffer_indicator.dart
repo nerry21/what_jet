@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:what_jet/core/theme/app_colors.dart';
+
 class VideoBufferIndicator extends StatelessWidget {
   const VideoBufferIndicator({
     super.key,
@@ -20,7 +22,7 @@ class VideoBufferIndicator extends StatelessWidget {
 
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withValues(alpha: 0.35),
+        color: AppColors.neutral800.withValues(alpha: 0.35),
         child: Center(
           child: isError
               ? Column(
@@ -28,14 +30,14 @@ class VideoBufferIndicator extends StatelessWidget {
                   children: <Widget>[
                     const Icon(
                       Icons.error_outline,
-                      color: Colors.white,
+                      color: AppColors.surfacePrimary,
                       size: 44,
                     ),
                     const SizedBox(height: 12),
                     const Text(
                       'Media gagal dimuat',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.surfacePrimary,
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
@@ -50,12 +52,12 @@ class VideoBufferIndicator extends StatelessWidget {
               : Column(
                   mainAxisSize: MainAxisSize.min,
                   children: const <Widget>[
-                    CircularProgressIndicator(color: Colors.white),
+                    CircularProgressIndicator(color: AppColors.white),
                     SizedBox(height: 12),
                     Text(
                       'Menyiapkan media...',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.surfacePrimary,
                         fontWeight: FontWeight.w700,
                       ),
                     ),

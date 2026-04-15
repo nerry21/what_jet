@@ -68,7 +68,7 @@ class _OmnichannelCallPageState extends State<OmnichannelCallPage>
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.white,
         title: const Text('Panggilan WhatsApp'),
       ),
       body: SafeArea(
@@ -104,7 +104,7 @@ class _OmnichannelCallPageState extends State<OmnichannelCallPage>
               ),
               child: Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+                  padding: EdgeInsets.fromLTRB(20, 20, 20, 28),
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 600),
                     child: Column(
@@ -133,10 +133,10 @@ class _OmnichannelCallPageState extends State<OmnichannelCallPage>
                           alignment: Alignment.center,
                           child: Text(
                             initials,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 34,
                               fontWeight: FontWeight.w800,
-                              color: Colors.white,
+                              color: AppColors.surfacePrimary,
                             ),
                           ),
                         ),
@@ -146,10 +146,10 @@ class _OmnichannelCallPageState extends State<OmnichannelCallPage>
                               ? 'Customer'
                               : widget.customerName.trim(),
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
-                            color: Colors.white,
+                            color: AppColors.surfacePrimary,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -177,10 +177,10 @@ class _OmnichannelCallPageState extends State<OmnichannelCallPage>
                         Text(
                           status,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            color: AppColors.surfacePrimary,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -306,7 +306,7 @@ class _OmnichannelCallPageState extends State<OmnichannelCallPage>
                                       height: 16,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        color: Colors.white,
+                                        color: AppColors.surfacePrimary,
                                       ),
                                     )
                                   : const Icon(Icons.refresh_rounded, size: 18),
@@ -336,7 +336,7 @@ class _OmnichannelCallPageState extends State<OmnichannelCallPage>
                                       ),
                                 style: FilledButton.styleFrom(
                                   backgroundColor: AppColors.error,
-                                  foregroundColor: Colors.white,
+                                  foregroundColor: AppColors.white,
                                 ),
                                 icon: const Icon(
                                   Icons.call_end_rounded,
@@ -355,8 +355,8 @@ class _OmnichannelCallPageState extends State<OmnichannelCallPage>
                                       ),
                                 style: FilledButton.styleFrom(
                                   backgroundColor: AppColors.error,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
+                                  foregroundColor: AppColors.white,
+                                  padding: EdgeInsets.symmetric(
                                     horizontal: 18,
                                     vertical: 14,
                                   ),
@@ -394,9 +394,9 @@ class _OmnichannelCallPageState extends State<OmnichannelCallPage>
 
   ButtonStyle _outlinedActionButtonStyle() {
     return OutlinedButton.styleFrom(
-      foregroundColor: Colors.white,
-      side: BorderSide(color: Colors.white.withValues(alpha: 0.22)),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      foregroundColor: AppColors.white,
+      side: BorderSide(color: AppColors.white.withValues(alpha: 0.22)),
+      padding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),
     );
   }
 }
@@ -414,7 +414,7 @@ class _FallbackNoticeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: const Color(0xFFF0C24A).withValues(alpha: 0.10),
         borderRadius: AppRadii.borderRadiusXl,
@@ -439,7 +439,7 @@ class _FallbackNoticeCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: AppColors.surfacePrimary,
                   ),
                 ),
               ),
@@ -448,10 +448,10 @@ class _FallbackNoticeCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             headline,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: AppColors.surfacePrimary,
             ),
           ),
           const SizedBox(height: 6),
@@ -478,15 +478,15 @@ class _InlineNoticeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: AppColors.white.withValues(alpha: 0.08),
         borderRadius: AppRadii.borderRadiusLg,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.08)),
       ),
       child: Text(
         message,
-        style: const TextStyle(fontSize: 13, color: Colors.white),
+        style: TextStyle(fontSize: 13, color: AppColors.white),
       ),
     );
   }
@@ -502,11 +502,11 @@ class _CallInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: AppColors.white.withValues(alpha: 0.08),
         borderRadius: AppRadii.borderRadiusXl,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
         children: <Widget>[
@@ -585,11 +585,11 @@ class _MediaStatusCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: AppColors.white.withValues(alpha: 0.08),
         borderRadius: AppRadii.borderRadiusXl,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -624,10 +624,10 @@ class _MediaStatusCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       mediaSnapshot.statusText,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: AppColors.surfacePrimary,
                       ),
                     ),
                   ],
@@ -659,7 +659,7 @@ class _MediaStatusCard extends StatelessWidget {
             const SizedBox(height: 12),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: const Color(0x33FFB3B3),
                 borderRadius: AppRadii.borderRadiusMd,
@@ -667,7 +667,7 @@ class _MediaStatusCard extends StatelessWidget {
               ),
               child: Text(
                 mediaSnapshot.lastError!,
-                style: const TextStyle(fontSize: 12, color: Colors.white),
+                style: TextStyle(fontSize: 12, color: AppColors.white),
               ),
             ),
           ],
@@ -698,10 +698,10 @@ class _CallInfoRow extends StatelessWidget {
           child: Text(
             value,
             textAlign: TextAlign.end,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: AppColors.surfacePrimary,
             ),
           ),
         ),

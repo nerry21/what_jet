@@ -117,7 +117,7 @@ class _ProfileCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.scaffoldBackground.withValues(alpha: 0.72),
         borderRadius: AppRadii.borderRadiusXl,
@@ -128,7 +128,7 @@ class _ProfileCard extends StatelessWidget {
           Container(
             width: 54,
             height: 54,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -139,10 +139,10 @@ class _ProfileCard extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               initial,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
-                color: Colors.white,
+                color: AppColors.surfacePrimary,
               ),
             ),
           ),
@@ -153,7 +153,7 @@ class _ProfileCard extends StatelessWidget {
               children: <Widget>[
                 Text(
                   safeName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: AppColors.neutral800,
@@ -162,10 +162,7 @@ class _ProfileCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   safeContact,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.neutral500,
-                  ),
+                  style: TextStyle(fontSize: 13, color: AppColors.neutral500),
                 ),
               ],
             ),
@@ -188,7 +185,7 @@ class _TagSection extends StatelessWidget {
       title: title,
       trailing: Text(
         '${tags.length}',
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w700,
           color: AppColors.neutral300,
@@ -216,7 +213,7 @@ class _TagChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: AppRadii.borderRadiusPill,
@@ -224,7 +221,7 @@ class _TagChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w700,
           color: AppColors.primary,
@@ -251,14 +248,14 @@ class _QuickDetailsCard extends StatelessWidget {
           : Column(
               children: details.entries.map((entry) {
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
+                  padding: EdgeInsets.only(bottom: 10),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Expanded(
                         child: Text(
                           entry.key,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.neutral300,
                           ),
@@ -269,7 +266,7 @@ class _QuickDetailsCard extends StatelessWidget {
                         child: Text(
                           entry.value,
                           textAlign: TextAlign.right,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: AppColors.neutral800,
@@ -302,15 +299,15 @@ class _InsightNotesCard extends StatelessWidget {
           : Column(
               children: noteLines.map((note) {
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
+                  padding: EdgeInsets.only(bottom: 10),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Container(
                         width: 8,
                         height: 8,
-                        margin: const EdgeInsets.only(top: 6),
-                        decoration: const BoxDecoration(
+                        margin: EdgeInsets.only(top: 6),
+                        decoration: BoxDecoration(
                           color: AppColors.primary,
                           shape: BoxShape.circle,
                         ),
@@ -319,7 +316,7 @@ class _InsightNotesCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           note,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             height: 1.45,
                             color: AppColors.neutral500,
@@ -346,7 +343,7 @@ class _RightPaneSkeleton extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       children: <Widget>[
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: AppColors.scaffoldBackground.withValues(alpha: 0.72),
             borderRadius: AppRadii.borderRadiusXl,

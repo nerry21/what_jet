@@ -21,12 +21,10 @@ class OmnichannelPaneCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusXxxl,
-        border: Border.all(
-          color: AppColors.borderLight.withValues(alpha: 0.9),
-        ),
+        border: Border.all(color: AppColors.borderLight.withValues(alpha: 0.9)),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: const Color(0x18000000),
             blurRadius: 28,
             offset: const Offset(0, 10),
           ),
@@ -53,7 +51,7 @@ class OmnichannelSectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.scaffoldBackground.withValues(alpha: 0.7),
         borderRadius: AppRadii.borderRadiusXl,
@@ -69,7 +67,7 @@ class OmnichannelSectionCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColors.neutral500,
@@ -101,19 +99,19 @@ class OmnichannelInlineBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.error.withValues(alpha: 0.08),
         borderRadius: AppRadii.borderRadiusLg,
       ),
       child: Row(
         children: <Widget>[
-          const Icon(Icons.error_outline, color: AppColors.error),
+          Icon(Icons.error_outline, color: AppColors.error),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 height: 1.4,
                 color: AppColors.error,
@@ -146,7 +144,7 @@ class OmnichannelEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -163,7 +161,7 @@ class OmnichannelEmptyState extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppColors.neutral800,
@@ -173,7 +171,7 @@ class OmnichannelEmptyState extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 height: 1.5,
                 color: AppColors.neutral500,
@@ -204,9 +202,9 @@ class OmnichannelErrorState extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 460),
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(24),
           child: OmnichannelPaneCard(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
@@ -227,7 +225,7 @@ class OmnichannelErrorState extends StatelessWidget {
                 Text(
                   title,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: AppColors.neutral800,
@@ -237,7 +235,7 @@ class OmnichannelErrorState extends StatelessWidget {
                 Text(
                   message,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     height: 1.5,
                     color: AppColors.neutral500,
@@ -248,18 +246,21 @@ class OmnichannelErrorState extends StatelessWidget {
                   width: double.infinity,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
+                      gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: <Color>[AppColors.primary, AppColors.primary200],
+                        colors: <Color>[
+                          AppColors.primary,
+                          AppColors.primary200,
+                        ],
                       ),
                       borderRadius: AppRadii.borderRadiusMd,
                     ),
                     child: TextButton(
                       onPressed: () => unawaited(onRetry()),
                       style: TextButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        foregroundColor: AppColors.white,
+                        padding: EdgeInsets.symmetric(vertical: 14),
                       ),
                       child: const Text(
                         'Coba lagi',

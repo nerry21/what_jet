@@ -109,12 +109,12 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
         child: Material(
           color: AppColors.surfaceSecondary,
           borderRadius: AppRadii.borderRadiusXxl,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+            padding: EdgeInsets.fromLTRB(18, 18, 18, 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
@@ -195,7 +195,7 @@ class _AttachmentActionTile extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               action.label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: AppColors.neutral500,

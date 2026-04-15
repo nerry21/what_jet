@@ -615,7 +615,7 @@ class WjBanner extends StatelessWidget {
         ),
       WjBannerType.warning => (
           AppColors.warning50,
-          AppColors.warning800,
+          const Color(0xFFFFCF73),
           Icons.warning_amber_rounded,
         ),
       WjBannerType.success => (

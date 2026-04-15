@@ -29,7 +29,7 @@ class OmnichannelConversationCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: AppRadii.borderRadiusXl,
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: selected
                 ? AppColors.primary.withValues(alpha: 0.08)
@@ -68,10 +68,10 @@ class OmnichannelConversationCard extends StatelessWidget {
                     alignment: Alignment.center,
                     child: Text(
                       initial,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: AppColors.surfacePrimary,
                       ),
                     ),
                   ),
@@ -84,7 +84,7 @@ class OmnichannelConversationCard extends StatelessWidget {
                           item.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: AppColors.neutral800,
@@ -95,7 +95,7 @@ class OmnichannelConversationCard extends StatelessWidget {
                           item.customerLabel ?? item.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.neutral500,
                           ),
@@ -123,7 +123,7 @@ class OmnichannelConversationCard extends StatelessWidget {
                 item.preview,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   height: 1.45,
                   color: AppColors.neutral500,
@@ -148,7 +148,7 @@ class OmnichannelConversationCard extends StatelessWidget {
                   ),
                   if (item.unreadCount > 0)
                     Container(
-                      padding: const EdgeInsets.symmetric(
+                      padding: EdgeInsets.symmetric(
                         horizontal: 10,
                         vertical: 5,
                       ),
@@ -158,10 +158,10 @@ class OmnichannelConversationCard extends StatelessWidget {
                       ),
                       child: Text(
                         '${item.unreadCount}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
-                          color: Colors.white,
+                          color: AppColors.surfacePrimary,
                         ),
                       ),
                     ),
@@ -184,7 +184,7 @@ class _MiniStatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: AppRadii.borderRadiusPill,

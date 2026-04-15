@@ -73,7 +73,7 @@ class _HistorySummaryCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusLg,
@@ -87,7 +87,7 @@ class _HistorySummaryCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   'Panggilan terakhir',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: AppColors.neutral500,
@@ -95,7 +95,7 @@ class _HistorySummaryCard extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                 decoration: BoxDecoration(
                   color: outcomeColor.withValues(alpha: 0.12),
                   borderRadius: AppRadii.borderRadiusPill,
@@ -152,8 +152,8 @@ class _HistoryRow extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondary,
         borderRadius: AppRadii.borderRadiusLg,
@@ -186,7 +186,7 @@ class _HistoryRow extends StatelessWidget {
                     item.finalStatus,
                     fallback: item.finalStatusLabel ?? 'Sedang berlangsung',
                   ),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
                     color: AppColors.neutral800,
@@ -203,7 +203,7 @@ class _HistoryRow extends StatelessWidget {
                     if ((item.waCallId?.trim().isNotEmpty ?? false))
                       'ID ${item.waCallId}',
                   ].join(' | '),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     height: 1.4,
                     color: AppColors.neutral500,
@@ -227,7 +227,7 @@ class _MetaPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.scaffoldBackground,
         borderRadius: AppRadii.borderRadiusMd,
@@ -237,7 +237,7 @@ class _MetaPill extends StatelessWidget {
         children: <Widget>[
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w700,
               color: AppColors.neutral300,
@@ -246,10 +246,10 @@ class _MetaPill extends StatelessWidget {
           const SizedBox(height: 3),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w800,
-              color: Colors.black87,
+              color: AppColors.neutral800,
             ),
           ),
         ],

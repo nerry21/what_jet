@@ -89,7 +89,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -110,12 +110,12 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                       _controller.isInitializing || _controller.isSubmitting;
 
                   return Padding(
-                    padding: const EdgeInsets.all(24),
+                    padding: EdgeInsets.all(24),
                     child: Container(
                       decoration: BoxDecoration(
                         color: AppColors.surfaceSecondary,
                         borderRadius: AppRadii.borderRadiusXxl,
-                        boxShadow: const <BoxShadow>[
+                        boxShadow: <BoxShadow>[
                           BoxShadow(
                             color: Color(0x40000000),
                             blurRadius: 32,
@@ -128,8 +128,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                         children: <Widget>[
                           Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
-                            decoration: const BoxDecoration(
+                            padding: EdgeInsets.fromLTRB(24, 24, 24, 20),
+                            decoration: BoxDecoration(
                               gradient: AppColors.primaryGradient,
                               borderRadius: BorderRadius.vertical(
                                 top: Radius.circular(24),
@@ -144,7 +144,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                                     fontSize: 30,
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: -0.5,
-                                    color: Colors.white,
+                                    color: AppColors.surfacePrimary,
                                   ),
                                 ),
                                 SizedBox(height: 8),
@@ -160,13 +160,13 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+                            padding: EdgeInsets.fromLTRB(24, 24, 24, 24),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 if (_controller.errorMessage != null)
                                   Padding(
-                                    padding: const EdgeInsets.only(bottom: 16),
+                                    padding: EdgeInsets.only(bottom: 16),
                                     child: _AdminAuthBanner(
                                       message: _controller.errorMessage!,
                                       isOffline: _controller.isOffline,
@@ -213,7 +213,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                                     decoration: BoxDecoration(
                                       gradient: AppColors.primaryGradient,
                                       borderRadius: AppRadii.borderRadiusMd,
-                                      boxShadow: const <BoxShadow>[
+                                      boxShadow: <BoxShadow>[
                                         BoxShadow(
                                           color: AppColors.primaryGlow,
                                           blurRadius: 12,
@@ -224,8 +224,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                                     child: TextButton(
                                       onPressed: isBusy ? null : _submit,
                                       style: TextButton.styleFrom(
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(
+                                        foregroundColor: AppColors.white,
+                                        padding: EdgeInsets.symmetric(
                                           vertical: 14,
                                         ),
                                         shape: RoundedRectangleBorder(
@@ -245,7 +245,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                                 const SizedBox(height: 14),
                                 SelectableText(
                                   'API Base URL: ${AppConfig.baseUrl}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     color: AppColors.neutral300,
                                   ),
@@ -272,7 +272,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       SnackBar(
         content: Text(message),
         behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        margin: EdgeInsets.fromLTRB(20, 0, 20, 20),
         backgroundColor: isError ? AppColors.error : AppColors.success,
       ),
     );
@@ -292,16 +292,14 @@ class _AdminAuthBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final foregroundColor = isOffline
-        ? AppColors.warning800
-        : AppColors.error;
+    final foregroundColor = isOffline ? const Color(0xFFFFCF73) : AppColors.error;
     final backgroundColor = isOffline
         ? AppColors.warning50
         : AppColors.error.withValues(alpha: 0.08);
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: AppRadii.borderRadiusMd,
@@ -337,7 +335,7 @@ class _FieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
         color: AppColors.neutral800,
@@ -383,13 +381,10 @@ class _AdminInput extends StatelessWidget {
         onSubmitted: onSubmitted,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: const TextStyle(color: AppColors.neutral300),
+          hintStyle: TextStyle(color: AppColors.neutral300),
           border: InputBorder.none,
           suffixIcon: suffixIcon,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
       ),
     );

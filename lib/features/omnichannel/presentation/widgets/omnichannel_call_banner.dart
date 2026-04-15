@@ -33,18 +33,21 @@ class OmnichannelCallBanner extends StatelessWidget {
     final detailText = omnichannelCallSecondaryStatusText(session);
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: <Color>[AppColors.surfaceSecondary, color.withValues(alpha: 0.08)],
+          colors: <Color>[
+            AppColors.surfaceSecondary,
+            color.withValues(alpha: 0.08),
+          ],
         ),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: color.withValues(alpha: 0.16)),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: const Color(0x10000000),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -74,7 +77,7 @@ class OmnichannelCallBanner extends StatelessWidget {
               children: <Widget>[
                 Text(
                   statusText,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: AppColors.neutral800,
@@ -85,7 +88,7 @@ class OmnichannelCallBanner extends StatelessWidget {
                   detailText,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     height: 1.35,
                     color: AppColors.neutral500,
@@ -99,7 +102,7 @@ class OmnichannelCallBanner extends StatelessWidget {
                         : omnichannelCallFallbackBannerNote(),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: AppColors.neutral500,
@@ -114,20 +117,18 @@ class OmnichannelCallBanner extends StatelessWidget {
                     OmnichannelCallStatusChip(session: session, compact: true),
                     if ((session?.waCallId?.trim().isNotEmpty ?? false))
                       Container(
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                           horizontal: 10,
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.surfaceSecondary,
                           borderRadius: AppRadii.borderRadiusPill,
-                          border: Border.all(
-                            color: AppColors.borderLight,
-                          ),
+                          border: Border.all(color: AppColors.borderLight),
                         ),
                         child: Text(
                           'ID ${session!.waCallId}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                             color: AppColors.neutral500,
@@ -183,9 +184,7 @@ class OmnichannelCallBanner extends StatelessWidget {
                         )
                       : const Icon(Icons.call_end_rounded, size: 18),
                   label: const Text('Akhiri'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppColors.error,
-                  ),
+                  style: TextButton.styleFrom(foregroundColor: AppColors.error),
                 ),
               ],
             ],
