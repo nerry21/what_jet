@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import 'package:what_jet/core/theme/app_colors.dart';
 import '../../../admin_auth/data/models/admin_user_model.dart';
 
 class OmnichannelShellHeader extends StatelessWidget {

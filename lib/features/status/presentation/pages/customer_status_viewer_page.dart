@@ -6,7 +6,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../../core/theme/app_dimensions.dart';
+import 'package:what_jet/core/theme/app_dimensions.dart';
 import '../../data/models/customer_status_group.dart';
 import '../../data/models/customer_status_item.dart';
 import '../../data/repositories/customer_status_repository.dart';

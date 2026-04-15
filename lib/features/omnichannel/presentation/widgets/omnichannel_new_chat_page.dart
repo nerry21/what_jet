@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_dimensions.dart';
+import 'package:what_jet/core/theme/app_colors.dart';
+import 'package:what_jet/core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_conversation_list_model.dart';
 
 class OmnichannelNewChatPage extends StatefulWidget {

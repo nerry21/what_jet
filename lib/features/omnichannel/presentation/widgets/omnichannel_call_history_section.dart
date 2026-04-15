@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_dimensions.dart';
+import 'package:what_jet/core/theme/app_colors.dart';
+import 'package:what_jet/core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_call_history_item_model.dart';
 import '../utils/omnichannel_call_status_ui.dart';
 import 'omnichannel_surface.dart';

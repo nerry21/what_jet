@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_dimensions.dart';
+import 'package:what_jet/core/theme/app_colors.dart';
+import 'package:what_jet/core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_call_session_model.dart';
 import '../../data/services/omnichannel_call_media_service.dart';
 import '../controllers/omnichannel_call_controller.dart';

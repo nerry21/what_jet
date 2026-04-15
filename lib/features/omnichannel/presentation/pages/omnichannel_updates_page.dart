@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:record/record.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_dimensions.dart';
+import 'package:what_jet/core/theme/app_colors.dart';
+import 'package:what_jet/core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_status_update_model.dart';
 import '../../data/repositories/omnichannel_repository.dart';
 

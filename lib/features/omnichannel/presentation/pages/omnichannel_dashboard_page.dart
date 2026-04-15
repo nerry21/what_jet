@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:record/record.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_dimensions.dart';
+import 'package:what_jet/core/theme/app_colors.dart';
+import 'package:what_jet/core/theme/app_dimensions.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../admin_auth/data/models/admin_user_model.dart';

@@ -1,9 +1,8 @@
 // ============================================================================
-// WhatsJet Premium Design System — Theme
+// WhatsJet Premium Design System — Theme (Dark Emerald Executive)
 // ============================================================================
-// Drop-in replacement for AppConfig.theme().
-// Usage: AppTheme.light() in MaterialApp's theme property.
-// Barrel export file for importing the entire design system.
+// Dark luxury theme for executive/manager use on Android.
+// Deep forest backgrounds, emerald accents, refined typography.
 // ============================================================================
 
 import 'package:flutter/material.dart';
@@ -21,15 +20,16 @@ export 'app_typography.dart';
 class AppTheme {
   const AppTheme._();
 
-  /// Premium light theme — replaces AppConfig.theme().
+  /// Dark Emerald Executive theme.
   static ThemeData light() {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.light,
+      brightness: Brightness.dark,
 
       // ─── Colors ──────────────────────────────────────────────────────
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primary,
+        brightness: Brightness.dark,
         primary: AppColors.primary,
         onPrimary: AppColors.white,
         secondary: AppColors.accent,
@@ -46,16 +46,18 @@ class AppTheme {
       // ─── Typography ──────────────────────────────────────────────────
       fontFamily: 'SF Pro Display',
 
-      // ─── AppBar ──────────────────────────────────────────────────────
+      // ─── AppBar (Dark translucent) ───────────────────────────────────
       appBarTheme: AppBarTheme(
         elevation: 0,
-        scrolledUnderElevation: 0.5,
+        scrolledUnderElevation: 0,
         backgroundColor: AppColors.surfacePrimary,
         foregroundColor: AppColors.neutral800,
         surfaceTintColor: Colors.transparent,
-        systemOverlayStyle: SystemUiOverlayStyle.dark.copyWith(
+        systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
           statusBarColor: Colors.transparent,
-          systemNavigationBarColor: AppColors.surfacePrimary,
+          statusBarIconBrightness: Brightness.light,
+          systemNavigationBarColor: AppColors.scaffoldBackground,
+          systemNavigationBarIconBrightness: Brightness.light,
         ),
         titleTextStyle: const TextStyle(
           fontSize: 18,
@@ -65,10 +67,10 @@ class AppTheme {
         ),
       ),
 
-      // ─── Card ────────────────────────────────────────────────────────
+      // ─── Card (Glass-like dark surface) ──────────────────────────────
       cardTheme: CardThemeData(
         elevation: 0,
-        color: AppColors.surfacePrimary,
+        color: AppColors.surfaceSecondary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: const BorderSide(color: AppColors.borderLight),
@@ -76,7 +78,7 @@ class AppTheme {
         margin: EdgeInsets.zero,
       ),
 
-      // ─── Elevated Button ─────────────────────────────────────────────
+      // ─── Elevated Button (Emerald glow) ──────────────────────────────
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
@@ -84,7 +86,7 @@ class AppTheme {
           foregroundColor: AppColors.white,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
           textStyle: const TextStyle(
             fontSize: 14,
@@ -112,7 +114,7 @@ class AppTheme {
       // ─── Text Button ─────────────────────────────────────────────────
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.primary,
+          foregroundColor: AppColors.primary400,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -124,10 +126,10 @@ class AppTheme {
         ),
       ),
 
-      // ─── Input Decoration ────────────────────────────────────────────
+      // ─── Input Decoration (Dark glass inputs) ────────────────────────
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.neutral50,
+        fillColor: AppColors.surfaceSecondary,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
@@ -143,7 +145,7 @@ class AppTheme {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: AppColors.borderFocus,
+            color: AppColors.primary400,
             width: 1.5,
           ),
         ),
@@ -171,24 +173,24 @@ class AppTheme {
       // ─── Divider ─────────────────────────────────────────────────────
       dividerTheme: const DividerThemeData(
         color: AppColors.borderLight,
-        thickness: 1,
+        thickness: 0.5,
         space: 0,
       ),
 
       // ─── Bottom Sheet ────────────────────────────────────────────────
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: AppColors.surfacePrimary,
+        backgroundColor: AppColors.surfaceSecondary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         showDragHandle: true,
-        dragHandleColor: AppColors.neutral200,
+        dragHandleColor: AppColors.borderDark,
         dragHandleSize: Size(36, 4),
       ),
 
       // ─── Dialog ──────────────────────────────────────────────────────
       dialogTheme: DialogThemeData(
-        backgroundColor: AppColors.surfacePrimary,
+        backgroundColor: AppColors.surfaceSecondary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
         ),
@@ -203,7 +205,7 @@ class AppTheme {
       // ─── Snackbar ────────────────────────────────────────────────────
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.neutral800,
+        backgroundColor: AppColors.surfaceTertiary,
         contentTextStyle: const TextStyle(
           fontSize: 14,
           color: AppColors.white,
@@ -217,8 +219,8 @@ class AppTheme {
 
       // ─── Chip ────────────────────────────────────────────────────────
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.neutral50,
-        selectedColor: AppColors.primary50,
+        backgroundColor: AppColors.surfaceSecondary,
+        selectedColor: AppColors.primary800,
         side: const BorderSide(color: AppColors.borderLight),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -234,8 +236,9 @@ class AppTheme {
       // ─── Tooltip ─────────────────────────────────────────────────────
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: AppColors.neutral800,
+          color: AppColors.surfaceTertiary,
           borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.borderLight),
         ),
         textStyle: const TextStyle(
           fontSize: 12,
@@ -245,8 +248,8 @@ class AppTheme {
       ),
 
       // ─── Splash & Highlight ──────────────────────────────────────────
-      splashColor: AppColors.primary.withValues(alpha: 0.08),
-      highlightColor: AppColors.primary.withValues(alpha: 0.04),
+      splashColor: AppColors.primary.withValues(alpha: 0.12),
+      highlightColor: AppColors.primary.withValues(alpha: 0.06),
       splashFactory: InkSparkle.splashFactory,
 
       // ─── Scroll ──────────────────────────────────────────────────────
@@ -257,7 +260,7 @@ class AppTheme {
           return 3;
         }),
         thumbColor: WidgetStateProperty.all(
-          AppColors.neutral300.withValues(alpha: 0.5),
+          AppColors.neutral300.withValues(alpha: 0.3),
         ),
       ),
 

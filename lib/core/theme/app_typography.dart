@@ -1,9 +1,8 @@
 // ============================================================================
-// WhatsJet Premium Design System — Typography
+// WhatsJet Premium Design System — Typography (Dark Emerald Executive)
 // ============================================================================
-// Replaces all 697 inline TextStyle declarations.
-// Usage: AppTypography.display, AppTypography.h1, body, caption, etc.
-// Each style has built-in variants: .bold, .muted, .primary, .onDark, etc.
+// Text styles adapted for dark backgrounds.
+// Light text on dark forest surfaces for maximum readability.
 // ============================================================================
 
 import 'package:flutter/material.dart';
@@ -22,7 +21,7 @@ class AppTypography {
     fontWeight: FontWeight.w700,
     height: 1.15,
     letterSpacing: -0.5,
-    color: AppColors.neutral800,
+    color: AppColors.neutral800, // #F0F5F2 on dark
     fontFamily: _fontFamily,
   );
 
@@ -87,7 +86,7 @@ class AppTypography {
     fontSize: 12,
     fontWeight: FontWeight.w500,
     height: 1.4,
-    color: AppColors.neutral500,
+    color: AppColors.neutral500, // #A3B5AA — readable on dark
     fontFamily: _fontFamily,
   );
 
@@ -97,7 +96,7 @@ class AppTypography {
     fontWeight: FontWeight.w600,
     height: 1.3,
     letterSpacing: 0.2,
-    color: AppColors.neutral400,
+    color: AppColors.neutral400, // #6B7D72 — subtle
     fontFamily: _fontFamily,
   );
 
@@ -125,7 +124,7 @@ class AppTypography {
     fontSize: 15,
     fontWeight: FontWeight.w400,
     height: 1.45,
-    color: AppColors.neutral800,
+    color: AppColors.neutral800, // bright text on dark bubble
     fontFamily: _fontFamily,
   );
 
@@ -141,7 +140,7 @@ class AppTypography {
     fontSize: 11,
     fontWeight: FontWeight.w400,
     height: 1.2,
-    color: AppColors.neutral300,
+    color: AppColors.neutral300, // #3D4F44 — hint on dark
     fontFamily: _fontFamily,
   );
 
@@ -149,7 +148,7 @@ class AppTypography {
     fontSize: 11,
     fontWeight: FontWeight.w400,
     height: 1.2,
-    color: Color(0xB3FFFFFF), // 70% white
+    color: Color(0x99F0F5F2), // 60% white-green
     fontFamily: _fontFamily,
   );
 
@@ -166,7 +165,7 @@ class AppTypography {
     fontSize: 12,
     fontWeight: FontWeight.w400,
     height: 1.3,
-    color: AppColors.neutral400,
+    color: AppColors.neutral400, // subtle on dark
     fontFamily: _fontFamily,
   );
 

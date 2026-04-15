@@ -1,8 +1,9 @@
 // ============================================================================
-// WhatsJet Premium Design System — Colors
+// WhatsJet Premium Design System — Colors (Dark Emerald Executive)
 // ============================================================================
-// Replaces all 246 hardcoded Color(0x...) across the codebase.
-// Usage: AppColors.primary, AppColors.primary50, AppColors.neutral700, etc.
+// Dark luxury theme with deep emerald accents for executive/manager use.
+// All presentation files already reference these tokens — changing values
+// here instantly transforms the entire app appearance.
 // ============================================================================
 
 import 'package:flutter/material.dart';
@@ -10,97 +11,99 @@ import 'package:flutter/material.dart';
 class AppColors {
   const AppColors._();
 
-  // ─── Primary (Emerald Green) ─────────────────────────────────────────────
-  static const Color primary = Color(0xFF00C896);
-  static const Color primary50 = Color(0xFFE8FAF4);
-  static const Color primary100 = Color(0xFFB8F0DC);
-  static const Color primary200 = Color(0xFF7AE4BF);
-  static const Color primary400 = Color(0xFF00C896);
-  static const Color primary600 = Color(0xFF00A878);
-  static const Color primary800 = Color(0xFF007A57);
-  static const Color primary900 = Color(0xFF004D36);
+  // ─── Primary (Deep Emerald — darker & more luxurious) ────────────────────
+  static const Color primary = Color(0xFF00A86B);
+  static const Color primary50 = Color(0xFFE6FFF4);
+  static const Color primary100 = Color(0xFFB3FFE0);
+  static const Color primary200 = Color(0xFF66EDBA);
+  static const Color primary300 = Color(0xFF2DD89A);
+  static const Color primary400 = Color(0xFF00C07A);
+  static const Color primary600 = Color(0xFF008C59);
+  static const Color primary700 = Color(0xFF006B44);
+  static const Color primary800 = Color(0xFF004D31);
+  static const Color primary900 = Color(0xFF00331F);
 
-  static const MaterialColor primarySwatch = MaterialColor(0xFF00C896, {
+  static const MaterialColor primarySwatch = MaterialColor(0xFF00A86B, {
     50: primary50,
     100: primary100,
     200: primary200,
-    300: Color(0xFF3CD6A8),
+    300: primary300,
     400: primary400,
-    500: Color(0xFF00B888),
+    500: primary,
     600: primary600,
-    700: Color(0xFF008C68),
+    700: primary700,
     800: primary800,
     900: primary900,
   });
 
   // ─── Accent (Royal Purple) ───────────────────────────────────────────────
-  static const Color accent = Color(0xFF8B6FD4);
-  static const Color accent50 = Color(0xFFF0EAFF);
-  static const Color accent100 = Color(0xFFD1C4F6);
-  static const Color accent200 = Color(0xFFB39DEB);
-  static const Color accent400 = Color(0xFF8B6FD4);
-  static const Color accent600 = Color(0xFF6B4FB8);
-  static const Color accent800 = Color(0xFF4A3390);
-  static const Color accent900 = Color(0xFF2E1F5E);
+  static const Color accent = Color(0xFF9B7FDB);
+  static const Color accent50 = Color(0xFFF3EEFF);
+  static const Color accent100 = Color(0xFFD9CDF6);
+  static const Color accent200 = Color(0xFFBEAAED);
+  static const Color accent400 = Color(0xFF9B7FDB);
+  static const Color accent600 = Color(0xFF7A5DC4);
+  static const Color accent800 = Color(0xFF53399E);
+  static const Color accent900 = Color(0xFF33216B);
 
-  // ─── Neutral (Warm Gray) ─────────────────────────────────────────────────
-  static const Color white = Color(0xFFFFFFFF);
-  static const Color neutral25 = Color(0xFFFAFAF9);
-  static const Color neutral50 = Color(0xFFF5F4F2);
-  static const Color neutral100 = Color(0xFFECEAE6);
-  static const Color neutral200 = Color(0xFFD8D6D0);
-  static const Color neutral300 = Color(0xFFB5B3AD);
-  static const Color neutral400 = Color(0xFF8A8884);
-  static const Color neutral500 = Color(0xFF6B6966);
-  static const Color neutral600 = Color(0xFF4A4845);
-  static const Color neutral700 = Color(0xFF33312F);
-  static const Color neutral800 = Color(0xFF1E1D1B);
-  static const Color neutral900 = Color(0xFF0D0D0C);
+  // ─── Neutral (Forest-tinted dark grays) ──────────────────────────────────
+  static const Color white = Color(0xFFF0F5F2);
+  static const Color neutral25 = Color(0xFF1A2920);
+  static const Color neutral50 = Color(0xFF131D17);
+  static const Color neutral100 = Color(0xFF1A2920);
+  static const Color neutral200 = Color(0xFF213529);
+  static const Color neutral300 = Color(0xFF3D4F44);
+  static const Color neutral400 = Color(0xFF6B7D72);
+  static const Color neutral500 = Color(0xFFA3B5AA);
+  static const Color neutral600 = Color(0xFFC5D3CA);
+  static const Color neutral700 = Color(0xFFD8E3DC);
+  static const Color neutral800 = Color(0xFFF0F5F2);
+  static const Color neutral900 = Color(0xFFFAFCFB);
 
   // ─── Semantic ────────────────────────────────────────────────────────────
-  static const Color success = Color(0xFF22C55E);
-  static const Color success50 = Color(0xFFECFDF5);
-  static const Color success800 = Color(0xFF166534);
+  static const Color success = Color(0xFF2DD89A);
+  static const Color success50 = Color(0xFF0D2E1F);
+  static const Color success800 = Color(0xFF7AEDC4);
 
-  static const Color warning = Color(0xFFF59E0B);
-  static const Color warning50 = Color(0xFFFEF3C7);
-  static const Color warning800 = Color(0xFF92400E);
+  static const Color warning = Color(0xFFF5A623);
+  static const Color warning50 = Color(0xFF2E1F0A);
+  static const Color warning800 = Color(0xFFFFCF73);
 
-  static const Color error = Color(0xFFEF4444);
-  static const Color error50 = Color(0xFFFEF2F2);
-  static const Color error800 = Color(0xFF991B1B);
+  static const Color error = Color(0xFFE85454);
+  static const Color error50 = Color(0xFF2E0D0D);
+  static const Color error800 = Color(0xFFFF9B9B);
 
-  static const Color info = Color(0xFF3B82F6);
-  static const Color info50 = Color(0xFFEFF6FF);
-  static const Color info800 = Color(0xFF1E40AF);
+  static const Color info = Color(0xFF4A9EF5);
+  static const Color info50 = Color(0xFF0D1F2E);
+  static const Color info800 = Color(0xFF9BCAFF);
 
-  // ─── Surface & Background ────────────────────────────────────────────────
-  static const Color scaffoldBackground = neutral50;
-  static const Color surfacePrimary = white;
-  static const Color surfaceSecondary = neutral25;
-  static const Color surfaceTertiary = neutral50;
-  static const Color surfaceDark = Color(0xFF0F1512);
-  static const Color surfaceDarkAlt = Color(0xFF0B0F0D);
-  static const Color surfaceOverlay = Color(0x29000000); // 16% black
+  // ─── Surface & Background (Deep dark forest) ────────────────────────────
+  static const Color scaffoldBackground = Color(0xFF080C0A);
+  static const Color surfacePrimary = Color(0xFF0D1410);
+  static const Color surfaceSecondary = Color(0xFF131D17);
+  static const Color surfaceTertiary = Color(0xFF1A2920);
+  static const Color surfaceDark = Color(0xFF080C0A);
+  static const Color surfaceDarkAlt = Color(0xFF060A08);
+  static const Color surfaceOverlay = Color(0x40000000);
 
-  // ─── Border ──────────────────────────────────────────────────────────────
-  static const Color borderLight = neutral100;
-  static const Color borderDefault = neutral200;
-  static const Color borderDark = neutral300;
+  // ─── Border (Subtle emerald-tinted) ──────────────────────────────────────
+  static const Color borderLight = Color(0xFF1A2920);
+  static const Color borderDefault = Color(0xFF213529);
+  static const Color borderDark = Color(0xFF3D4F44);
   static const Color borderFocus = primary400;
 
   // ─── Chat-specific ───────────────────────────────────────────────────────
-  static const Color bubbleOutgoing = primary400;
-  static const Color bubbleOutgoingGradientEnd = primary600;
-  static const Color bubbleIncoming = white;
-  static const Color readReceipt = Color(0xFF53BDEB);
+  static const Color bubbleOutgoing = Color(0xFF008C59);
+  static const Color bubbleOutgoingGradientEnd = Color(0xFF006B44);
+  static const Color bubbleIncoming = Color(0xFF1A2920);
+  static const Color readReceipt = Color(0xFF66EDBA);
   static const Color onlineIndicator = success;
 
   // ─── Gradient Presets ────────────────────────────────────────────────────
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [primary400, primary600],
+    colors: [primary400, primary700],
   );
 
   static const LinearGradient accentGradient = LinearGradient(
@@ -112,27 +115,27 @@ class AppColors {
   static const LinearGradient darkSurfaceGradient = LinearGradient(
     begin: Alignment(-.3, -1),
     end: Alignment(.3, 1),
-    colors: [surfaceDark, surfaceDarkAlt],
+    colors: [surfacePrimary, scaffoldBackground],
   );
 
   static const LinearGradient subtleGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [neutral50, neutral100],
+    colors: [surfaceSecondary, surfaceTertiary],
   );
 
   static const LinearGradient shimmerGradient = LinearGradient(
     begin: Alignment(-1.5, -0.3),
     end: Alignment(1.5, 0.3),
-    colors: [neutral100, neutral50, neutral100],
+    colors: [borderLight, surfaceSecondary, borderLight],
     stops: [0.0, 0.5, 1.0],
   );
 
   // ─── Glow / Shadow Colors ───────────────────────────────────────────────
-  static const Color primaryGlow = Color(0x4000C896); // 25%
-  static const Color accentGlow = Color(0x338B6FD4); // 20%
-  static const Color successGlow = Color(0x4022C55E);
-  static const Color errorGlow = Color(0x33EF4444);
+  static const Color primaryGlow = Color(0x4000A86B);
+  static const Color accentGlow = Color(0x339B7FDB);
+  static const Color successGlow = Color(0x402DD89A);
+  static const Color errorGlow = Color(0x33E85454);
 
   // ─── Channel Colors ──────────────────────────────────────────────────────
   static Color channelColor(String channel) {

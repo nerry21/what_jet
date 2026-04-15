@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import 'package:what_jet/core/theme/app_colors.dart';
 import '../../data/models/conversation_model.dart';
 import 'channel_badge.dart';
 

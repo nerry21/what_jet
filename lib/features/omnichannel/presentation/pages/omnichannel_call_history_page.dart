@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_dimensions.dart';
+import 'package:what_jet/core/theme/app_colors.dart';
+import 'package:what_jet/core/theme/app_dimensions.dart';
 import '../../../../core/network/api_client.dart';
 import '../../data/models/omnichannel_call_history_item_model.dart';
 import '../../data/repositories/omnichannel_repository.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_dimensions.dart';
+import 'package:what_jet/core/theme/app_dimensions.dart';
 import 'package:shimmer/shimmer.dart';
 
 class StatusStripShimmer extends StatelessWidget {

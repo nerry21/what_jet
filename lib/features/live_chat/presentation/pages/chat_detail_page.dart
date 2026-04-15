@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../core/config/app_config.dart';
-import '../../../../core/theme/app_colors.dart';
+import 'package:what_jet/core/theme/app_colors.dart';
 import '../../data/models/chat_message_model.dart';
 import '../../data/models/conversation_model.dart';
 import '../../data/repositories/live_chat_repository.dart';
