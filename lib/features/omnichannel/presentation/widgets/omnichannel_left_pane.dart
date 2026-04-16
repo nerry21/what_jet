@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:what_jet/core/theme/app_animations.dart';
 import 'package:what_jet/core/theme/app_colors.dart';
 import 'package:what_jet/core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_conversation_list_model.dart';
@@ -223,10 +224,14 @@ class OmnichannelLeftPane extends StatelessWidget {
                                   }
 
                                   final item = items[index];
-                                  return OmnichannelConversationCard(
-                                    item: item,
-                                    selected: selectedConversationId == item.id,
-                                    onTap: () => onConversationTap(item.id),
+                                  return AppFadeSlideIn(
+                                    delay: AppDurations.stagger(index),
+                                    child: OmnichannelConversationCard(
+                                      item: item,
+                                      selected:
+                                          selectedConversationId == item.id,
+                                      onTap: () => onConversationTap(item.id),
+                                    ),
                                   );
                                 },
                               ),
@@ -362,20 +367,30 @@ class _SearchField extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.scaffoldBackground.withValues(alpha: 0.9),
+        color: AppColors.surfaceTertiary,
         borderRadius: AppRadii.borderRadiusXl,
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.08),
+        ),
       ),
       child: TextField(
         controller: controller,
         enabled: enabled,
         textInputAction: TextInputAction.search,
-        decoration: const InputDecoration(
-          prefixIcon: Icon(Icons.search, color: AppColors.neutral300),
+        style: TextStyle(fontSize: 14, color: AppColors.neutral800),
+        decoration: InputDecoration(
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            size: 20,
+            color: AppColors.neutral300,
+          ),
           hintText: 'Cari customer, preview, atau channel',
-          hintStyle: TextStyle(color: AppColors.neutral300),
+          hintStyle: TextStyle(color: AppColors.neutral300, fontSize: 14),
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
         ),
       ),
     );
@@ -516,7 +531,9 @@ class _ConversationListSkeleton extends StatelessWidget {
       itemCount: 5,
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
-        return Container(
+        return AppFadeSlideIn(
+          delay: AppDurations.stagger(index),
+          child: Container(
           padding: EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: AppColors.scaffoldBackground.withValues(alpha: 0.75),
@@ -528,7 +545,7 @@ class _ConversationListSkeleton extends StatelessWidget {
             children: const <Widget>[
               Row(
                 children: <Widget>[
-                  OmnichannelSkeletonBlock(width: 42, height: 42, radius: 21),
+                  OmnichannelSkeletonBlock(width: 42, height: 42, radius: 16),
                   SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -557,7 +574,7 @@ class _ConversationListSkeleton extends StatelessWidget {
               ),
             ],
           ),
-        );
+        ));
       },
     );
   }
@@ -786,12 +803,16 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                           }
 
                           final item = items[index];
-                          return _PremiumConversationTile(
-                            item: item,
-                            selected:
-                                selectedConversationId == item.id ||
-                                (selectedConversationId == null && index == 0),
-                            onTap: () => onConversationTap(item.id),
+                          return AppFadeSlideIn(
+                            delay: AppDurations.stagger(index),
+                            child: _PremiumConversationTile(
+                              item: item,
+                              selected:
+                                  selectedConversationId == item.id ||
+                                  (selectedConversationId == null &&
+                                      index == 0),
+                              onTap: () => onConversationTap(item.id),
+                            ),
                           );
                         },
                       ),
@@ -801,52 +822,45 @@ class _MobileWhatsAppInbox extends StatelessWidget {
             ],
           ),
 
-          // ═══ FAB with glow ring ═══
+          // ═══ FAB with glow ring + scale animation ═══
           Positioned(
             right: 18,
             bottom: 18 + bottomInset,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.35),
-                    blurRadius: 20,
-                    offset: const Offset(0, 6),
+            child: AppScaleIn(
+              delay: AppDurations.slow,
+              child: AppPressable(
+                onTap: () {
+                  Navigator.of(context).push(
+                    AppPageTransitions.fadeSlideUp(
+                      OmnichannelNewChatPage(
+                        items: items,
+                        onConversationSelected: onConversationTap,
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [AppColors.primary, AppColors.primary700],
+                    ),
+                    borderRadius: AppRadii.borderRadiusXl,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.35),
+                        blurRadius: 20,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: Material(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(18),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => OmnichannelNewChatPage(
-                          items: items,
-                          onConversationSelected: onConversationTap,
-                        ),
-                      ),
-                    );
-                  },
-                  borderRadius: BorderRadius.circular(18),
-                  child: Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [AppColors.primary, AppColors.primary700],
-                      ),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Icon(
-                      Icons.person_add_alt_1_rounded,
-                      color: AppColors.white,
-                      size: 26,
-                    ),
+                  child: Icon(
+                    Icons.person_add_alt_1_rounded,
+                    color: AppColors.white,
+                    size: 26,
                   ),
                 ),
               ),
@@ -1141,7 +1155,9 @@ class _PremiumListSkeleton extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(0, 4, 0, 110),
       itemCount: 6,
       itemBuilder: (context, index) {
-        return Padding(
+        return AppFadeSlideIn(
+          delay: AppDurations.stagger(index),
+          child: Padding(
           padding: EdgeInsets.fromLTRB(16, 12, 14, 12),
           child: Row(
             children: <Widget>[
@@ -1180,7 +1196,7 @@ class _PremiumListSkeleton extends StatelessWidget {
               ),
             ],
           ),
-        );
+        ));
       },
     );
   }

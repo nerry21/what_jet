@@ -2341,9 +2341,25 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       children: <Widget>[
         Expanded(
           child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 220),
+            duration: const Duration(milliseconds: 300),
             switchInCurve: Curves.easeOutCubic,
             switchOutCurve: Curves.easeInCubic,
+            transitionBuilder: (child, animation) {
+              final curved = CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+              );
+              return FadeTransition(
+                opacity: curved,
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0, 0.02),
+                    end: Offset.zero,
+                  ).animate(curved),
+                  child: child,
+                ),
+              );
+            },
             child: KeyedSubtree(
               key: ValueKey<_OmnichannelMobilePane>(_mobilePane),
               child: switch (_mobilePane) {
@@ -2696,50 +2712,59 @@ class _MobilePaneButton extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+            duration: const Duration(milliseconds: 250),
             curve: Curves.easeOutCubic,
-            width: 48,
-            height: 30,
+            width: 52,
+            height: 32,
             decoration: BoxDecoration(
               color: selected
                   ? AppColors.primary.withValues(alpha: 0.15)
                   : Colors.transparent,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: AppRadii.borderRadiusLg,
             ),
             alignment: Alignment.center,
-            child: Icon(
-              icon,
-              size: 22,
-              color: selected ? AppColors.primary : AppColors.neutral400,
+            child: AnimatedScale(
+              scale: selected ? 1.0 : 0.9,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              child: Icon(
+                icon,
+                size: 22,
+                color: selected ? AppColors.primary : AppColors.neutral400,
+              ),
             ),
           ),
           const SizedBox(height: 3),
-          Text(
-            label,
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutCubic,
             style: TextStyle(
               fontSize: 11,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
               color: selected ? AppColors.primary : AppColors.neutral400,
             ),
+            child: Text(label),
           ),
-          if (selected)
-            Container(
-              width: 16,
-              height: 2,
-              margin: EdgeInsets.only(top: 4),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(1),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.5),
-                    blurRadius: 4,
-                  ),
-                ],
-              ),
-            )
-          else
-            const SizedBox(height: 6),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutCubic,
+            width: selected ? 20 : 0,
+            height: 2.5,
+            margin: EdgeInsets.only(top: 4),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: AppRadii.borderRadiusPill,
+              boxShadow: selected
+                  ? [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.6),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ]
+                  : null,
+            ),
+          ),
         ],
       ),
     );
