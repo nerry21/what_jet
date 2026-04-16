@@ -96,6 +96,9 @@ class ApiEndpoints {
 
   static String adminMetaFilters() => '$_adminMobileBase/meta/filters';
 
+  // ─── WhatsApp Contacts (address book) ────────────────────────────────
+  static String adminContacts() => '$_adminMobileBase/contacts';
+
   static String startConversation() => '$_mobileLiveChatBase/start';
 
   static String conversations() => '$_mobileLiveChatBase/conversations';

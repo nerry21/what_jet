@@ -433,6 +433,46 @@ class OmnichannelApiService {
     );
   }
 
+  // ─── WhatsApp Contacts (address book) ────────────────────────────────
+
+  /// POST /api/admin-mobile/contacts
+  /// Menyimpan kontak WhatsApp baru ke backend. Backend akan otomatis
+  /// membuat customer & conversation placeholder agar admin bisa langsung
+  /// mulai chat.
+  Future<Map<String, dynamic>> createWhatsAppContact({
+    required String accessToken,
+    required String firstName,
+    required String lastName,
+    required String phone,
+    String? email,
+    String? countryCode,
+    bool syncToDevice = true,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminContacts(),
+      headers: _headers(accessToken),
+      body: <String, Object?>{
+        'first_name': firstName,
+        'last_name': _normalizedNullableText(lastName),
+        'phone': phone,
+        'email': _normalizedNullableText(email),
+        'country_code': _normalizedNullableText(countryCode),
+        'sync_to_device': syncToDevice,
+      },
+    );
+  }
+
+  /// GET /api/admin-mobile/contacts
+  /// Mengambil daftar kontak WhatsApp tersimpan untuk admin saat ini.
+  Future<Map<String, dynamic>> fetchWhatsAppContacts({
+    required String accessToken,
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminContacts(),
+      headers: _headers(accessToken),
+    );
+  }
+
   Map<String, String> _headers(String accessToken) {
     return <String, String>{'Authorization': 'Bearer $accessToken'};
   }

@@ -1,19 +1,30 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:what_jet/core/theme/app_colors.dart';
 import 'package:what_jet/core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_conversation_list_model.dart';
+import '../../data/models/whatsapp_contact_model.dart';
+import '../../data/repositories/omnichannel_repository.dart';
 
 class OmnichannelNewChatPage extends StatefulWidget {
   const OmnichannelNewChatPage({
     super.key,
     required this.items,
     required this.onConversationSelected,
+    required this.repository,
+    this.onContactSaved,
   });
 
   final List<OmnichannelConversationListItemModel> items;
   final ValueChanged<int> onConversationSelected;
+  final OmnichannelRepository repository;
+
+  /// Dipanggil setelah kontak baru tersimpan ke backend, sehingga
+  /// dashboard bisa refresh daftar conversation.
+  final VoidCallback? onContactSaved;
 
   @override
   State<OmnichannelNewChatPage> createState() => _OmnichannelNewChatPageState();
@@ -21,7 +32,16 @@ class OmnichannelNewChatPage extends StatefulWidget {
 
 class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
   final TextEditingController _searchController = TextEditingController();
-  final List<_NewChatContactEntry> _customContacts = <_NewChatContactEntry>[];
+
+  /// Kontak WhatsApp tersimpan dari backend (address book).
+  List<WhatsAppContactModel> _savedContacts = <WhatsAppContactModel>[];
+  bool _loadingSavedContacts = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedContacts();
+  }
 
   @override
   void dispose() {
@@ -29,10 +49,32 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
     super.dispose();
   }
 
+  Future<void> _loadSavedContacts() async {
+    if (!mounted) return;
+    setState(() => _loadingSavedContacts = true);
+
+    try {
+      final contacts = await widget.repository.listWhatsAppContacts();
+      if (!mounted) return;
+      setState(() {
+        _savedContacts = contacts;
+        _loadingSavedContacts = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      // Diam saja kalau gagal — UI tetap menampilkan kontak dari conversation.
+      setState(() => _loadingSavedContacts = false);
+    }
+  }
+
   List<_NewChatContactEntry> get _contacts {
     final existing = widget.items
         .map(_NewChatContactEntry.fromConversation)
         .where((entry) => entry.title.trim().isNotEmpty)
+        .toList();
+
+    final savedFromBackend = _savedContacts
+        .map(_NewChatContactEntry.fromWhatsAppContact)
         .toList();
 
     final deduped = <String>{};
@@ -43,17 +85,31 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
         avatarLabel: 'A',
         avatarColors: <Color>[Color(0xFF8C6DE9), Color(0xFFB07BFF)],
       ),
-      ..._customContacts,
+      // Kontak dari backend tampil duluan (yang paling relevan).
+      ...savedFromBackend,
     ];
 
+    for (final entry in merged.skip(1)) {
+      deduped.add(_dedupeKey(entry));
+    }
+
     for (final entry in existing) {
-      final key = entry.title.toLowerCase();
+      final key = _dedupeKey(entry);
       if (deduped.add(key)) {
         merged.add(entry);
       }
     }
 
     return merged;
+  }
+
+  String _dedupeKey(_NewChatContactEntry entry) {
+    // Prioritaskan dedup berdasarkan nomor (kalau ada), fallback ke nama.
+    final phone = entry.subtitle.trim();
+    if (phone.isNotEmpty && phone.startsWith('+')) {
+      return phone.toLowerCase();
+    }
+    return entry.title.toLowerCase();
   }
 
   List<_NewChatContactEntry> get _filteredContacts {
@@ -80,41 +136,93 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
       return;
     }
 
-    setState(() {
-      _customContacts.insert(
-        0,
-        _NewChatContactEntry(
-          title: createdContact.fullName,
-          subtitle: createdContact.phone,
-          avatarLabel: _contactInitial(createdContact.fullName),
-          avatarColors: _avatarColorsFor(createdContact.fullName),
+    // ─── Loading dialog ────────────────────────────────────────────────
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: SizedBox(
+          width: 56,
+          height: 56,
+          child: CircularProgressIndicator(strokeWidth: 3),
         ),
-      );
-    });
+      ),
+    );
 
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(content: Text('Kontak ${createdContact.fullName} disimpan.')),
+    // ─── POST ke backend ───────────────────────────────────────────────
+    try {
+      final result = await widget.repository.createWhatsAppContact(
+        firstName: createdContact.firstName,
+        lastName: createdContact.lastName,
+        phone: createdContact.phone,
+        email: createdContact.email,
+        countryCode: createdContact.countryCode,
+        syncToDevice: createdContact.syncToDevice,
       );
-  }
 
-  void _selectConversation(_NewChatContactEntry entry) {
-    if (entry.conversationId == null) {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop(); // dismiss loading
+
+      // Snackbar konfirmasi
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'Kontak baru tersimpan. Mulai chat backend belum tersedia.',
+              result.notice.isNotEmpty
+                  ? result.notice
+                  : 'Kontak ${createdContact.fullName} berhasil disimpan.',
             ),
+            duration: const Duration(seconds: 2),
           ),
         );
+
+      // Refresh list kontak tersimpan dari backend
+      unawaited(_loadSavedContacts());
+
+      // Beri tahu dashboard untuk refresh conversation list
+      widget.onContactSaved?.call();
+
+      // ─── Auto-navigate ke chat baru ──────────────────────────────────
+      if (result.conversationId > 0) {
+        widget.onConversationSelected(result.conversationId);
+        if (mounted) Navigator.of(context).pop();
+      }
+    } catch (error) {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop(); // dismiss loading
+
+      final message = error.toString().replaceFirst('Exception: ', '');
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('Gagal menyimpan kontak: $message'),
+            backgroundColor: Colors.red.shade700,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+    }
+  }
+
+  void _selectConversation(_NewChatContactEntry entry) {
+    if (entry.conversationId != null) {
+      widget.onConversationSelected(entry.conversationId!);
+      Navigator.of(context).pop();
       return;
     }
 
-    widget.onConversationSelected(entry.conversationId!);
-    Navigator.of(context).pop();
+    // Kontak yang belum punya conversation ID — seharusnya tidak terjadi
+    // karena backend selalu membuat conversation saat menyimpan kontak.
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Kontak ini belum memiliki sesi chat. Coba simpan ulang dari menu Kontak baru.',
+          ),
+        ),
+      );
   }
 
   void _showComingSoon(String feature) {
@@ -132,7 +240,7 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
         child: Column(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.fromLTRB(4, 6, 4, 0),
+              padding: const EdgeInsets.fromLTRB(4, 6, 4, 0),
               child: Row(
                 children: <Widget>[
                   IconButton(
@@ -161,7 +269,7 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(16, 8, 16, 14),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
               child: Container(
                 decoration: BoxDecoration(
                   color: AppColors.surfaceTertiary,
@@ -170,7 +278,10 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
                 child: TextField(
                   controller: _searchController,
                   onChanged: (_) => setState(() {}),
-                  style: TextStyle(fontSize: 17, color: AppColors.neutral800),
+                  style: const TextStyle(
+                    fontSize: 17,
+                    color: AppColors.neutral800,
+                  ),
                   decoration: const InputDecoration(
                     hintText: 'Cari nama atau nomor',
                     hintStyle: TextStyle(
@@ -212,23 +323,32 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
               subtitle: 'Satukan grup berdasarkan topik',
               onTap: () => _showComingSoon('Komunitas baru'),
             ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Daftar kontak di WhatsApp',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.neutral400,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Row(
+                children: <Widget>[
+                  const Expanded(
+                    child: Text(
+                      'Daftar kontak di WhatsApp',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.neutral400,
+                      ),
+                    ),
                   ),
-                ),
+                  if (_loadingSavedContacts)
+                    const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                ],
               ),
             ),
             Expanded(
               child: ListView.builder(
-                padding: EdgeInsets.only(bottom: 18),
+                padding: const EdgeInsets.only(bottom: 18),
                 itemCount: _filteredContacts.length,
                 itemBuilder: (context, index) {
                   final entry = _filteredContacts[index];
@@ -312,9 +432,9 @@ class _OmnichannelCreateContactPageState
   void _save() {
     final firstName = _firstNameController.text.trim();
     final lastName = _lastNameController.text.trim();
-    final phone = _phoneController.text.trim();
+    final phoneInput = _phoneController.text.trim();
 
-    if (firstName.isEmpty || phone.isEmpty) {
+    if (firstName.isEmpty || phoneInput.isEmpty) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
@@ -325,11 +445,24 @@ class _OmnichannelCreateContactPageState
       return;
     }
 
+    // Normalisasi nomor telepon ke format internasional.
+    // Backend akan re-validate via PhoneNumberService::toE164().
+    String normalizedPhone = phoneInput;
+    if (!normalizedPhone.startsWith('+')) {
+      // Hilangkan leading 0 (format lokal Indonesia) lalu prepend +62
+      final digits = normalizedPhone.replaceAll(RegExp(r'\D'), '');
+      final stripped = digits.startsWith('0') ? digits.substring(1) : digits;
+      normalizedPhone = '+62$stripped';
+    }
+
     Navigator.of(context).pop(
       _CreatedContactDraft(
         firstName: firstName,
         lastName: lastName,
-        phone: phone.startsWith('+62') ? phone : '+62 $phone',
+        phone: normalizedPhone,
+        email: null,
+        countryCode: '+62',
+        syncToDevice: _syncToPhone,
       ),
     );
   }
@@ -343,7 +476,7 @@ class _OmnichannelCreateContactPageState
         child: Column(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.fromLTRB(4, 6, 4, 0),
+              padding: const EdgeInsets.fromLTRB(4, 6, 4, 0),
               child: Row(
                 children: <Widget>[
                   IconButton(
@@ -373,7 +506,7 @@ class _OmnichannelCreateContactPageState
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(16, 20, 16, 24),
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
                 child: Column(
                   children: <Widget>[
                     _CreateContactInputRow(
@@ -456,7 +589,7 @@ class _OmnichannelCreateContactPageState
                     if (_syncToPhone) ...<Widget>[
                       const SizedBox(height: 18),
                       Padding(
-                        padding: EdgeInsets.only(left: 40),
+                        padding: const EdgeInsets.only(left: 40),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
@@ -472,8 +605,8 @@ class _OmnichannelCreateContactPageState
                               onTap: _pickAccount,
                               child: Container(
                                 width: double.infinity,
-                                padding: EdgeInsets.only(bottom: 8),
-                                decoration: BoxDecoration(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                decoration: const BoxDecoration(
                                   border: Border(
                                     bottom: BorderSide(
                                       color: AppColors.borderDefault,
@@ -485,7 +618,7 @@ class _OmnichannelCreateContactPageState
                                     Expanded(
                                       child: Text(
                                         _selectedAccount,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           color: AppColors.neutral800,
                                         ),
@@ -510,7 +643,7 @@ class _OmnichannelCreateContactPageState
             SafeArea(
               top: false,
               child: Padding(
-                padding: EdgeInsets.fromLTRB(16, 0, 16, 18),
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
                 child: SizedBox(
                   width: double.infinity,
                   child: FilledButton(
@@ -518,7 +651,7 @@ class _OmnichannelCreateContactPageState
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: AppColors.white,
-                      padding: EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: AppRadii.borderRadiusXxxl,
                       ),
@@ -590,18 +723,21 @@ class _OutlinedField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
-      style: TextStyle(fontSize: 16, color: AppColors.neutral800),
+      style: const TextStyle(fontSize: 16, color: AppColors.neutral800),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(fontSize: 16, color: AppColors.neutral400),
-        contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 15),
+        hintStyle: const TextStyle(fontSize: 16, color: AppColors.neutral400),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 15,
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: AppColors.borderDefault),
+          borderSide: const BorderSide(color: AppColors.borderDefault),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: AppColors.primary, width: 1.4),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.4),
         ),
       ),
     );
@@ -620,7 +756,7 @@ class _CountryCodeField extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: EdgeInsets.fromLTRB(12, 6, 12, 10),
+        padding: const EdgeInsets.fromLTRB(12, 6, 12, 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: AppColors.borderDefault),
@@ -638,7 +774,10 @@ class _CountryCodeField extends StatelessWidget {
                 Expanded(
                   child: Text(
                     value,
-                    style: TextStyle(fontSize: 16, color: AppColors.neutral800),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: AppColors.neutral800,
+                    ),
                   ),
                 ),
                 const Icon(
@@ -674,13 +813,13 @@ class _NewChatActionTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         child: Row(
           children: <Widget>[
             Container(
               width: 38,
               height: 38,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.primary,
                 shape: BoxShape.circle,
               ),
@@ -693,7 +832,7 @@ class _NewChatActionTile extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
                       color: AppColors.neutral800,
@@ -702,7 +841,7 @@ class _NewChatActionTile extends StatelessWidget {
                   if (subtitle != null)
                     Text(
                       subtitle!,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         color: AppColors.neutral400,
                       ),
@@ -729,7 +868,7 @@ class _NewChatContactTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(16, 10, 16, 10),
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
         child: Row(
           children: <Widget>[
             Container(
@@ -746,7 +885,7 @@ class _NewChatContactTile extends StatelessWidget {
               alignment: Alignment.center,
               child: Text(
                 entry.avatarLabel,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: AppColors.surfacePrimary,
@@ -762,7 +901,7 @@ class _NewChatContactTile extends StatelessWidget {
                     entry.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w500,
                       color: AppColors.neutral800,
@@ -773,7 +912,10 @@ class _NewChatContactTile extends StatelessWidget {
                     entry.subtitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 14, color: AppColors.neutral400),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: AppColors.neutral400,
+                    ),
                   ),
                 ],
               ),
@@ -799,11 +941,17 @@ class _CreatedContactDraft {
     required this.firstName,
     required this.lastName,
     required this.phone,
+    required this.email,
+    required this.countryCode,
+    required this.syncToDevice,
   });
 
   final String firstName;
   final String lastName;
   final String phone;
+  final String? email;
+  final String countryCode;
+  final bool syncToDevice;
 
   String get fullName {
     final parts = <String>[
@@ -836,6 +984,18 @@ class _NewChatContactEntry {
       avatarLabel: _contactInitial(name.isEmpty ? item.title : name),
       avatarColors: _avatarColorsFor(name.isEmpty ? item.title : name),
       conversationId: item.id,
+    );
+  }
+
+  /// Konversi dari WhatsAppContactModel (kontak tersimpan dari backend).
+  factory _NewChatContactEntry.fromWhatsAppContact(WhatsAppContactModel c) {
+    final name = c.displayName.trim();
+    return _NewChatContactEntry(
+      title: name.isEmpty ? c.firstName : name,
+      subtitle: c.phoneE164,
+      avatarLabel: c.initial,
+      avatarColors: c.avatarColors,
+      conversationId: c.conversationId,
     );
   }
 

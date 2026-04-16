@@ -14,6 +14,7 @@ import '../models/omnichannel_shell_snapshot_model.dart';
 import '../models/omnichannel_status_update_model.dart';
 import '../models/omnichannel_thread_model.dart';
 import '../models/omnichannel_workspace_model.dart';
+import '../models/whatsapp_contact_model.dart';
 import '../services/omnichannel_api_service.dart';
 
 class OmnichannelRepository {
@@ -387,6 +388,56 @@ class OmnichannelRepository {
     }
 
     return 'Lokasi berhasil diproses.';
+  }
+
+  // ─── WhatsApp Contacts (address book) ────────────────────────────────
+
+  /// Buat kontak WhatsApp baru di backend.
+  /// Backend akan otomatis menyiapkan customer & conversation placeholder
+  /// sehingga admin bisa langsung mulai chat di UI.
+  Future<WhatsAppContactCreateResult> createWhatsAppContact({
+    required String firstName,
+    required String lastName,
+    required String phone,
+    String? email,
+    String? countryCode,
+    bool syncToDevice = true,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.createWhatsAppContact(
+        accessToken: accessToken,
+        firstName: firstName,
+        lastName: lastName,
+        phone: phone,
+        email: email,
+        countryCode: countryCode,
+        syncToDevice: syncToDevice,
+      ),
+    );
+
+    return WhatsAppContactCreateResult.fromJson(payload);
+  }
+
+  /// Ambil daftar kontak WhatsApp tersimpan.
+  Future<List<WhatsAppContactModel>> listWhatsAppContacts() async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.fetchWhatsAppContacts(accessToken: accessToken),
+    );
+
+    final data = _asStringMap(payload['data']);
+    final raw = data['contacts'];
+    if (raw is! List) {
+      return const <WhatsAppContactModel>[];
+    }
+
+    return raw
+        .whereType<Map>()
+        .map((e) => WhatsAppContactModel.fromJson(
+              e.map((k, v) => MapEntry(k.toString(), v)),
+            ))
+        .toList();
   }
 
   Future<String> turnBotOn({required int conversationId}) async {

@@ -15,6 +15,26 @@ import '../../data/models/omnichannel_thread_model.dart';
 import '../../data/models/omnichannel_workspace_model.dart';
 import '../../data/repositories/omnichannel_repository.dart';
 
+/// Event yang dipancarkan saat ada pesan masuk baru terdeteksi via polling.
+/// Digunakan untuk memicu in-app notification di UI layer.
+class ChatNotificationEvent {
+  const ChatNotificationEvent({
+    required this.conversationId,
+    required this.senderName,
+    required this.preview,
+    required this.totalNewCount,
+    required this.affectedConversationIds,
+  });
+
+  final int conversationId;
+  final String senderName;
+  final String preview;
+  final int totalNewCount;
+  final List<int> affectedConversationIds;
+}
+
+typedef ChatNotificationListener = void Function(ChatNotificationEvent event);
+
 class OmnichannelShellController extends ChangeNotifier {
   OmnichannelShellController({
     required OmnichannelRepository repository,
@@ -47,6 +67,30 @@ class OmnichannelShellController extends ChangeNotifier {
   Timer? _listPollingTimer;
   Timer? _conversationPollingTimer;
   int _selectionVersion = 0;
+
+  // ─── Chat notification (in-app banner) ─────────────────────────────────
+  final List<ChatNotificationListener> _notificationListeners =
+      <ChatNotificationListener>[];
+
+  void addChatNotificationListener(ChatNotificationListener listener) {
+    if (!_notificationListeners.contains(listener)) {
+      _notificationListeners.add(listener);
+    }
+  }
+
+  void removeChatNotificationListener(ChatNotificationListener listener) {
+    _notificationListeners.remove(listener);
+  }
+
+  void _emitChatNotification(ChatNotificationEvent event) {
+    for (final listener in List<ChatNotificationListener>.from(
+      _notificationListeners,
+    )) {
+      try {
+        listener(event);
+      } catch (_) {}
+    }
+  }
 
   bool get isLoading => _isLoading;
   bool get isRefreshing => _isRefreshing;
@@ -317,6 +361,12 @@ class OmnichannelShellController extends ChangeNotifier {
     try {
       final currentSelectedId = selectedConversationId;
       final selectionVersion = _selectionVersion;
+
+      // Snapshot unreadCount sebelum polling untuk diff notifikasi.
+      final Map<int, int> previousUnread = <int, int>{
+        for (final item in currentList.items) item.id: item.unreadCount,
+      };
+
       final snapshot = await _repository.pollShell(
         query: _query,
         currentWorkspace: currentWorkspace,
@@ -332,6 +382,13 @@ class OmnichannelShellController extends ChangeNotifier {
       }
 
       _conversationList = snapshot.conversationList;
+
+      // Deteksi pesan masuk baru → emit event ke listener.
+      _detectAndEmitNewMessages(
+        previousUnread: previousUnread,
+        currentItems: snapshot.conversationList.items,
+        skipConversationId: currentSelectedId,
+      );
 
       final nextConversationId =
           snapshot.conversationList.selectedConversationId;
@@ -604,5 +661,62 @@ class OmnichannelShellController extends ChangeNotifier {
     }
 
     _errorMessage = text.replaceFirst('Bad state: ', '');
+  }
+
+  // ─── New-message detection helpers ─────────────────────────────────────
+
+  void _detectAndEmitNewMessages({
+    required Map<int, int> previousUnread,
+    required List<OmnichannelConversationListItemModel> currentItems,
+    required int? skipConversationId,
+  }) {
+    if (_notificationListeners.isEmpty) {
+      return;
+    }
+
+    int totalNewCount = 0;
+    final List<int> affectedIds = <int>[];
+    OmnichannelConversationListItemModel? mostRecent;
+
+    for (final item in currentItems) {
+      if (skipConversationId != null && item.id == skipConversationId) {
+        continue;
+      }
+
+      final previous = previousUnread[item.id] ?? 0;
+      final delta = item.unreadCount - previous;
+
+      if (delta > 0) {
+        totalNewCount += delta;
+        affectedIds.add(item.id);
+        if (mostRecent == null) {
+          mostRecent = item;
+        } else {
+          final mostRecentDelta =
+              item.unreadCount - (previousUnread[mostRecent.id] ?? 0);
+          if (delta > mostRecentDelta) {
+            mostRecent = item;
+          }
+        }
+      }
+    }
+
+    if (totalNewCount == 0 || mostRecent == null) {
+      return;
+    }
+
+    final senderName = (mostRecent.customerLabel?.trim().isNotEmpty == true)
+        ? mostRecent.customerLabel!.trim()
+        : mostRecent.title;
+
+    _emitChatNotification(
+      ChatNotificationEvent(
+        conversationId: mostRecent.id,
+        senderName: senderName,
+        preview: mostRecent.preview,
+        totalNewCount: totalNewCount,
+        affectedConversationIds: affectedIds,
+      ),
+    );
   }
 }

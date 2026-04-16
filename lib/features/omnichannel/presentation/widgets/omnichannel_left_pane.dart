@@ -5,6 +5,7 @@ import 'package:what_jet/core/theme/app_colors.dart';
 import 'package:what_jet/core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_conversation_list_model.dart';
 import '../../data/models/omnichannel_workspace_model.dart';
+import '../../data/repositories/omnichannel_repository.dart';
 import 'omnichannel_conversation_card.dart';
 import 'omnichannel_new_chat_page.dart';
 import 'omnichannel_surface.dart';
@@ -26,6 +27,8 @@ class OmnichannelLeftPane extends StatelessWidget {
     required this.isLoadingMore,
     required this.hasMore,
     this.useMobileInboxLayout = false,
+    this.repository,
+    this.onContactSaved,
   });
 
   final OmnichannelWorkspaceModel workspace;
@@ -43,6 +46,14 @@ class OmnichannelLeftPane extends StatelessWidget {
   final bool hasMore;
   final bool useMobileInboxLayout;
 
+  /// Optional repository, dipakai oleh halaman "Obrolan baru" untuk
+  /// menyimpan kontak baru ke backend.
+  final OmnichannelRepository? repository;
+
+  /// Callback opsional saat kontak baru berhasil disimpan, untuk
+  /// trigger refresh list di dashboard.
+  final VoidCallback? onContactSaved;
+
   @override
   Widget build(BuildContext context) {
     if (useMobileInboxLayout) {
@@ -58,6 +69,8 @@ class OmnichannelLeftPane extends StatelessWidget {
         isLoading: isLoading,
         isLoadingMore: isLoadingMore,
         hasMore: hasMore,
+        repository: repository,
+        onContactSaved: onContactSaved,
       );
     }
 
@@ -600,6 +613,8 @@ class _MobileWhatsAppInbox extends StatelessWidget {
     required this.isLoading,
     required this.isLoadingMore,
     required this.hasMore,
+    this.repository,
+    this.onContactSaved,
   });
 
   final OmnichannelWorkspaceModel workspace;
@@ -613,6 +628,8 @@ class _MobileWhatsAppInbox extends StatelessWidget {
   final bool isLoading;
   final bool isLoadingMore;
   final bool hasMore;
+  final OmnichannelRepository? repository;
+  final VoidCallback? onContactSaved;
 
   @override
   Widget build(BuildContext context) {
@@ -837,11 +854,27 @@ class _MobileWhatsAppInbox extends StatelessWidget {
               delay: AppDurations.slow,
               child: AppPressable(
                 onTap: () {
+                  final repo = repository;
+                  if (repo == null) {
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Repository belum tersedia. Mohon tunggu sesaat.',
+                          ),
+                        ),
+                      );
+                    return;
+                  }
+
                   Navigator.of(context).push(
                     AppPageTransitions.fadeSlideUp(
                       OmnichannelNewChatPage(
                         items: items,
                         onConversationSelected: onConversationTap,
+                        repository: repo,
+                        onContactSaved: onContactSaved,
                       ),
                     ),
                   );

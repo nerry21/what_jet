@@ -26,6 +26,7 @@ import '../../data/services/omnichannel_call_media_service.dart';
 import '../controllers/omnichannel_call_analytics_controller.dart';
 import '../controllers/omnichannel_call_controller.dart';
 import '../controllers/omnichannel_shell_controller.dart';
+import '../notifications/in_app_notification_overlay.dart';
 import '../pages/omnichannel_call_page.dart';
 import '../pages/omnichannel_call_history_page.dart';
 import '../pages/omnichannel_updates_page.dart';
@@ -118,6 +119,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       repository: widget.repository,
       adminAuthRepository: widget.adminAuthRepository,
     )..addListener(_handleControllerChanged);
+    // Daftarkan listener untuk notifikasi pesan masuk → tampilkan banner.
+    _controller.addChatNotificationListener(_handleChatNotification);
     _callMediaService = OmnichannelCallMediaService();
     _callController = OmnichannelCallController(
       repository: widget.repository,
@@ -141,6 +144,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     WidgetsBinding.instance.removeObserver(this);
 
     _controller
+      ..removeChatNotificationListener(_handleChatNotification)
       ..removeListener(_handleControllerChanged)
       ..dispose();
     _callController.removeListener(_handleCallControllerChanged);
@@ -2293,6 +2297,27 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     setState(() => _mobilePane = pane);
   }
 
+  /// Callback dari [OmnichannelShellController] saat ada pesan masuk baru
+  /// terdeteksi dari poll cycle. Menampilkan in-app notification banner
+  /// gaya WhatsApp di bagian atas layar.
+  void _handleChatNotification(ChatNotificationEvent event) {
+    if (!mounted) return;
+
+    InAppNotificationOverlay.instance.showSummary(
+      context: context,
+      newMessageCount: event.totalNewCount,
+      firstSenderName: event.senderName,
+      firstSenderPreview: event.preview,
+      onTap: () {
+        if (!mounted) return;
+        _handleConversationTap(
+          event.conversationId,
+          showConversationOnMobile: true,
+        );
+      },
+    );
+  }
+
   void _handleConversationTap(
     int conversationId, {
     required bool showConversationOnMobile,
@@ -2407,6 +2432,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 isLoading: shellLoading,
                 isLoadingMore: _controller.isLoadingMore,
                 hasMore: _controller.hasMoreConversations,
+                repository: widget.repository,
+                onContactSaved: () => unawaited(_controller.refresh()),
               ),
             ),
             SizedBox(width: gap),
@@ -2534,6 +2561,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   isLoadingMore: _controller.isLoadingMore,
                   hasMore: _controller.hasMoreConversations,
                   useMobileInboxLayout: true,
+                  repository: widget.repository,
+                  onContactSaved: () => unawaited(_controller.refresh()),
                 ),
                 _OmnichannelMobilePane.updates => OmnichannelUpdatesPage(
                   repository: widget.repository,
