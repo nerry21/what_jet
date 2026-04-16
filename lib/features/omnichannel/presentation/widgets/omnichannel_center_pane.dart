@@ -1359,6 +1359,17 @@ class _MobileConversationBubble extends StatelessWidget {
                 _ConversationDocumentCard(message: message, compact: true),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
+              if (message.hasLocation) ...<Widget>[
+                _ConversationLocationCard(
+                  message: message,
+                  maxWidth: maxWidth - 24,
+                ),
+                if (message.displayText.isNotEmpty) const SizedBox(height: 8),
+              ],
+              if (message.hasInteractive) ...<Widget>[
+                _ConversationInteractiveCard(message: message),
+                if (message.displayText.isNotEmpty) const SizedBox(height: 8),
+              ],
               if (message.displayText.isNotEmpty)
                 Text(
                   message.displayText,
@@ -1372,7 +1383,9 @@ class _MobileConversationBubble extends StatelessWidget {
                   !message.hasImage &&
                   !message.hasAudio &&
                   !message.hasVideo &&
-                  !message.hasDocument)
+                  !message.hasDocument &&
+                  !message.hasLocation &&
+                  !message.hasInteractive)
                 const Text(
                   '-',
                   style: TextStyle(
