@@ -593,7 +593,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
-    final listBottomPadding = 102.0 + bottomInset;
+    final listBottomPadding = 80.0 + bottomInset;
 
     return ColoredBox(
       color: AppColors.scaffoldBackground,
@@ -797,15 +797,14 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                       ),
               ),
 
-              // ═══ PREMIUM BOTTOM NAV ═══
-              const _PremiumBottomBar(),
+              // Bottom nav removed — using top _MobilePaneSelector only
             ],
           ),
 
           // ═══ FAB with glow ring ═══
           Positioned(
             right: 18,
-            bottom: 78 + bottomInset,
+            bottom: 18 + bottomInset,
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(18),
@@ -1130,173 +1129,6 @@ class _PremiumConversationTile extends StatelessWidget {
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PREMIUM BOTTOM BAR — Dark glass with emerald active indicator
-// ═══════════════════════════════════════════════════════════════════════════
-
-class _PremiumBottomBar extends StatelessWidget {
-  const _PremiumBottomBar({this.badgeCount});
-
-  final int? badgeCount;
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-        decoration: BoxDecoration(
-          color: AppColors.surfacePrimary,
-          border: Border(
-            top: BorderSide(color: AppColors.primary.withValues(alpha: 0.08)),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0x30000000),
-              blurRadius: 20,
-              offset: const Offset(0, -4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: _PremiumNavItem(
-                icon: Icons.chat_bubble_rounded,
-                label: 'Inbox',
-                selected: true,
-                badgeCount: badgeCount,
-              ),
-            ),
-            Expanded(
-              child: _PremiumNavItem(
-                icon: Icons.autorenew_rounded,
-                label: 'Pembaruan',
-              ),
-            ),
-            Expanded(
-              child: _PremiumNavItem(
-                icon: Icons.insights_rounded,
-                label: 'Insight',
-              ),
-            ),
-            Expanded(
-              child: _PremiumNavItem(
-                icon: Icons.call_rounded,
-                label: 'Panggilan',
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _PremiumNavItem extends StatelessWidget {
-  const _PremiumNavItem({
-    required this.icon,
-    required this.label,
-    this.selected = false,
-    this.badgeCount,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool selected;
-  final int? badgeCount;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        SizedBox(
-          width: 52,
-          height: 32,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: <Widget>[
-              Align(
-                alignment: Alignment.center,
-                child: Container(
-                  width: 48,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: selected
-                        ? AppColors.primary.withValues(alpha: 0.15)
-                        : Colors.transparent,
-                    borderRadius: AppRadii.borderRadiusLg,
-                  ),
-                  alignment: Alignment.center,
-                  child: Icon(
-                    icon,
-                    size: 22,
-                    color: selected ? AppColors.primary : AppColors.neutral400,
-                  ),
-                ),
-              ),
-              if (badgeCount != null && badgeCount! > 0)
-                Positioned(
-                  right: 2,
-                  top: -4,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [AppColors.primary, AppColors.primary700],
-                      ),
-                      borderRadius: AppRadii.borderRadiusPill,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.4),
-                          blurRadius: 6,
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      '$badgeCount',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.white,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 3),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-            color: selected ? AppColors.primary : AppColors.neutral400,
-          ),
-        ),
-        if (selected)
-          Container(
-            width: 16,
-            height: 2,
-            margin: EdgeInsets.only(top: 3),
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: AppRadii.borderRadiusPill,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.5),
-                  blurRadius: 4,
-                ),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// PREMIUM LIST SKELETON — Shimmer dark
 // ═══════════════════════════════════════════════════════════════════════════
 
 class _PremiumListSkeleton extends StatelessWidget {

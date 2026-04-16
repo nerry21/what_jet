@@ -825,12 +825,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     final readiness = _callReadiness;
     final statusText = readiness?.statusLabel ?? 'Checking...';
     final isReady = readiness?.ok == true;
-    final statusBg = isReady
-        ? AppColors.success50
-        : AppColors.error50;
-    final statusFg = isReady
-        ? AppColors.success
-        : AppColors.error;
+    final statusBg = isReady ? AppColors.success50 : AppColors.error50;
+    final statusFg = isReady ? AppColors.success : AppColors.error;
     final statusBorder = isReady
         ? AppColors.success.withValues(alpha: 0.28)
         : AppColors.error.withValues(alpha: 0.28);
@@ -914,10 +910,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       : () => unawaited(_loadCallReadiness(forceRefresh: true)),
                   borderRadius: AppRadii.borderRadiusPill,
                   child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 9,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 9),
                     decoration: BoxDecoration(
                       color: AppColors.surfaceTertiary,
                       borderRadius: AppRadii.borderRadiusPill,
@@ -1021,9 +1014,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                             decoration: BoxDecoration(
                               color: AppColors.surfaceSecondary,
                               borderRadius: AppRadii.borderRadiusPill,
-                              border: Border.all(
-                                color: AppColors.borderLight,
-                              ),
+                              border: Border.all(color: AppColors.borderLight),
                             ),
                             child: Text(
                               readiness.eligibilityCacheTtlSeconds != null
@@ -1046,9 +1037,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                             decoration: BoxDecoration(
                               color: AppColors.surfaceSecondary,
                               borderRadius: AppRadii.borderRadiusPill,
-                              border: Border.all(
-                                color: AppColors.borderLight,
-                              ),
+                              border: Border.all(color: AppColors.borderLight),
                             ),
                             child: Text(
                               'Tier: ${readiness.messagingLimitTier}',
@@ -1069,9 +1058,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                             decoration: BoxDecoration(
                               color: AppColors.surfaceSecondary,
                               borderRadius: AppRadii.borderRadiusPill,
-                              border: Border.all(
-                                color: AppColors.borderLight,
-                              ),
+                              border: Border.all(color: AppColors.borderLight),
                             ),
                             child: Text(
                               'Quality: ${readiness.qualityRating}',
@@ -1152,7 +1139,9 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       decoration: BoxDecoration(
                         color: AppColors.warning50,
                         borderRadius: AppRadii.borderRadiusLg,
-                        border: Border.all(color: AppColors.warning.withValues(alpha: 0.28)),
+                        border: Border.all(
+                          color: AppColors.warning.withValues(alpha: 0.28),
+                        ),
                       ),
                       child: Text(
                         'Konfigurasi yang masih kurang: ${readiness.missing.join(', ')}',
@@ -1270,7 +1259,9 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                         : () => unawaited(_clearCallEligibilityCacheNow()),
                     style: OutlinedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 13),
-                      side: BorderSide(color: AppColors.error.withValues(alpha: 0.18)),
+                      side: BorderSide(
+                        color: AppColors.error.withValues(alpha: 0.18),
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: AppRadii.borderRadiusLg,
                       ),
@@ -1434,10 +1425,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   ],
                 ),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 9,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 9),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -2502,7 +2490,10 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
               );
 
               if (isMobileShell) {
-                return ColoredBox(color: AppColors.surfaceSecondary, child: errorBody);
+                return ColoredBox(
+                  color: AppColors.surfaceSecondary,
+                  child: errorBody,
+                );
               }
 
               return Container(
@@ -2589,7 +2580,10 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
             );
 
             if (isMobileShell) {
-              return ColoredBox(color: AppColors.surfaceSecondary, child: layeredShellBody);
+              return ColoredBox(
+                color: AppColors.surfaceSecondary,
+                child: layeredShellBody,
+              );
             }
 
             return Container(
@@ -2626,15 +2620,16 @@ class _MobilePaneSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.symmetric(horizontal: 12),
       padding: EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondary,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.06)),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.neutral800.withValues(alpha: 0.03),
-            blurRadius: 12,
+            color: const Color(0x20000000),
+            blurRadius: 16,
             offset: const Offset(0, 4),
           ),
         ],
@@ -2644,14 +2639,14 @@ class _MobilePaneSelector extends StatelessWidget {
           Expanded(
             child: _MobilePaneButton(
               label: 'Inbox',
-              icon: Icons.inbox_outlined,
+              icon: Icons.chat_bubble_rounded,
               selected: selectedPane == _OmnichannelMobilePane.inbox,
               onTap: () => onPaneSelected(_OmnichannelMobilePane.inbox),
             ),
           ),
           Expanded(
             child: _MobilePaneButton(
-              label: 'Pembaharuan',
+              label: 'Pembaruan',
               icon: Icons.autorenew_rounded,
               selected: selectedPane == _OmnichannelMobilePane.updates,
               onTap: () => onPaneSelected(_OmnichannelMobilePane.updates),
@@ -2660,7 +2655,7 @@ class _MobilePaneSelector extends StatelessWidget {
           Expanded(
             child: _MobilePaneButton(
               label: 'Chat',
-              icon: Icons.forum_outlined,
+              icon: Icons.forum_rounded,
               selected: selectedPane == _OmnichannelMobilePane.conversation,
               onTap: () => onPaneSelected(_OmnichannelMobilePane.conversation),
             ),
@@ -2668,7 +2663,7 @@ class _MobilePaneSelector extends StatelessWidget {
           Expanded(
             child: _MobilePaneButton(
               label: 'Insight',
-              icon: Icons.insights_outlined,
+              icon: Icons.insights_rounded,
               selected: selectedPane == _OmnichannelMobilePane.insight,
               onTap: () => onPaneSelected(_OmnichannelMobilePane.insight),
             ),
@@ -2694,41 +2689,52 @@ class _MobilePaneButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: AppRadii.borderRadiusMd,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          curve: Curves.easeOutCubic,
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-          decoration: BoxDecoration(
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        decoration: BoxDecoration(
+          color: selected
+              ? AppColors.primary.withValues(alpha: 0.15)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
             color: selected
-                ? AppColors.primary.withValues(alpha: 0.12)
+                ? AppColors.primary.withValues(alpha: 0.20)
                 : Colors.transparent,
-            borderRadius: AppRadii.borderRadiusMd,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(
-                icon,
-                size: 18,
-                color: selected ? AppColors.primary : AppColors.neutral500,
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.12),
+                    blurRadius: 8,
+                  ),
+                ]
+              : null,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(
+              icon,
+              size: 20,
+              color: selected ? AppColors.primary : AppColors.neutral400,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                color: selected ? AppColors.primary : AppColors.neutral400,
               ),
-              const SizedBox(height: 6),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: selected ? AppColors.primary : AppColors.neutral500,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
