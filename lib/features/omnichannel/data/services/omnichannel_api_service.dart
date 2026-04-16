@@ -219,6 +219,56 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> sendAdminDocumentReply({
+    required String accessToken,
+    required int conversationId,
+    required List<int> fileBytes,
+    required String fileName,
+    String? caption,
+    String? mimeType,
+  }) {
+    final fields = <String, Object?>{
+      'message_type': 'document',
+      'caption': _normalizedNullableText(caption),
+      'mime_type': _normalizedNullableText(mimeType),
+    };
+
+    return _apiClient.postMultipart(
+      ApiEndpoints.adminConversationReply(conversationId),
+      headers: _headers(accessToken),
+      fields: fields,
+      files: <ApiMultipartFile>[
+        ApiMultipartFile(
+          field: 'document_file',
+          bytes: fileBytes,
+          filename: fileName,
+          contentType: mimeType,
+        ),
+      ],
+    );
+  }
+
+  Future<Map<String, dynamic>> sendAdminLocationReply({
+    required String accessToken,
+    required int conversationId,
+    required double latitude,
+    required double longitude,
+    String? locationName,
+    String? locationAddress,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationReply(conversationId),
+      headers: _headers(accessToken),
+      body: <String, Object?>{
+        'message_type': 'location',
+        'latitude': latitude,
+        'longitude': longitude,
+        'location_name': _normalizedNullableText(locationName),
+        'location_address': _normalizedNullableText(locationAddress),
+      },
+    );
+  }
+
   Future<Map<String, dynamic>> sendAdminContact({
     required String accessToken,
     required int conversationId,

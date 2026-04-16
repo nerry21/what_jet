@@ -36,6 +36,8 @@ class OmnichannelCenterPane extends StatefulWidget {
     required this.onSendGalleryImage,
     required this.onSendCameraImage,
     required this.onSendContact,
+    required this.onSendDocument,
+    required this.onSendLocation,
     required this.onSendVoiceNote,
     required this.onCancelVoiceNote,
     required this.isRecordingVoiceNote,
@@ -74,6 +76,14 @@ class OmnichannelCenterPane extends StatefulWidget {
     String? company,
   })
   onSendContact;
+  final Future<bool> Function(String? caption) onSendDocument;
+  final Future<bool> Function({
+    required double latitude,
+    required double longitude,
+    String? locationName,
+    String? locationAddress,
+  })
+  onSendLocation;
   final Future<bool> Function() onSendVoiceNote;
   final Future<bool> Function() onCancelVoiceNote;
   final bool isRecordingVoiceNote;
@@ -394,12 +404,118 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
     );
   }
 
-  void _showComingSoon(String feature) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(content: Text('$feature belum diaktifkan di backend.')),
-      );
+  Future<void> _handleDocumentAttachment() async {
+    final caption = _composerController.text.trim();
+    final success = await widget.onSendDocument(
+      caption.isEmpty ? null : caption,
+    );
+
+    if (success && mounted) {
+      await _finalizeSuccessfulComposerSend();
+    }
+  }
+
+  Future<void> _handleAudioFileAttachment() async {
+    // Audio from the attachment tray is sent as a document (it keeps the
+    // original filename and MIME type, while the mic button beside the
+    // composer is still used to record and send voice notes).
+    final caption = _composerController.text.trim();
+    final success = await widget.onSendDocument(
+      caption.isEmpty ? null : caption,
+    );
+
+    if (success && mounted) {
+      await _finalizeSuccessfulComposerSend();
+    }
+  }
+
+  Future<void> _handlePollAttachment() async {
+    if (widget.conversation == null || widget.isSendingReply) {
+      return;
+    }
+
+    final poll = await showDialog<_PollDraftResult>(
+      context: context,
+      builder: (context) => const _SendPollDialog(),
+    );
+
+    if (poll == null || !mounted) {
+      return;
+    }
+
+    final buffer = StringBuffer('📊 *${poll.question}*\n\n');
+    for (var i = 0; i < poll.options.length; i++) {
+      buffer.writeln('${i + 1}. ${poll.options[i]}');
+    }
+    buffer.writeln(
+      '\nBalas dengan angka (1-${poll.options.length}) untuk memilih.',
+    );
+
+    final success = await widget.onSendReply(buffer.toString().trim());
+    if (success && mounted) {
+      await _finalizeSuccessfulComposerSend();
+    }
+  }
+
+  Future<void> _handleEventAttachment() async {
+    if (widget.conversation == null || widget.isSendingReply) {
+      return;
+    }
+
+    final event = await showDialog<_EventDraftResult>(
+      context: context,
+      builder: (context) => const _SendEventDialog(),
+    );
+
+    if (event == null || !mounted) {
+      return;
+    }
+
+    final buffer = StringBuffer('📅 *${event.title}*\n\n');
+    if (event.location.isNotEmpty) {
+      buffer.writeln('📍 ${event.location}');
+    }
+    buffer.writeln('🗓️ ${event.formattedDate()}');
+    if (event.description.isNotEmpty) {
+      buffer.writeln('\n${event.description}');
+    }
+
+    final success = await widget.onSendReply(buffer.toString().trim());
+    if (success && mounted) {
+      await _finalizeSuccessfulComposerSend();
+    }
+  }
+
+  Future<void> _handleLocationAttachment() async {
+    if (widget.conversation == null || widget.isSendingReply) {
+      return;
+    }
+
+    await _openLocationDialog();
+  }
+
+  Future<void> _openLocationDialog() async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) {
+        return const _SendLocationDialog();
+      },
+    );
+
+    if (result == null || !mounted) {
+      return;
+    }
+
+    final success = await widget.onSendLocation(
+      latitude: result['latitude'] as double,
+      longitude: result['longitude'] as double,
+      locationName: result['name'] as String?,
+      locationAddress: result['address'] as String?,
+    );
+
+    if (success && mounted) {
+      await _finalizeSuccessfulComposerSend();
+    }
   }
 
   Future<void> _openAttachmentSheet() async {
@@ -413,12 +529,12 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
       context: context,
       onGalleryTap: _handleGalleryAttachment,
       onCameraTap: _handleCameraAttachment,
-      onLocationTap: () async => _showComingSoon('Lokasi'),
+      onLocationTap: _handleLocationAttachment,
       onContactTap: _openSendContactDialog,
-      onDocumentTap: () async => _showComingSoon('Dokumen'),
-      onAudioTap: () async => _showComingSoon('Audio'),
-      onPollTap: () async => _showComingSoon('Polling'),
-      onEventTap: () async => _showComingSoon('Acara'),
+      onDocumentTap: _handleDocumentAttachment,
+      onAudioTap: _handleAudioFileAttachment,
+      onPollTap: _handlePollAttachment,
+      onEventTap: _handleEventAttachment,
     );
   }
 
@@ -3625,6 +3741,160 @@ class _DialogField extends StatelessWidget {
   }
 }
 
+class _SendLocationDialog extends StatefulWidget {
+  const _SendLocationDialog();
+
+  @override
+  State<_SendLocationDialog> createState() => _SendLocationDialogState();
+}
+
+class _SendLocationDialogState extends State<_SendLocationDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _latController = TextEditingController();
+  final _lngController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _addressController = TextEditingController();
+
+  @override
+  void dispose() {
+    _latController.dispose();
+    _lngController.dispose();
+    _nameController.dispose();
+    _addressController.dispose();
+    super.dispose();
+  }
+
+  void _handleSubmit() {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    final lat = double.tryParse(_latController.text.trim());
+    final lng = double.tryParse(_lngController.text.trim());
+
+    if (lat == null || lng == null) {
+      return;
+    }
+
+    final name = _nameController.text.trim();
+    final address = _addressController.text.trim();
+
+    Navigator.of(context).pop(<String, dynamic>{
+      'latitude': lat,
+      'longitude': lng,
+      'name': name.isNotEmpty ? name : null,
+      'address': address.isNotEmpty ? address : null,
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: AppRadii.borderRadiusXxl),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.location_on_rounded,
+                      color: const Color(0xFF22B07D),
+                      size: 28,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Kirim Lokasi',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.neutral800,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                _DialogField(
+                  controller: _latController,
+                  label: 'Latitude',
+                  hintText: 'Contoh: -0.5071',
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  validator: (value) {
+                    final text = value?.trim() ?? '';
+                    if (text.isEmpty) {
+                      return 'Latitude wajib diisi.';
+                    }
+                    final parsed = double.tryParse(text);
+                    if (parsed == null || parsed < -90 || parsed > 90) {
+                      return 'Latitude harus antara -90 dan 90.';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                _DialogField(
+                  controller: _lngController,
+                  label: 'Longitude',
+                  hintText: 'Contoh: 100.5478',
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  validator: (value) {
+                    final text = value?.trim() ?? '';
+                    if (text.isEmpty) {
+                      return 'Longitude wajib diisi.';
+                    }
+                    final parsed = double.tryParse(text);
+                    if (parsed == null || parsed < -180 || parsed > 180) {
+                      return 'Longitude harus antara -180 dan 180.';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                _DialogField(
+                  controller: _nameController,
+                  label: 'Nama Lokasi',
+                  hintText: 'Opsional, contoh: Kantor NCP',
+                ),
+                const SizedBox(height: 12),
+                _DialogField(
+                  controller: _addressController,
+                  label: 'Alamat',
+                  hintText: 'Opsional',
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Batal'),
+                    ),
+                    const SizedBox(width: 8),
+                    FilledButton.icon(
+                      onPressed: _handleSubmit,
+                      icon: const Icon(Icons.send_rounded),
+                      label: const Text('Kirim Lokasi'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _CenterPaneSkeleton extends StatelessWidget {
   const _CenterPaneSkeleton();
 
@@ -3701,6 +3971,481 @@ class _CenterPaneSkeleton extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PollDraftResult {
+  const _PollDraftResult({required this.question, required this.options});
+
+  final String question;
+  final List<String> options;
+}
+
+class _SendPollDialog extends StatefulWidget {
+  const _SendPollDialog();
+
+  @override
+  State<_SendPollDialog> createState() => _SendPollDialogState();
+}
+
+class _SendPollDialogState extends State<_SendPollDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _questionController = TextEditingController();
+  final List<TextEditingController> _optionControllers =
+      <TextEditingController>[TextEditingController(), TextEditingController()];
+
+  @override
+  void dispose() {
+    _questionController.dispose();
+    for (final controller in _optionControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  void _addOption() {
+    if (_optionControllers.length >= 10) {
+      return;
+    }
+    setState(() {
+      _optionControllers.add(TextEditingController());
+    });
+  }
+
+  void _removeOption(int index) {
+    if (_optionControllers.length <= 2) {
+      return;
+    }
+    setState(() {
+      _optionControllers[index].dispose();
+      _optionControllers.removeAt(index);
+    });
+  }
+
+  void _handleSubmit() {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    final question = _questionController.text.trim();
+    final options = _optionControllers
+        .map((c) => c.text.trim())
+        .where((text) => text.isNotEmpty)
+        .toList(growable: false);
+
+    if (options.length < 2) {
+      return;
+    }
+
+    Navigator.of(
+      context,
+    ).pop(_PollDraftResult(question: question, options: options));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: AppRadii.borderRadiusXxl),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 480),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Icon(
+                        Icons.poll_rounded,
+                        color: const Color(0xFFF2B300),
+                        size: 28,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Buat Polling',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.neutral800,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  _DialogField(
+                    controller: _questionController,
+                    label: 'Pertanyaan',
+                    hintText: 'Contoh: Kapan jadwal paling cocok?',
+                    validator: (value) {
+                      final text = value?.trim() ?? '';
+                      if (text.isEmpty) {
+                        return 'Pertanyaan polling wajib diisi.';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Pilihan Jawaban',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.neutral500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  for (var i = 0; i < _optionControllers.length; i++)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Expanded(
+                            child: TextFormField(
+                              controller: _optionControllers[i],
+                              validator: (value) {
+                                if (i < 2) {
+                                  final text = value?.trim() ?? '';
+                                  if (text.isEmpty) {
+                                    return 'Pilihan ${i + 1} wajib diisi.';
+                                  }
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Opsi ${i + 1}',
+                                filled: true,
+                                fillColor: AppColors.scaffoldBackground,
+                                border: OutlineInputBorder(
+                                  borderRadius: AppRadii.borderRadiusLg,
+                                  borderSide: BorderSide(
+                                    color: AppColors.borderLight,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: AppRadii.borderRadiusLg,
+                                  borderSide: BorderSide(
+                                    color: AppColors.borderLight,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: AppRadii.borderRadiusLg,
+                                  borderSide: BorderSide(
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (_optionControllers.length > 2)
+                            IconButton(
+                              icon: const Icon(
+                                Icons.remove_circle_outline_rounded,
+                              ),
+                              color: AppColors.neutral500,
+                              onPressed: () => _removeOption(i),
+                            ),
+                        ],
+                      ),
+                    ),
+                  if (_optionControllers.length < 10)
+                    TextButton.icon(
+                      onPressed: _addOption,
+                      icon: const Icon(Icons.add_circle_outline_rounded),
+                      label: const Text('Tambah Opsi'),
+                    ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Batal'),
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton.icon(
+                        onPressed: _handleSubmit,
+                        icon: const Icon(Icons.send_rounded),
+                        label: const Text('Kirim Polling'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EventDraftResult {
+  const _EventDraftResult({
+    required this.title,
+    required this.location,
+    required this.date,
+    required this.description,
+  });
+
+  final String title;
+  final String location;
+  final DateTime date;
+  final String description;
+
+  String formattedDate() {
+    const months = <String>[
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    final day = date.day.toString().padLeft(2, '0');
+    final month = months[date.month - 1];
+    final year = date.year;
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
+    return '$day $month $year, $hour:$minute WIB';
+  }
+}
+
+class _SendEventDialog extends StatefulWidget {
+  const _SendEventDialog();
+
+  @override
+  State<_SendEventDialog> createState() => _SendEventDialogState();
+}
+
+class _SendEventDialogState extends State<_SendEventDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _titleController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  DateTime? _selectedDateTime;
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _locationController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickDateTime() async {
+    final now = DateTime.now();
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _selectedDateTime ?? now.add(const Duration(days: 1)),
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 365 * 3)),
+    );
+
+    if (date == null || !mounted) {
+      return;
+    }
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(
+        _selectedDateTime ?? now.add(const Duration(hours: 1)),
+      ),
+    );
+
+    if (time == null) {
+      return;
+    }
+
+    setState(() {
+      _selectedDateTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute,
+      );
+    });
+  }
+
+  void _handleSubmit() {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (_selectedDateTime == null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('Tanggal & waktu acara wajib dipilih.')),
+        );
+      return;
+    }
+
+    Navigator.of(context).pop(
+      _EventDraftResult(
+        title: _titleController.text.trim(),
+        location: _locationController.text.trim(),
+        date: _selectedDateTime!,
+        description: _descriptionController.text.trim(),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final dateLabel = _selectedDateTime == null
+        ? 'Pilih tanggal & waktu'
+        : _EventDraftResult(
+            title: '',
+            location: '',
+            date: _selectedDateTime!,
+            description: '',
+          ).formattedDate();
+
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: AppRadii.borderRadiusXxl),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 480),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Icon(
+                        Icons.event_rounded,
+                        color: const Color(0xFFFF3B8D),
+                        size: 28,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Buat Acara',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.neutral800,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  _DialogField(
+                    controller: _titleController,
+                    label: 'Judul Acara',
+                    hintText: 'Contoh: Rapat Koordinasi Tim',
+                    validator: (value) {
+                      final text = value?.trim() ?? '';
+                      if (text.isEmpty) {
+                        return 'Judul acara wajib diisi.';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  _DialogField(
+                    controller: _locationController,
+                    label: 'Lokasi',
+                    hintText: 'Opsional, contoh: Kantor NCP Lt. 3',
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Tanggal & Waktu',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.neutral500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  InkWell(
+                    onTap: _pickDateTime,
+                    borderRadius: AppRadii.borderRadiusLg,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 14,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.scaffoldBackground,
+                        borderRadius: AppRadii.borderRadiusLg,
+                        border: Border.all(color: AppColors.borderLight),
+                      ),
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            Icons.calendar_today_rounded,
+                            size: 18,
+                            color: AppColors.neutral500,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              dateLabel,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: _selectedDateTime == null
+                                    ? AppColors.neutral300
+                                    : AppColors.neutral800,
+                              ),
+                            ),
+                          ),
+                          Icon(
+                            Icons.arrow_drop_down_rounded,
+                            color: AppColors.neutral500,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _DialogField(
+                    controller: _descriptionController,
+                    label: 'Deskripsi',
+                    hintText: 'Opsional',
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Batal'),
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton.icon(
+                        onPressed: _handleSubmit,
+                        icon: const Icon(Icons.send_rounded),
+                        label: const Text('Kirim Acara'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

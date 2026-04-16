@@ -6,8 +6,6 @@
 // All components use design tokens and include micro-animations.
 // ============================================================================
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import 'app_animations.dart';

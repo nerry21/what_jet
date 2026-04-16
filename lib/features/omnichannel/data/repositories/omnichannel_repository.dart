@@ -321,6 +321,60 @@ class OmnichannelRepository {
     return 'Voice note admin berhasil diproses.';
   }
 
+  Future<String> sendAdminDocumentReply({
+    required int conversationId,
+    required List<int> fileBytes,
+    required String fileName,
+    String? caption,
+    String? mimeType,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.sendAdminDocumentReply(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        fileBytes: fileBytes,
+        fileName: fileName,
+        caption: caption,
+        mimeType: mimeType,
+      ),
+    );
+
+    final notice = payload['notice']?.toString().trim();
+    if (notice != null && notice.isNotEmpty) {
+      return notice;
+    }
+
+    return 'Dokumen admin berhasil diproses.';
+  }
+
+  Future<String> sendAdminLocationReply({
+    required int conversationId,
+    required double latitude,
+    required double longitude,
+    String? locationName,
+    String? locationAddress,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.sendAdminLocationReply(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        latitude: latitude,
+        longitude: longitude,
+        locationName: locationName,
+        locationAddress: locationAddress,
+      ),
+    );
+
+    final notice = payload['notice']?.toString().trim();
+    if (notice != null && notice.isNotEmpty) {
+      return notice;
+    }
+
+    return 'Lokasi berhasil diproses.';
+  }
+
   Future<String> turnBotOn({required int conversationId}) async {
     final accessToken = await _ensureAdminSession();
     final payload = await _readWithRetry(

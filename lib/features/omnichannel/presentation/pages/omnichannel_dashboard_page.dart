@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:record/record.dart';
 
@@ -2062,6 +2063,167 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     return '$baseName.$fallbackExtension';
   }
 
+  Future<bool> _sendAdminDocument(String? caption) async {
+    final conversation = _controller.selectedConversation;
+    final conversationId = conversation?.id;
+
+    if (conversationId == null || conversationId <= 0) {
+      _showSnackBar('Conversation belum dipilih.');
+      return false;
+    }
+
+    if (conversation?.channel != 'whatsapp') {
+      _showSnackBar(
+        'Dokumen saat ini hanya aktif untuk conversation WhatsApp.',
+      );
+      return false;
+    }
+
+    if (_isSendingReply || _isSendingContact) {
+      return false;
+    }
+
+    FilePickerResult? picked;
+    try {
+      picked = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        withData: true,
+      );
+    } catch (error) {
+      _showSnackBar('Gagal membuka pemilih file: $error');
+      return false;
+    }
+
+    if (picked == null || picked.files.isEmpty) {
+      return false;
+    }
+
+    final pickedFile = picked.files.first;
+    final fileName = pickedFile.name;
+    List<int> fileBytes;
+    final initialBytes = pickedFile.bytes;
+
+    if (initialBytes != null && initialBytes.isNotEmpty) {
+      fileBytes = initialBytes;
+    } else if (pickedFile.path != null) {
+      try {
+        fileBytes = await File(pickedFile.path!).readAsBytes();
+      } catch (error) {
+        _showSnackBar('Gagal membaca file dokumen: $error');
+        return false;
+      }
+    } else {
+      _showSnackBar('File dokumen kosong atau gagal dibaca.');
+      return false;
+    }
+
+    if (fileBytes.isEmpty) {
+      _showSnackBar('File dokumen kosong atau gagal dibaca.');
+      return false;
+    }
+
+    // WhatsApp document size limit: 100 MB
+    const int maxBytes = 100 * 1024 * 1024;
+    if (fileBytes.length > maxBytes) {
+      _showSnackBar('Ukuran dokumen melebihi 100 MB. Pilih file lebih kecil.');
+      return false;
+    }
+
+    final mimeType = _mimeTypeFromFileName(fileName);
+
+    setState(() => _isSendingReply = true);
+
+    try {
+      final notice = await widget.repository.sendAdminDocumentReply(
+        conversationId: conversationId,
+        fileBytes: fileBytes,
+        fileName: fileName,
+        caption: caption,
+        mimeType: mimeType,
+      );
+
+      await _controller.softRefreshAfterExternalAction();
+
+      if (mounted) {
+        _showSnackBar(notice);
+      }
+
+      return true;
+    } on ApiException catch (error) {
+      if (mounted) {
+        _showSnackBar(error.message);
+      }
+      return false;
+    } catch (error) {
+      if (mounted) {
+        _showSnackBar('Gagal mengirim dokumen: $error');
+      }
+      return false;
+    } finally {
+      if (mounted) {
+        setState(() => _isSendingReply = false);
+      }
+    }
+  }
+
+  Future<bool> _sendAdminLocation({
+    required double latitude,
+    required double longitude,
+    String? locationName,
+    String? locationAddress,
+  }) async {
+    final conversation = _controller.selectedConversation;
+    final conversationId = conversation?.id;
+
+    if (conversationId == null || conversationId <= 0) {
+      _showSnackBar('Conversation belum dipilih.');
+      return false;
+    }
+
+    if (conversation?.channel != 'whatsapp') {
+      _showSnackBar('Lokasi saat ini hanya aktif untuk conversation WhatsApp.');
+      return false;
+    }
+
+    if (_isSendingReply || _isSendingContact) {
+      return false;
+    }
+
+    setState(() => _isSendingReply = true);
+
+    try {
+      final notice = await widget.repository.sendAdminLocationReply(
+        conversationId: conversationId,
+        latitude: latitude,
+        longitude: longitude,
+        locationName: locationName,
+        locationAddress: locationAddress,
+      );
+
+      await _controller.softRefreshAfterExternalAction();
+
+      if (mounted) {
+        _showSnackBar(notice);
+      }
+
+      return true;
+    } on ApiException catch (error) {
+      if (mounted) {
+        _showSnackBar(error.message);
+      }
+      return false;
+    } catch (error) {
+      if (mounted) {
+        _showSnackBar('Gagal mengirim lokasi: $error');
+      }
+      return false;
+    } finally {
+      if (mounted) {
+        setState(() => _isSendingReply = false);
+      }
+    }
+  }
+
   Future<bool> _sendAdminContact({
     required String fullName,
     required String phone,
@@ -2293,6 +2455,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   onSendReply: _sendAdminReply,
                   onSendGalleryImage: _sendAdminGalleryImage,
                   onSendCameraImage: _sendAdminCameraImage,
+                  onSendDocument: _sendAdminDocument,
+                  onSendLocation: _sendAdminLocation,
                   onSendVoiceNote: _toggleVoiceNoteRecording,
                   onCancelVoiceNote: _cancelVoiceNoteRecording,
                   isRecordingVoiceNote: _isRecordingVoiceNote,
@@ -2419,6 +2583,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       onSendReply: _sendAdminReply,
                       onSendGalleryImage: _sendAdminGalleryImage,
                       onSendCameraImage: _sendAdminCameraImage,
+                      onSendDocument: _sendAdminDocument,
+                      onSendLocation: _sendAdminLocation,
                       onSendVoiceNote: _toggleVoiceNoteRecording,
                       onCancelVoiceNote: _cancelVoiceNoteRecording,
                       isRecordingVoiceNote: _isRecordingVoiceNote,
