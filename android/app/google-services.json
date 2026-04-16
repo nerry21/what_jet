@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "135489712160",
+    "project_id": "what-jet-chatbot",
+    "storage_bucket": "what-jet-chatbot.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:135489712160:android:fe0ee55906194376518c45",
+        "android_client_info": {
+          "package_name": "com.example.what_jet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6UOV9YUTioZZ7yESmuaY4PUaKvYEYFmg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

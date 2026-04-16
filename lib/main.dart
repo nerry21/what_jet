@@ -1,12 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'core/config/app_config.dart';
 import 'core/network/api_client.dart';
 import 'core/theme/app_theme.dart';
 import 'core/routing/app_routes.dart';
 import 'core/storage/admin_token_storage.dart';
+import 'core/services/push_notification_service.dart';
 import 'features/admin_auth/data/models/admin_user_model.dart';
 import 'features/admin_auth/data/repositories/admin_auth_repository.dart';
 import 'features/admin_auth/data/services/admin_auth_api_service.dart';
@@ -15,8 +18,13 @@ import 'features/omnichannel/data/repositories/omnichannel_repository.dart';
 import 'features/omnichannel/data/services/omnichannel_api_service.dart';
 import 'features/omnichannel/presentation/pages/omnichannel_dashboard_page.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ─── Firebase Initialization ─────────────────────────────────────────
+  await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  await PushNotificationService.instance.initialize();
 
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);

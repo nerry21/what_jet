@@ -27,6 +27,7 @@ import '../controllers/omnichannel_call_analytics_controller.dart';
 import '../controllers/omnichannel_call_controller.dart';
 import '../controllers/omnichannel_shell_controller.dart';
 import '../notifications/in_app_notification_overlay.dart';
+import '../../../../core/services/push_notification_service.dart';
 import '../pages/omnichannel_call_page.dart';
 import '../pages/omnichannel_call_history_page.dart';
 import '../pages/omnichannel_updates_page.dart';
@@ -121,6 +122,14 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     )..addListener(_handleControllerChanged);
     // Daftarkan listener untuk notifikasi pesan masuk → tampilkan banner.
     _controller.addChatNotificationListener(_handleChatNotification);
+    // Register callback untuk push notification tap → navigate ke conversation
+    PushNotificationService.instance.onNotificationTapped = (conversationId) {
+      if (!mounted) return;
+      _handleConversationTap(
+        conversationId,
+        showConversationOnMobile: true,
+      );
+    };
     _callMediaService = OmnichannelCallMediaService();
     _callController = OmnichannelCallController(
       repository: widget.repository,
@@ -143,6 +152,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
 
+    PushNotificationService.instance.onNotificationTapped = null;
     _controller
       ..removeChatNotificationListener(_handleChatNotification)
       ..removeListener(_handleControllerChanged)

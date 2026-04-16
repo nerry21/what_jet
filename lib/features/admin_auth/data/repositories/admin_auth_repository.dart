@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import '../../../../core/network/api_client.dart';
 import '../../../../core/storage/admin_token_storage.dart';
+import '../../../../core/services/push_notification_service.dart';
 import '../models/admin_auth_session_model.dart';
 import '../models/admin_user_model.dart';
 import '../services/admin_auth_api_service.dart';
@@ -58,6 +61,10 @@ class AdminAuthRepository {
         tokenType: session.tokenType ?? 'Bearer',
         user: user,
       );
+
+      // Re-register FCM token saat session restored (app restart)
+      unawaited(PushNotificationService.instance.registerAfterLogin());
+
       return user;
     } on ApiException catch (error) {
       if (error.isUnauthorized) {
@@ -82,10 +89,17 @@ class AdminAuthRepository {
       tokenType: session.tokenType,
       user: session.user,
     );
+
+    // Register FCM token ke backend setelah login berhasil
+    unawaited(PushNotificationService.instance.registerAfterLogin());
+
     return session;
   }
 
   Future<void> logout() async {
+    // Unregister FCM token sebelum logout
+    await PushNotificationService.instance.unregisterBeforeLogout();
+
     final accessToken = await _tokenStorage.readAccessToken();
 
     try {

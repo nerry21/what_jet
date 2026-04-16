@@ -99,6 +99,12 @@ class ApiEndpoints {
   // ─── WhatsApp Contacts (address book) ────────────────────────────────
   static String adminContacts() => '$_adminMobileBase/contacts';
 
+  // ─── Device FCM Token (Push Notification) ────────────────────────────
+  static String adminDeviceTokenRegister() =>
+      '$_adminMobileBase/device-token/register';
+  static String adminDeviceTokenUnregister() =>
+      '$_adminMobileBase/device-token/unregister';
+
   static String startConversation() => '$_mobileLiveChatBase/start';
 
   static String conversations() => '$_mobileLiveChatBase/conversations';
