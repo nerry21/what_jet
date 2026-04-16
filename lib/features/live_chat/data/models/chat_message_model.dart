@@ -2,6 +2,133 @@ import 'conversation_model.dart';
 
 enum ChatMessageLocalState { stable, sending, failed }
 
+/// Location payload attached to a chat message (message_type == 'location').
+/// All fields are nullable because older or incomplete messages may not
+/// carry every coordinate/label.
+class ChatMessageLocation {
+  const ChatMessageLocation({
+    this.latitude,
+    this.longitude,
+    this.name,
+    this.address,
+  });
+
+  final double? latitude;
+  final double? longitude;
+  final String? name;
+  final String? address;
+
+  /// True when we have enough data to actually pin a point on a map.
+  bool get hasCoordinates => latitude != null && longitude != null;
+
+  /// True when there's at least something worth rendering (coords or text).
+  bool get hasAnyData =>
+      hasCoordinates ||
+      (name != null && name!.isNotEmpty) ||
+      (address != null && address!.isNotEmpty);
+
+  static ChatMessageLocation? fromJson(Object? value) {
+    if (value is! Map) {
+      return null;
+    }
+    final map = Map<String, dynamic>.from(value);
+
+    final location = ChatMessageLocation(
+      latitude: _parseDouble(map['latitude']),
+      longitude: _parseDouble(map['longitude']),
+      name: _nullableString(map['name']),
+      address: _nullableString(map['address']),
+    );
+
+    return location.hasAnyData ? location : null;
+  }
+}
+
+/// Interactive payload attached to a chat message (message_type == 'interactive').
+/// Mirrors the shape emitted by `ConversationMessageResource` on the Laravel
+/// backend.
+class ChatMessageInteractive {
+  const ChatMessageInteractive({
+    this.type,
+    this.header,
+    this.body,
+    this.footer,
+    this.listButtonTitle,
+    this.buttonOptions = const <String>[],
+    this.listOptions = const <String>[],
+    this.selection,
+    this.isBookingReview = false,
+  });
+
+  /// Typically 'button' or 'list' (as sent to the WhatsApp Cloud API).
+  final String? type;
+  final String? header;
+  final String? body;
+  final String? footer;
+
+  /// For list-type interactives, the label shown on the "open list" button
+  /// (e.g. "Pilih Layanan").
+  final String? listButtonTitle;
+
+  /// Titles of reply buttons (for type == 'button').
+  final List<String> buttonOptions;
+
+  /// Row titles collected across all sections (for type == 'list').
+  final List<String> listOptions;
+
+  /// Which option the customer eventually tapped, if any. Shape is opaque;
+  /// we only use this to show a selected-indicator in the UI.
+  final Map<String, dynamic>? selection;
+
+  final bool isBookingReview;
+
+  bool get hasAnyOptions => buttonOptions.isNotEmpty || listOptions.isNotEmpty;
+
+  bool get hasAnyData =>
+      hasAnyOptions ||
+      (header != null && header!.isNotEmpty) ||
+      (body != null && body!.isNotEmpty) ||
+      (footer != null && footer!.isNotEmpty);
+
+  /// Preferred label to use in chat list previews or empty-bubble fallbacks.
+  String get previewLabel {
+    if (body != null && body!.isNotEmpty) return body!;
+    if (header != null && header!.isNotEmpty) return header!;
+    if (buttonOptions.isNotEmpty) return buttonOptions.first;
+    if (listOptions.isNotEmpty) return listOptions.first;
+    return 'Menu interaktif';
+  }
+
+  static ChatMessageInteractive? fromJson(Object? value) {
+    if (value is! Map) {
+      return null;
+    }
+    final map = Map<String, dynamic>.from(value);
+
+    final buttonOptions = _stringList(map['button_options']);
+    final listOptions = _stringList(map['list_options']);
+    Map<String, dynamic>? selection;
+    final rawSelection = map['selection'];
+    if (rawSelection is Map) {
+      selection = Map<String, dynamic>.from(rawSelection);
+    }
+
+    final interactive = ChatMessageInteractive(
+      type: _nullableString(map['type']),
+      header: _nullableString(map['header']),
+      body: _nullableString(map['body']),
+      footer: _nullableString(map['footer']),
+      listButtonTitle: _nullableString(map['list_button_title']),
+      buttonOptions: buttonOptions,
+      listOptions: listOptions,
+      selection: selection,
+      isBookingReview: map['is_booking_review'] == true,
+    );
+
+    return interactive.hasAnyData ? interactive : null;
+  }
+}
+
 class ChatMessageModel {
   const ChatMessageModel({
     required this.localId,
@@ -24,6 +151,8 @@ class ChatMessageModel {
     this.updatedAt,
     this.isMineFlag,
     this.localState = ChatMessageLocalState.stable,
+    this.location,
+    this.interactive,
   });
 
   final int? id;
@@ -47,6 +176,12 @@ class ChatMessageModel {
   final bool? isMineFlag;
   final ChatMessageLocalState localState;
 
+  /// Populated when `message_type == 'location'`.
+  final ChatMessageLocation? location;
+
+  /// Populated when `message_type == 'interactive'`.
+  final ChatMessageInteractive? interactive;
+
   bool get isMine =>
       isMineFlag == true ||
       (senderType == 'customer' && direction == 'inbound');
@@ -64,6 +199,10 @@ class ChatMessageModel {
       deliveryStatus == 'read';
 
   bool get isReadByCustomer => readAt != null || deliveryStatus == 'read';
+
+  bool get isLocation => messageType == 'location' && location != null;
+
+  bool get isInteractive => messageType == 'interactive' && interactive != null;
 
   String get stableKey => id != null
       ? 'server_$id'
@@ -104,6 +243,8 @@ class ChatMessageModel {
       localState: deliveryStatus == 'failed'
           ? ChatMessageLocalState.failed
           : ChatMessageLocalState.stable,
+      location: ChatMessageLocation.fromJson(json['location']),
+      interactive: ChatMessageInteractive.fromJson(json['interactive']),
     );
   }
 
@@ -152,6 +293,8 @@ class ChatMessageModel {
     DateTime? updatedAt,
     bool? isMineFlag,
     ChatMessageLocalState? localState,
+    ChatMessageLocation? location,
+    ChatMessageInteractive? interactive,
   }) {
     return ChatMessageModel(
       id: id ?? this.id,
@@ -174,6 +317,8 @@ class ChatMessageModel {
       updatedAt: updatedAt ?? this.updatedAt,
       isMineFlag: isMineFlag ?? this.isMineFlag,
       localState: localState ?? this.localState,
+      location: location ?? this.location,
+      interactive: interactive ?? this.interactive,
     );
   }
 
@@ -244,4 +389,23 @@ DateTime? _parseDateTime(Object? value) {
 String? _nullableString(Object? value) {
   final text = value?.toString().trim();
   return text == null || text.isEmpty ? null : text;
+}
+
+double? _parseDouble(Object? value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  if (value is String) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return null;
+    return double.tryParse(trimmed);
+  }
+  return null;
+}
+
+List<String> _stringList(Object? value) {
+  if (value is! List) return const <String>[];
+  return value
+      .map((e) => e?.toString().trim() ?? '')
+      .where((e) => e.isNotEmpty)
+      .toList(growable: false);
 }
