@@ -2337,17 +2337,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     required int? selectedConversationId,
     required bool shellLoading,
   }) {
-    const showPaneSelector = true;
-
     return Column(
       children: <Widget>[
-        if (showPaneSelector) ...<Widget>[
-          _MobilePaneSelector(
-            selectedPane: _mobilePane,
-            onPaneSelected: _setMobilePane,
-          ),
-          const SizedBox(height: 12),
-        ],
         Expanded(
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 220),
@@ -2443,6 +2434,11 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
               },
             ),
           ),
+        ),
+        // ═══ BOTTOM NAVIGATION BAR ═══
+        _MobilePaneSelector(
+          selectedPane: _mobilePane,
+          onPaneSelected: _setMobilePane,
         ),
       ],
     );
@@ -2619,56 +2615,60 @@ class _MobilePaneSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 12),
-      padding: EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceSecondary,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.06)),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: const Color(0x20000000),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: EdgeInsets.fromLTRB(8, 6, 8, 6),
+        decoration: BoxDecoration(
+          color: AppColors.surfacePrimary,
+          border: Border(
+            top: BorderSide(color: AppColors.primary.withValues(alpha: 0.08)),
           ),
-        ],
-      ),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: _MobilePaneButton(
-              label: 'Inbox',
-              icon: Icons.chat_bubble_rounded,
-              selected: selectedPane == _OmnichannelMobilePane.inbox,
-              onTap: () => onPaneSelected(_OmnichannelMobilePane.inbox),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0x30000000),
+              blurRadius: 20,
+              offset: const Offset(0, -4),
             ),
-          ),
-          Expanded(
-            child: _MobilePaneButton(
-              label: 'Pembaruan',
-              icon: Icons.autorenew_rounded,
-              selected: selectedPane == _OmnichannelMobilePane.updates,
-              onTap: () => onPaneSelected(_OmnichannelMobilePane.updates),
+          ],
+        ),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: _MobilePaneButton(
+                label: 'Inbox',
+                icon: Icons.chat_bubble_rounded,
+                selected: selectedPane == _OmnichannelMobilePane.inbox,
+                onTap: () => onPaneSelected(_OmnichannelMobilePane.inbox),
+              ),
             ),
-          ),
-          Expanded(
-            child: _MobilePaneButton(
-              label: 'Chat',
-              icon: Icons.forum_rounded,
-              selected: selectedPane == _OmnichannelMobilePane.conversation,
-              onTap: () => onPaneSelected(_OmnichannelMobilePane.conversation),
+            Expanded(
+              child: _MobilePaneButton(
+                label: 'Pembaruan',
+                icon: Icons.autorenew_rounded,
+                selected: selectedPane == _OmnichannelMobilePane.updates,
+                onTap: () => onPaneSelected(_OmnichannelMobilePane.updates),
+              ),
             ),
-          ),
-          Expanded(
-            child: _MobilePaneButton(
-              label: 'Insight',
-              icon: Icons.insights_rounded,
-              selected: selectedPane == _OmnichannelMobilePane.insight,
-              onTap: () => onPaneSelected(_OmnichannelMobilePane.insight),
+            Expanded(
+              child: _MobilePaneButton(
+                label: 'Insight',
+                icon: Icons.insights_rounded,
+                selected: selectedPane == _OmnichannelMobilePane.insight,
+                onTap: () => onPaneSelected(_OmnichannelMobilePane.insight),
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              child: _MobilePaneButton(
+                label: 'Panggilan',
+                icon: Icons.call_rounded,
+                selected: selectedPane == _OmnichannelMobilePane.conversation,
+                onTap: () =>
+                    onPaneSelected(_OmnichannelMobilePane.conversation),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -2691,51 +2691,56 @@ class _MobilePaneButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCubic,
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-        decoration: BoxDecoration(
-          color: selected
-              ? AppColors.primary.withValues(alpha: 0.15)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: selected
-                ? AppColors.primary.withValues(alpha: 0.20)
-                : Colors.transparent,
-          ),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.12),
-                    blurRadius: 8,
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Icon(
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutCubic,
+            width: 48,
+            height: 30,
+            decoration: BoxDecoration(
+              color: selected
+                  ? AppColors.primary.withValues(alpha: 0.15)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            alignment: Alignment.center,
+            child: Icon(
               icon,
-              size: 20,
+              size: 22,
               color: selected ? AppColors.primary : AppColors.neutral400,
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                color: selected ? AppColors.primary : AppColors.neutral400,
-              ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              color: selected ? AppColors.primary : AppColors.neutral400,
             ),
-          ],
-        ),
+          ),
+          if (selected)
+            Container(
+              width: 16,
+              height: 2,
+              margin: EdgeInsets.only(top: 4),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(1),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.5),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+            )
+          else
+            const SizedBox(height: 6),
+        ],
       ),
     );
   }

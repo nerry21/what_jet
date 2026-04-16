@@ -593,7 +593,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
-    final listBottomPadding = 80.0 + bottomInset;
+    final listBottomPadding = 90.0 + bottomInset;
 
     return ColoredBox(
       color: AppColors.scaffoldBackground,
