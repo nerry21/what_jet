@@ -32,6 +32,64 @@ class OmnichannelCallBanner extends StatelessWidget {
     final statusText = omnichannelCallPrimaryStatusText(session);
     final detailText = omnichannelCallSecondaryStatusText(session);
 
+    final card = _buildCard(context, color, statusText, detailText);
+
+    // When the card can be dismissed (onClose provided), allow swipe in either
+    // horizontal direction to hide it. This makes the card much easier to get
+    // rid of than relying solely on the small close button.
+    if (onClose != null) {
+      return Dismissible(
+        key: ValueKey<String>(
+          'omnichannel-call-banner-${session?.id ?? session?.waCallId ?? 'placeholder'}',
+        ),
+        direction: DismissDirection.horizontal,
+        dismissThresholds: const <DismissDirection, double>{
+          DismissDirection.startToEnd: 0.25,
+          DismissDirection.endToStart: 0.25,
+        },
+        onDismissed: (_) => onClose!.call(),
+        background: _buildSwipeBackground(alignLeft: true),
+        secondaryBackground: _buildSwipeBackground(alignLeft: false),
+        child: card,
+      );
+    }
+
+    return card;
+  }
+
+  Widget _buildSwipeBackground({required bool alignLeft}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      alignment: alignLeft ? Alignment.centerLeft : Alignment.centerRight,
+      decoration: BoxDecoration(
+        color: AppColors.error.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(Icons.close_rounded, color: AppColors.error, size: 22),
+          const SizedBox(width: 6),
+          Text(
+            'Sembunyikan',
+            style: TextStyle(
+              color: AppColors.error,
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCard(
+    BuildContext context,
+    Color color,
+    String statusText,
+    String detailText,
+  ) {
     return Container(
       padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -145,21 +203,28 @@ class OmnichannelCallBanner extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
               if (onClose != null) ...<Widget>[
-                InkWell(
-                  onTap: onClose,
-                  borderRadius: AppRadii.borderRadiusPill,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceTertiary,
-                      borderRadius: AppRadii.borderRadiusPill,
-                      border: Border.all(color: AppColors.borderLight),
-                    ),
-                    child: const Icon(
-                      Icons.close_rounded,
-                      size: 20,
-                      color: AppColors.neutral400,
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: onClose,
+                    borderRadius: AppRadii.borderRadiusPill,
+                    // Larger tap target with extra padding for easier dismissal.
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.error.withValues(alpha: 0.10),
+                        borderRadius: AppRadii.borderRadiusPill,
+                        border: Border.all(
+                          color: AppColors.error.withValues(alpha: 0.35),
+                          width: 1.2,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 24,
+                        color: AppColors.error,
+                      ),
                     ),
                   ),
                 ),

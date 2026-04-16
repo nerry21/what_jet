@@ -1474,7 +1474,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       'permission_expired' =>
         'Izin panggilan sudah kedaluwarsa dan perlu diminta ulang.',
       'call_blocked_configuration_error' =>
-        'Konfigurasi panggilan belum lengkap.',
+        'Konfigurasi panggilan belum lengkap. Aktifkan WhatsApp Calling API di Meta Business Manager (Phone Numbers → Calling) untuk nomor ini, lalu coba lagi.',
       'call_rate_limited' => 'Layanan panggilan sedang dibatasi sementara.',
       'duplicate_action' =>
         'Permintaan aksi panggilan yang sama masih diproses.',
