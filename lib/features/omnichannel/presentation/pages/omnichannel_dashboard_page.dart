@@ -35,8 +35,15 @@ import '../widgets/omnichannel_left_pane.dart';
 import '../widgets/omnichannel_right_pane.dart';
 import '../widgets/omnichannel_shell_header.dart';
 import '../widgets/omnichannel_surface.dart';
+import '../widgets/omnichannel_call_analytics_panel.dart';
 
-enum _OmnichannelMobilePane { inbox, updates, conversation, insight }
+enum _OmnichannelMobilePane {
+  inbox,
+  updates,
+  conversation,
+  insight,
+  callHistory,
+}
 
 class OmnichannelDashboardPage extends StatefulWidget {
   const OmnichannelDashboardPage({
@@ -2447,6 +2454,48 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                         showConversationOnMobile: true,
                       ),
                 ),
+                _OmnichannelMobilePane.callHistory => Scaffold(
+                  backgroundColor: AppColors.scaffoldBackground,
+                  body: SingleChildScrollView(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'Panggilan',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.neutral800,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Riwayat dan analitik panggilan',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.neutral400,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        OmnichannelCallAnalyticsPanel(
+                          snapshot: _callAnalyticsController.snapshot,
+                          isLoading:
+                              _callAnalyticsController.isLoading ||
+                              _callAnalyticsController.isRefreshing,
+                          errorMessage: _callAnalyticsController.errorMessage,
+                          onRetry: () => _callAnalyticsController.refresh(),
+                          onOpenConversation: (conversationId) =>
+                              _handleConversationTap(
+                                conversationId,
+                                showConversationOnMobile: true,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               },
             ),
           ),
@@ -2678,9 +2727,8 @@ class _MobilePaneSelector extends StatelessWidget {
               child: _MobilePaneButton(
                 label: 'Panggilan',
                 icon: Icons.call_rounded,
-                selected: selectedPane == _OmnichannelMobilePane.conversation,
-                onTap: () =>
-                    onPaneSelected(_OmnichannelMobilePane.conversation),
+                selected: selectedPane == _OmnichannelMobilePane.callHistory,
+                onTap: () => onPaneSelected(_OmnichannelMobilePane.callHistory),
               ),
             ),
           ],
