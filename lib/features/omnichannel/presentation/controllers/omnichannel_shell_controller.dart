@@ -204,6 +204,9 @@ class OmnichannelShellController extends ChangeNotifier {
       return;
     }
 
+    // Instantly clear unread count for tapped conversation (visual mark-as-read)
+    _clearUnreadForConversation(conversationId);
+
     if (_selectedConversation?.id == conversationId &&
         !_isConversationLoading &&
         _threadGroups.isNotEmpty) {
@@ -215,6 +218,34 @@ class OmnichannelShellController extends ChangeNotifier {
       notify: notify,
       incrementSelectionVersion: true,
     );
+  }
+
+  /// Clears unread count locally for a conversation so it appears read immediately.
+  void _clearUnreadForConversation(int conversationId) {
+    final currentList = _conversationList;
+    if (currentList == null) return;
+
+    final updatedItems = currentList.items.map((item) {
+      if (item.id == conversationId && item.unreadCount > 0) {
+        return OmnichannelConversationListItemModel(
+          id: item.id,
+          title: item.title,
+          preview: item.preview,
+          channel: item.channel,
+          statusLabel: item.statusLabel,
+          unreadCount: 0,
+          lastActivityAt: item.lastActivityAt,
+          mergeKey: item.mergeKey,
+          customerLabel: item.customerLabel,
+          customerPhone: item.customerPhone,
+          mergedConversationCount: item.mergedConversationCount,
+        );
+      }
+      return item;
+    }).toList();
+
+    _conversationList = currentList.copyWith(items: updatedItems);
+    notifyListeners();
   }
 
   Future<void> refreshSelectedConversation() async {

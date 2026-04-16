@@ -369,9 +369,7 @@ class _SearchField extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceTertiary,
         borderRadius: AppRadii.borderRadiusXl,
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.08),
-        ),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.08)),
       ),
       child: TextField(
         controller: controller,
@@ -534,47 +532,56 @@ class _ConversationListSkeleton extends StatelessWidget {
         return AppFadeSlideIn(
           delay: AppDurations.stagger(index),
           child: Container(
-          padding: EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: AppColors.scaffoldBackground.withValues(alpha: 0.75),
-            borderRadius: AppRadii.borderRadiusXl,
-            border: Border.all(color: AppColors.borderLight),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const <Widget>[
-              Row(
-                children: <Widget>[
-                  OmnichannelSkeletonBlock(width: 42, height: 42, radius: 16),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        OmnichannelSkeletonBlock(width: 120),
-                        SizedBox(height: 8),
-                        OmnichannelSkeletonBlock(width: 88, height: 12),
-                      ],
+            padding: EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.scaffoldBackground.withValues(alpha: 0.75),
+              borderRadius: AppRadii.borderRadiusXl,
+              border: Border.all(color: AppColors.borderLight),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const <Widget>[
+                Row(
+                  children: <Widget>[
+                    OmnichannelSkeletonBlock(width: 42, height: 42, radius: 16),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          OmnichannelSkeletonBlock(width: 120),
+                          SizedBox(height: 8),
+                          OmnichannelSkeletonBlock(width: 88, height: 12),
+                        ],
+                      ),
                     ),
-                  ),
-                  OmnichannelSkeletonBlock(width: 32, height: 12, radius: 8),
-                ],
-              ),
-              SizedBox(height: 12),
-              OmnichannelSkeletonBlock(height: 12),
-              SizedBox(height: 8),
-              OmnichannelSkeletonBlock(width: 180, height: 12),
-              SizedBox(height: 14),
-              Row(
-                children: <Widget>[
-                  OmnichannelSkeletonBlock(width: 76, height: 24, radius: 999),
-                  SizedBox(width: 8),
-                  OmnichannelSkeletonBlock(width: 96, height: 24, radius: 999),
-                ],
-              ),
-            ],
+                    OmnichannelSkeletonBlock(width: 32, height: 12, radius: 8),
+                  ],
+                ),
+                SizedBox(height: 12),
+                OmnichannelSkeletonBlock(height: 12),
+                SizedBox(height: 8),
+                OmnichannelSkeletonBlock(width: 180, height: 12),
+                SizedBox(height: 14),
+                Row(
+                  children: <Widget>[
+                    OmnichannelSkeletonBlock(
+                      width: 76,
+                      height: 24,
+                      radius: 999,
+                    ),
+                    SizedBox(width: 8),
+                    OmnichannelSkeletonBlock(
+                      width: 96,
+                      height: 24,
+                      radius: 999,
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ));
+        );
       },
     );
   }
@@ -992,12 +999,6 @@ class _PremiumConversationTile extends StatelessWidget {
             color: selected
                 ? AppColors.primary.withValues(alpha: 0.06)
                 : Colors.transparent,
-            border: Border(
-              bottom: BorderSide(
-                color: AppColors.borderLight.withValues(alpha: 0.5),
-                width: 0.5,
-              ),
-            ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -1158,45 +1159,46 @@ class _PremiumListSkeleton extends StatelessWidget {
         return AppFadeSlideIn(
           delay: AppDurations.stagger(index),
           child: Padding(
-          padding: EdgeInsets.fromLTRB(16, 12, 14, 12),
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceTertiary,
-                  borderRadius: BorderRadius.circular(16),
+            padding: EdgeInsets.fromLTRB(16, 12, 14, 12),
+            child: Row(
+              children: <Widget>[
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceTertiary,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      width: 140,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceTertiary,
-                        borderRadius: AppRadii.borderRadiusSm,
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        width: 140,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceTertiary,
+                          borderRadius: AppRadii.borderRadiusSm,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      width: 200,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceTertiary,
-                        borderRadius: AppRadii.borderRadiusSm,
+                      const SizedBox(height: 8),
+                      Container(
+                        width: 200,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceTertiary,
+                          borderRadius: AppRadii.borderRadiusSm,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ));
+        );
       },
     );
   }
