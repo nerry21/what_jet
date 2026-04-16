@@ -267,6 +267,20 @@ class OmnichannelRepository {
     return 'Balasan admin berhasil diproses.';
   }
 
+  /// Mark conversation as read on the backend.
+  /// Fails silently — this is a non-critical UX enhancement.
+  Future<void> markConversationAsRead({required int conversationId}) async {
+    try {
+      final accessToken = await _ensureAdminSession();
+      await _apiService.markConversationAsRead(
+        accessToken: accessToken,
+        conversationId: conversationId,
+      );
+    } catch (_) {
+      // Silent fail — unread badge will be recalculated on next poll.
+    }
+  }
+
   Future<String> sendAdminImageReply({
     required int conversationId,
     required List<int> fileBytes,

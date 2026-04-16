@@ -75,6 +75,11 @@ class OmnichannelShellController extends ChangeNotifier {
   int? get selectedConversationId =>
       _conversationList?.selectedConversationId ?? _selectedConversation?.id;
 
+  /// Increments each time a conversation is (re)selected — useful for
+  /// widgets that need to react to selection events even when the ID is
+  /// the same (e.g. to scroll to the bottom again).
+  int get selectionVersion => _selectionVersion;
+
   Future<void> initialize({AdminUserModel? initialUser}) async {
     if (_isLoading) {
       return;
@@ -207,9 +212,22 @@ class OmnichannelShellController extends ChangeNotifier {
     // Instantly clear unread count for tapped conversation (visual mark-as-read)
     _clearUnreadForConversation(conversationId);
 
+    // Fire-and-forget: tell backend the conversation has been read so
+    // subsequent polls won't re-populate the unread badge.
+    unawaited(
+      _repository.markConversationAsRead(conversationId: conversationId),
+    );
+
     if (_selectedConversation?.id == conversationId &&
         !_isConversationLoading &&
         _threadGroups.isNotEmpty) {
+      // Same conversation re-opened. Bump the selection version so
+      // listeners (like the thread scroller) can react and auto-scroll
+      // to the bottom again even though the content didn't change.
+      _selectionVersion++;
+      if (notify) {
+        notifyListeners();
+      }
       return;
     }
 

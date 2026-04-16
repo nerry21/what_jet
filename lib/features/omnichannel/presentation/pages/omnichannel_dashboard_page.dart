@@ -84,7 +84,11 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   OmnichannelCallReadinessModel? _callReadiness;
   bool _isLoadingCallReadiness = false;
   bool _isClearingCallEligibilityCache = false;
-  bool _showCallReadinessCard = true;
+  // Call Readiness UI is disabled by user request — keep the flag as `false`
+  // so both the pinned panel and the restore floating bubble never render.
+  // Underlying state and network helpers are left intact to avoid touching
+  // unrelated logic.
+  final bool _showCallReadinessCard = false;
   bool _showActiveCallCard = true;
   Offset _callReadinessBubbleOffset = const Offset(0, 0);
   Offset _activeCallBubbleOffset = const Offset(0, 56);
@@ -128,7 +132,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
 
     unawaited(_controller.initialize(initialUser: widget.initialUser));
     unawaited(_callAnalyticsController.initialize());
-    unawaited(_loadCallReadiness());
+    // Call Readiness is hidden — skip the initial readiness request
+    // so we don't spend battery/network on a feature users don't see.
   }
 
   @override
@@ -541,6 +546,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     );
   }
 
+  // ignore: unused_element
   void _updateCallReadinessBubbleOffset(Offset delta, Size viewportSize) {
     if (!mounted) {
       return;
@@ -572,22 +578,15 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   }
 
   void _hideCallReadinessCard() {
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _showCallReadinessCard = false;
-    });
+    // No-op: Call Readiness UI is disabled entirely.
+    // Method is kept so existing callers (e.g. button callbacks still wired
+    // in the widget tree) remain valid without breaking compilation.
   }
 
+  // ignore: unused_element
   void _showCallReadinessCardAgain() {
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _showCallReadinessCard = true;
-      _callReadinessBubbleOffset = const Offset(0, 0);
-    });
+    // No-op: the restore chip is never rendered, so this is unreachable,
+    // but left in place as a safety net for any lingering callers.
   }
 
   void _hideActiveCallCard() {
@@ -1325,7 +1324,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   }
 
   Widget _buildFloatingHiddenCallChips() {
-    final canRestoreReadiness = !_showCallReadinessCard;
+    // Call Readiness UI is disabled — do not render its restore chip.
+    const canRestoreReadiness = false;
     final activeSession = _effectiveCallSession(
       _controller.selectedConversation,
     );
@@ -1345,12 +1345,6 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
               constraints.maxWidth,
               constraints.maxHeight,
             );
-            final callReadinessOffset = _clampBubbleOffset(
-              _callReadinessBubbleOffset,
-              viewportSize: viewportSize,
-              bubbleWidth: _floatingBubbleWidth,
-              bubbleHeight: _floatingBubbleHeight,
-            );
             final activeCallOffset = _clampBubbleOffset(
               _activeCallBubbleOffset,
               viewportSize: viewportSize,
@@ -1360,20 +1354,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
 
             return Stack(
               children: [
-                if (canRestoreReadiness)
-                  _buildDraggableFloatingRestoreBubble(
-                    label: 'Call Readiness',
-                    icon: Icons.verified_outlined,
-                    offset: callReadinessOffset,
-                    baseRight: _floatingBubbleBaseRight,
-                    baseBottom: _floatingBubbleBaseBottom,
-                    onTap: _showCallReadinessCardAgain,
-                    onPanUpdate: (delta) =>
-                        _updateCallReadinessBubbleOffset(delta, viewportSize),
-                    accentColor: AppColors.error,
-                    borderColor: AppColors.error.withValues(alpha: 0.28),
-                    iconBg: const Color(0xFFFFF1F0),
-                  ),
+                // Call Readiness restore chip intentionally omitted.
                 if (canRestoreActiveCallCard)
                   _buildDraggableFloatingRestoreBubble(
                     label: 'Kartu Panggilan',
@@ -2471,6 +2452,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       unawaited(_openConversationCallHistory()),
                   onEndCall: _endConversationCall,
                   onOpenInbox: null,
+                  selectionVersion: _controller.selectionVersion,
                 ),
               ),
             ),
@@ -2600,6 +2582,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       onEndCall: _endConversationCall,
                       onOpenInbox: () =>
                           _setMobilePane(_OmnichannelMobilePane.inbox),
+                      selectionVersion: _controller.selectionVersion,
                     ),
                   ),
                 _OmnichannelMobilePane.insight => OmnichannelRightPane(

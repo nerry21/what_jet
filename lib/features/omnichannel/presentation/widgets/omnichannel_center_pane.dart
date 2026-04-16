@@ -13,6 +13,7 @@ import '../../data/models/omnichannel_call_session_model.dart';
 import '../../data/models/omnichannel_call_timeline_item_model.dart';
 import '../../data/models/omnichannel_conversation_detail_model.dart';
 import '../../data/models/omnichannel_thread_model.dart';
+import '../pages/location_picker_page.dart';
 import '../utils/omnichannel_call_status_ui.dart';
 import 'omnichannel_call_banner.dart';
 import 'omnichannel_call_history_section.dart';
@@ -58,6 +59,7 @@ class OmnichannelCenterPane extends StatefulWidget {
     this.onOpenCallHistory,
     this.onEndCall,
     this.onOpenInbox,
+    this.selectionVersion = 0,
   });
 
   final OmnichannelConversationDetailModel? conversation;
@@ -104,6 +106,7 @@ class OmnichannelCenterPane extends StatefulWidget {
   final VoidCallback? onOpenCallHistory;
   final Future<void> Function()? onEndCall;
   final VoidCallback? onOpenInbox;
+  final int selectionVersion;
 
   @override
   State<OmnichannelCenterPane> createState() => _OmnichannelCenterPaneState();
@@ -141,8 +144,17 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
     );
     final currentLatestMessageId = _latestThreadMessageId(widget.threadGroups);
     final wasNearBottom = _isNearThreadBottom();
+    final selectionVersionChanged =
+        oldWidget.selectionVersion != widget.selectionVersion;
 
     if (conversationChanged && currentMessageCount > 0) {
+      _scheduleScrollToThreadBottom();
+      return;
+    }
+
+    // Re-selecting the same conversation (e.g. tapping it again in the
+    // inbox list) should still jump to the latest message.
+    if (selectionVersionChanged && currentMessageCount > 0) {
       _scheduleScrollToThreadBottom();
       return;
     }
@@ -491,15 +503,8 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
       return;
     }
 
-    await _openLocationDialog();
-  }
-
-  Future<void> _openLocationDialog() async {
-    final result = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (context) {
-        return const _SendLocationDialog();
-      },
+    final result = await Navigator.of(context).push<PickedLocationResult>(
+      MaterialPageRoute(builder: (_) => const LocationPickerPage()),
     );
 
     if (result == null || !mounted) {
@@ -507,10 +512,10 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
     }
 
     final success = await widget.onSendLocation(
-      latitude: result['latitude'] as double,
-      longitude: result['longitude'] as double,
-      locationName: result['name'] as String?,
-      locationAddress: result['address'] as String?,
+      latitude: result.latitude,
+      longitude: result.longitude,
+      locationName: result.name,
+      locationAddress: result.address,
     );
 
     if (success && mounted) {
@@ -650,7 +655,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           if (isShellLoading)
-            const Expanded(child: _CenterPaneSkeleton())
+            const Expanded(child: Center(child: CircularProgressIndicator()))
           else if (conversation == null)
             const Expanded(
               child: OmnichannelEmptyState(
@@ -3734,240 +3739,6 @@ class _DialogField extends StatelessWidget {
               borderSide: BorderSide(color: AppColors.primary),
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SendLocationDialog extends StatefulWidget {
-  const _SendLocationDialog();
-
-  @override
-  State<_SendLocationDialog> createState() => _SendLocationDialogState();
-}
-
-class _SendLocationDialogState extends State<_SendLocationDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final _latController = TextEditingController();
-  final _lngController = TextEditingController();
-  final _nameController = TextEditingController();
-  final _addressController = TextEditingController();
-
-  @override
-  void dispose() {
-    _latController.dispose();
-    _lngController.dispose();
-    _nameController.dispose();
-    _addressController.dispose();
-    super.dispose();
-  }
-
-  void _handleSubmit() {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    final lat = double.tryParse(_latController.text.trim());
-    final lng = double.tryParse(_lngController.text.trim());
-
-    if (lat == null || lng == null) {
-      return;
-    }
-
-    final name = _nameController.text.trim();
-    final address = _addressController.text.trim();
-
-    Navigator.of(context).pop(<String, dynamic>{
-      'latitude': lat,
-      'longitude': lng,
-      'name': name.isNotEmpty ? name : null,
-      'address': address.isNotEmpty ? address : null,
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: AppRadii.borderRadiusXxl),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Icon(
-                      Icons.location_on_rounded,
-                      color: const Color(0xFF22B07D),
-                      size: 28,
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      'Kirim Lokasi',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.neutral800,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                _DialogField(
-                  controller: _latController,
-                  label: 'Latitude',
-                  hintText: 'Contoh: -0.5071',
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  validator: (value) {
-                    final text = value?.trim() ?? '';
-                    if (text.isEmpty) {
-                      return 'Latitude wajib diisi.';
-                    }
-                    final parsed = double.tryParse(text);
-                    if (parsed == null || parsed < -90 || parsed > 90) {
-                      return 'Latitude harus antara -90 dan 90.';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                _DialogField(
-                  controller: _lngController,
-                  label: 'Longitude',
-                  hintText: 'Contoh: 100.5478',
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  validator: (value) {
-                    final text = value?.trim() ?? '';
-                    if (text.isEmpty) {
-                      return 'Longitude wajib diisi.';
-                    }
-                    final parsed = double.tryParse(text);
-                    if (parsed == null || parsed < -180 || parsed > 180) {
-                      return 'Longitude harus antara -180 dan 180.';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                _DialogField(
-                  controller: _nameController,
-                  label: 'Nama Lokasi',
-                  hintText: 'Opsional, contoh: Kantor NCP',
-                ),
-                const SizedBox(height: 12),
-                _DialogField(
-                  controller: _addressController,
-                  label: 'Alamat',
-                  hintText: 'Opsional',
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Batal'),
-                    ),
-                    const SizedBox(width: 8),
-                    FilledButton.icon(
-                      onPressed: _handleSubmit,
-                      icon: const Icon(Icons.send_rounded),
-                      label: const Text('Kirim Lokasi'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CenterPaneSkeleton extends StatelessWidget {
-  const _CenterPaneSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.scaffoldBackground.withValues(alpha: 0.72),
-            borderRadius: AppRadii.borderRadiusXl,
-            border: Border.all(color: AppColors.borderLight),
-          ),
-          child: const Row(
-            children: <Widget>[
-              OmnichannelSkeletonBlock(width: 48, height: 48, radius: 24),
-              SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    OmnichannelSkeletonBlock(width: 180, height: 18),
-                    SizedBox(height: 8),
-                    OmnichannelSkeletonBlock(width: 220, height: 12),
-                    SizedBox(height: 12),
-                    Row(
-                      children: <Widget>[
-                        OmnichannelSkeletonBlock(
-                          width: 88,
-                          height: 26,
-                          radius: 999,
-                        ),
-                        SizedBox(width: 8),
-                        OmnichannelSkeletonBlock(
-                          width: 120,
-                          height: 26,
-                          radius: 999,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 18),
-        const Expanded(
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: OmnichannelSkeletonBlock(
-              width: double.infinity,
-              height: 280,
-              radius: 20,
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        OmnichannelPaneCard(
-          child: Row(
-            children: const <Widget>[
-              OmnichannelSkeletonBlock(width: 88, height: 40, radius: 999),
-              SizedBox(width: 8),
-              OmnichannelSkeletonBlock(width: 42, height: 42, radius: 999),
-              SizedBox(width: 8),
-              OmnichannelSkeletonBlock(width: 42, height: 42, radius: 999),
-              SizedBox(width: 10),
-              Expanded(child: OmnichannelSkeletonBlock(height: 48, radius: 18)),
-              SizedBox(width: 10),
-              OmnichannelSkeletonBlock(width: 40, height: 40, radius: 20),
-            ],
           ),
         ),
       ],
