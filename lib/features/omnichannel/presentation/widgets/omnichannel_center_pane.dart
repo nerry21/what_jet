@@ -2211,6 +2211,17 @@ class _ThreadBubble extends StatelessWidget {
                 _ConversationDocumentCard(message: message, compact: false),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
+              if (message.hasLocation) ...<Widget>[
+                _ConversationLocationCard(
+                  message: message,
+                  maxWidth: maxWidth - 28,
+                ),
+                if (message.displayText.isNotEmpty) const SizedBox(height: 8),
+              ],
+              if (message.hasInteractive) ...<Widget>[
+                _ConversationInteractiveCard(message: message),
+                if (message.displayText.isNotEmpty) const SizedBox(height: 8),
+              ],
               if (message.displayText.isNotEmpty)
                 Text(
                   message.displayText,
@@ -2224,7 +2235,9 @@ class _ThreadBubble extends StatelessWidget {
                   !message.hasImage &&
                   !message.hasAudio &&
                   !message.hasVideo &&
-                  !message.hasDocument)
+                  !message.hasDocument &&
+                  !message.hasLocation &&
+                  !message.hasInteractive)
                 const Text(
                   '-',
                   style: TextStyle(
@@ -2241,22 +2254,349 @@ class _ThreadBubble extends StatelessWidget {
                     formatOmnichannelThreadTime(message.sentAt),
                     style: TextStyle(fontSize: 11, color: AppColors.neutral300),
                   ),
-                  if (message.statusLabel != null) ...<Widget>[
-                    const SizedBox(width: 8),
-                    Text(
-                      message.statusLabel!,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
-                      ),
-                    ),
+                  if (message.isMine) ...<Widget>[
+                    const SizedBox(width: 6),
+                    _DeliveryStatusIcon(message: message),
                   ],
                 ],
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// WhatsApp-style delivery status icon — renders:
+///  - clock icon (grey)         → pending / sending
+///  - single check (grey)       → sent (accepted by WA server)
+///  - double check (grey)       → delivered to customer device
+///  - double check (blue)       → read by customer
+///  - warning icon (red)        → failed
+///  Only rendered for outbound messages (`isMine == true`).
+class _DeliveryStatusIcon extends StatelessWidget {
+  const _DeliveryStatusIcon({required this.message});
+
+  final OmnichannelThreadMessageModel message;
+
+  @override
+  Widget build(BuildContext context) {
+    if (message.isFailed) {
+      return Icon(
+        Icons.error_outline_rounded,
+        size: 14,
+        color: AppColors.error,
+      );
+    }
+
+    if (message.isSending) {
+      return Icon(
+        Icons.access_time_rounded,
+        size: 13,
+        color: AppColors.neutral300,
+      );
+    }
+
+    if (message.isRead) {
+      return Icon(
+        Icons.done_all_rounded,
+        size: 15,
+        color: const Color(0xFF34B7F1), // WhatsApp blue tick
+      );
+    }
+
+    if (message.isDelivered) {
+      return Icon(
+        Icons.done_all_rounded,
+        size: 15,
+        color: AppColors.neutral400,
+      );
+    }
+
+    if (message.isSent) {
+      return Icon(Icons.done_rounded, size: 15, color: AppColors.neutral400);
+    }
+
+    // Fallback — brand new message not yet reported by transport.
+    return Icon(
+      Icons.access_time_rounded,
+      size: 13,
+      color: AppColors.neutral300,
+    );
+  }
+}
+
+/// Renders an inline map preview for `location` messages. Uses OpenStreetMap
+/// static-tile style: a centered pin drawn over a map tile fetched from
+/// `staticmap.openstreetmap.de`. Free, no API key.
+class _ConversationLocationCard extends StatelessWidget {
+  const _ConversationLocationCard({
+    required this.message,
+    required this.maxWidth,
+  });
+
+  final OmnichannelThreadMessageModel message;
+  final double maxWidth;
+
+  Future<void> _openInExternalMaps() async {
+    final lat = message.latitude;
+    final lng = message.longitude;
+    if (lat == null || lng == null) return;
+
+    final uri = Uri.parse('geo:$lat,$lng?q=$lat,$lng');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+      return;
+    }
+
+    final fallback = Uri.parse(
+      'https://www.openstreetmap.org/?mlat=$lat&mlon=$lng#map=16/$lat/$lng',
+    );
+    if (await canLaunchUrl(fallback)) {
+      await launchUrl(fallback, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final lat = message.latitude;
+    final lng = message.longitude;
+    if (lat == null || lng == null) {
+      return const SizedBox.shrink();
+    }
+
+    final previewWidth = maxWidth.clamp(180.0, 260.0).toDouble();
+    final previewHeight = previewWidth * 0.6;
+    final name = message.locationName?.trim() ?? '';
+    final address = message.locationAddress?.trim() ?? '';
+
+    return InkWell(
+      onTap: _openInExternalMaps,
+      borderRadius: AppRadii.borderRadiusLg,
+      child: Container(
+        width: previewWidth,
+        decoration: BoxDecoration(
+          color: AppColors.surfaceTertiary,
+          borderRadius: AppRadii.borderRadiusLg,
+          border: Border.all(color: AppColors.borderLight),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                Image.network(
+                  'https://staticmap.openstreetmap.de/staticmap.php'
+                  '?center=$lat,$lng&zoom=16&size=${previewWidth.toInt()}x${previewHeight.toInt()}&maptype=mapnik&markers=$lat,$lng,red-pushpin',
+                  width: previewWidth,
+                  height: previewHeight,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stack) => Container(
+                    width: previewWidth,
+                    height: previewHeight,
+                    color: AppColors.surfaceSecondary,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Icons.location_on_rounded,
+                      size: 40,
+                      color: AppColors.neutral400,
+                    ),
+                  ),
+                  loadingBuilder: (context, child, progress) {
+                    if (progress == null) return child;
+                    return Container(
+                      width: previewWidth,
+                      height: previewHeight,
+                      color: AppColors.surfaceSecondary,
+                      alignment: Alignment.center,
+                      child: const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    );
+                  },
+                ),
+                // Fallback pin drawn on top in case the tile's marker parameter
+                // gets dropped — guarantees the user always sees a pin.
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 14),
+                  child: Icon(
+                    Icons.location_on_rounded,
+                    color: Color(0xFFEA4335),
+                    size: 32,
+                  ),
+                ),
+              ],
+            ),
+            if (name.isNotEmpty || address.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    if (name.isNotEmpty)
+                      Text(
+                        name,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.neutral800,
+                          decoration: TextDecoration.underline,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    if (address.isNotEmpty) ...<Widget>[
+                      if (name.isNotEmpty) const SizedBox(height: 4),
+                      Text(
+                        address,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.neutral500,
+                          height: 1.4,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Renders a WhatsApp-style interactive card (button list or list picker).
+/// Shows header / body / footer + a list of options as read-only items.
+/// Also appends the selected option if the customer has already replied.
+class _ConversationInteractiveCard extends StatelessWidget {
+  const _ConversationInteractiveCard({required this.message});
+
+  final OmnichannelThreadMessageModel message;
+
+  @override
+  Widget build(BuildContext context) {
+    final header = message.interactiveHeader?.trim() ?? '';
+    final body = message.interactiveBody?.trim() ?? message.text.trim();
+    final footer = message.interactiveFooter?.trim() ?? '';
+    final buttons = message.interactiveButtonOptions;
+    final listItems = message.interactiveListOptions;
+    final listButtonLabel =
+        message.interactiveListButtonTitle?.trim().isNotEmpty == true
+        ? message.interactiveListButtonTitle!.trim()
+        : 'Pilih Layanan';
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSecondary,
+        borderRadius: AppRadii.borderRadiusLg,
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          if (header.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                header,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.neutral800,
+                ),
+              ),
+            ),
+          if (body.isNotEmpty)
+            Text(
+              body,
+              style: TextStyle(
+                fontSize: 14,
+                height: 1.45,
+                color: AppColors.neutral800,
+              ),
+            ),
+          if (footer.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                footer,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                  color: AppColors.neutral500,
+                ),
+              ),
+            ),
+          if (buttons.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 10),
+            Divider(height: 1, color: AppColors.borderLight),
+            const SizedBox(height: 6),
+            for (final label in buttons)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.reply_rounded,
+                      size: 16,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+          if (listItems.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 10),
+            Divider(height: 1, color: AppColors.borderLight),
+            const SizedBox(height: 6),
+            Row(
+              children: <Widget>[
+                Icon(Icons.list_rounded, size: 16, color: AppColors.primary),
+                const SizedBox(width: 8),
+                Text(
+                  listButtonLabel,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            for (final label in listItems)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Text(
+                  '• $label',
+                  style: TextStyle(fontSize: 12, color: AppColors.neutral500),
+                ),
+              ),
+          ],
+        ],
       ),
     );
   }

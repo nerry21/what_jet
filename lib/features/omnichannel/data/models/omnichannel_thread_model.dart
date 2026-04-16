@@ -131,6 +131,17 @@ class OmnichannelThreadMessageModel {
     this.sizeBytes,
     this.isVoiceNote = false,
     this.isReadByCustomer = false,
+    this.latitude,
+    this.longitude,
+    this.locationName,
+    this.locationAddress,
+    this.interactiveType,
+    this.interactiveButtonOptions = const <String>[],
+    this.interactiveListOptions = const <String>[],
+    this.interactiveHeader,
+    this.interactiveBody,
+    this.interactiveFooter,
+    this.interactiveListButtonTitle,
   });
 
   final int id;
@@ -159,6 +170,17 @@ class OmnichannelThreadMessageModel {
   final int? sizeBytes;
   final bool isVoiceNote;
   final bool isReadByCustomer;
+  final double? latitude;
+  final double? longitude;
+  final String? locationName;
+  final String? locationAddress;
+  final String? interactiveType;
+  final List<String> interactiveButtonOptions;
+  final List<String> interactiveListOptions;
+  final String? interactiveHeader;
+  final String? interactiveBody;
+  final String? interactiveFooter;
+  final String? interactiveListButtonTitle;
 
   bool get hasImage =>
       messageType == 'image' && (imageUrl?.trim().isNotEmpty ?? false);
@@ -178,6 +200,17 @@ class OmnichannelThreadMessageModel {
       ((documentUrl?.trim().isNotEmpty ?? false) ||
           (documentId?.trim().isNotEmpty ?? false));
 
+  bool get hasLocation =>
+      (messageType == 'location' || latitude != null || longitude != null) &&
+      latitude != null &&
+      longitude != null;
+
+  bool get hasInteractive =>
+      (messageType == 'interactive' ||
+          (interactiveType?.trim().isNotEmpty ?? false)) &&
+      (interactiveButtonOptions.isNotEmpty ||
+          interactiveListOptions.isNotEmpty);
+
   String? get preferredImageDownloadUrl => imageDownloadUrl ?? imageUrl;
   String? get preferredAudioDownloadUrl => audioDownloadUrl ?? audioUrl;
   String? get preferredVideoDownloadUrl => videoDownloadUrl ?? videoUrl;
@@ -190,7 +223,7 @@ class OmnichannelThreadMessageModel {
       return caption;
     }
 
-    if (hasImage || hasAudio || hasVideo || hasDocument) {
+    if (hasImage || hasAudio || hasVideo || hasDocument || hasLocation) {
       return '';
     }
 
@@ -216,6 +249,13 @@ class OmnichannelThreadMessageModel {
       'user',
     ]);
     final media = omnichannelFirstMap(json, const <String>['media']);
+    final location = omnichannelFirstMap(json, const <String>['location']);
+    final interactive = omnichannelFirstMap(json, const <String>[
+      'interactive',
+    ]);
+
+    final interactiveButtonOptions = _stringList(interactive['button_options']);
+    final interactiveListOptions = _stringList(interactive['list_options']);
 
     final sentAt =
         omnichannelFirstMappedFromSources<DateTime>(
@@ -402,8 +442,82 @@ class OmnichannelThreadMessageModel {
             'is_read_by_customer',
           ], omnichannelBool) ??
           false,
+      latitude: omnichannelFirstMappedFromSources<double>(
+        <Map<String, dynamic>>[location, media, json],
+        const <String>['latitude', 'media.latitude', 'location.latitude'],
+        _toDouble,
+      ),
+      longitude: omnichannelFirstMappedFromSources<double>(
+        <Map<String, dynamic>>[location, media, json],
+        const <String>['longitude', 'media.longitude', 'location.longitude'],
+        _toDouble,
+      ),
+      locationName: omnichannelFirstMappedFromSources<String>(
+        <Map<String, dynamic>>[location, media, json],
+        const <String>['name', 'location.name', 'location_name'],
+        omnichannelString,
+      ),
+      locationAddress: omnichannelFirstMappedFromSources<String>(
+        <Map<String, dynamic>>[location, media, json],
+        const <String>['address', 'location.address', 'location_address'],
+        omnichannelString,
+      ),
+      interactiveType: omnichannelFirstMapped<String>(
+        interactive,
+        const <String>['type'],
+        omnichannelString,
+      ),
+      interactiveButtonOptions: interactiveButtonOptions,
+      interactiveListOptions: interactiveListOptions,
+      interactiveHeader: omnichannelFirstMapped<String>(
+        interactive,
+        const <String>['header', 'header_text'],
+        omnichannelString,
+      ),
+      interactiveBody: omnichannelFirstMapped<String>(
+        interactive,
+        const <String>['body', 'body_text'],
+        omnichannelString,
+      ),
+      interactiveFooter: omnichannelFirstMapped<String>(
+        interactive,
+        const <String>['footer', 'footer_text'],
+        omnichannelString,
+      ),
+      interactiveListButtonTitle: omnichannelFirstMapped<String>(
+        interactive,
+        const <String>['list_button_title', 'button_title'],
+        omnichannelString,
+      ),
     );
   }
+}
+
+/// Helper: accept int, double, or string and return a double.
+double? _toDouble(Object? value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  if (value is String) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return null;
+    return double.tryParse(trimmed);
+  }
+  return null;
+}
+
+/// Helper: safely convert any iterable into a `List<String>` of trimmed,
+/// non-empty entries.
+List<String> _stringList(Object? value) {
+  if (value is! Iterable) return const <String>[];
+  final result = <String>[];
+  for (final item in value) {
+    if (item == null) continue;
+    final text = item.toString().trim();
+    if (text.isNotEmpty) {
+      result.add(text);
+    }
+  }
+  return result;
 }
 
 String _groupLabel(DateTime date) {
