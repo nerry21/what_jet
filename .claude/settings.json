@@ -1,0 +1,15 @@
+{
+  "defaultMode": "acceptEdits",
+  "permissions": {
+    "allow": ["Bash", "Read", "Edit", "Write", "Glob", "Grep"],
+    "deny": [
+      "Bash(git push:*)",
+      "Bash(git push)",
+      "Bash(ssh:*)",
+      "Bash(scp:*)",
+      "Bash(rm -rf:*)",
+      "Bash(rm -fr:*)",
+      "Bash(rm -r:*)"
+    ]
+  }
+}
