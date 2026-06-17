@@ -103,6 +103,33 @@ class OmnichannelThreadGroupModel {
   }
 }
 
+class OmnichannelReplyContext {
+  const OmnichannelReplyContext({
+    this.quotedMessageId,
+    this.quotedType,
+    this.quotedDirection,
+    this.quotedTextPreview,
+  });
+
+  final int? quotedMessageId;
+  final String? quotedType;
+  final String? quotedDirection;
+  final String? quotedTextPreview;
+
+  static OmnichannelReplyContext? fromJson(Object? value) {
+    final map = asOmnichannelMap(value);
+    if (map == null) {
+      return null;
+    }
+    return OmnichannelReplyContext(
+      quotedMessageId: omnichannelInt(map['quoted_message_id']),
+      quotedType: omnichannelString(map['quoted_type']),
+      quotedDirection: omnichannelString(map['quoted_direction']),
+      quotedTextPreview: omnichannelString(map['quoted_text_preview']),
+    );
+  }
+}
+
 class OmnichannelThreadMessageModel {
   const OmnichannelThreadMessageModel({
     required this.id,
@@ -142,6 +169,7 @@ class OmnichannelThreadMessageModel {
     this.interactiveBody,
     this.interactiveFooter,
     this.interactiveListButtonTitle,
+    this.replyContext,
   });
 
   final int id;
@@ -181,6 +209,7 @@ class OmnichannelThreadMessageModel {
   final String? interactiveBody;
   final String? interactiveFooter;
   final String? interactiveListButtonTitle;
+  final OmnichannelReplyContext? replyContext;
 
   bool get hasImage =>
       messageType == 'image' && (imageUrl?.trim().isNotEmpty ?? false);
@@ -489,6 +518,7 @@ class OmnichannelThreadMessageModel {
         const <String>['list_button_title', 'button_title'],
         omnichannelString,
       ),
+      replyContext: OmnichannelReplyContext.fromJson(json['reply_context']),
     );
   }
 }
