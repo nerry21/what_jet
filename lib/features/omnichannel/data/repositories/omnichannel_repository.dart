@@ -311,6 +311,27 @@ class OmnichannelRepository {
     }
   }
 
+  /// Send a WhatsApp reaction for [messageId]. Returns the backend status
+  /// ('sent' | 'skipped' | 'failed') — reports outcome (NOT silent).
+  Future<String> sendConversationReaction({
+    required int conversationId,
+    required int messageId,
+    required String emoji,
+  }) async {
+    try {
+      final accessToken = await _ensureAdminSession();
+      final payload = await _apiService.sendConversationReaction(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        messageId: messageId,
+        emoji: emoji,
+      );
+      return payload['status']?.toString() ?? 'failed';
+    } catch (_) {
+      return 'failed';
+    }
+  }
+
   Future<String> sendAdminImageReply({
     required int conversationId,
     required List<int> fileBytes,

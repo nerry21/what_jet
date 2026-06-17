@@ -2270,6 +2270,26 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
   }
 
+  Future<void> _handleReactToMessage(int messageId, String emoji) async {
+    final status = await _controller.reactToMessage(
+      messageId: messageId,
+      emoji: emoji,
+    );
+    if (!mounted) {
+      return;
+    }
+    if (status != 'sent') {
+      _showSnackBar(_reactionFeedbackMessage(status));
+    }
+  }
+
+  String _reactionFeedbackMessage(String status) {
+    if (status == 'skipped') {
+      return 'Reaksi tidak didukung untuk pesan ini.';
+    }
+    return 'Gagal mengirim reaksi.';
+  }
+
   void _showSnackBar(String message) {
     final text = message.trim();
     if (text.isEmpty || !mounted) {
@@ -2450,6 +2470,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
             Expanded(
               child: _buildCenterPaneWithPinnedReadiness(
                 child: OmnichannelCenterPane(
+                  onReactToMessage: (messageId, emoji) =>
+                      unawaited(_handleReactToMessage(messageId, emoji)),
                   onComposerChanged: (text) =>
                       _controller.notifyAdminTyping(text),
                   conversation: _controller.selectedConversation,
@@ -2582,6 +2604,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 _OmnichannelMobilePane.conversation =>
                   _buildCenterPaneWithPinnedReadiness(
                     child: OmnichannelCenterPane(
+                      onReactToMessage: (messageId, emoji) =>
+                          unawaited(_handleReactToMessage(messageId, emoji)),
                       onComposerChanged: (text) =>
                           _controller.notifyAdminTyping(text),
                       conversation: _controller.selectedConversation,

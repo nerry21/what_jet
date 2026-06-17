@@ -191,6 +191,19 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> sendConversationReaction({
+    required String accessToken,
+    required int conversationId,
+    required int messageId,
+    required String emoji,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationReaction(conversationId),
+      headers: _headers(accessToken),
+      body: <String, Object?>{'message_id': messageId, 'emoji': emoji},
+    );
+  }
+
   Future<Map<String, dynamic>> sendAdminImageReply({
     required String accessToken,
     required int conversationId,

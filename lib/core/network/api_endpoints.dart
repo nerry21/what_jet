@@ -46,6 +46,9 @@ class ApiEndpoints {
   static String adminConversationTyping(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/typing';
 
+  static String adminConversationReaction(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/reaction';
+
   static String adminConversationSendContact(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/send-contact';
 
