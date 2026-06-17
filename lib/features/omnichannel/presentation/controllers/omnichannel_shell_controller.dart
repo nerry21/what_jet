@@ -67,6 +67,7 @@ class OmnichannelShellController extends ChangeNotifier {
   Timer? _listPollingTimer;
   Timer? _conversationPollingTimer;
   int _selectionVersion = 0;
+  DateTime? _lastTypingSentAt;
 
   // ─── Chat notification (in-app banner) ─────────────────────────────────
   final List<ChatNotificationListener> _notificationListeners =
@@ -262,6 +263,15 @@ class OmnichannelShellController extends ChangeNotifier {
       _repository.markConversationAsRead(conversationId: conversationId),
     );
 
+    // Presence (Wave 1): reset typing throttle for the (re)selected chat,
+    // then fire-and-forget a WhatsApp read receipt (WA channel only).
+    _lastTypingSentAt = null;
+    if (_isWhatsAppConversation(conversationId)) {
+      unawaited(
+        _repository.sendConversationReadReceipt(conversationId: conversationId),
+      );
+    }
+
     if (_selectedConversation?.id == conversationId &&
         !_isConversationLoading &&
         _threadGroups.isNotEmpty) {
@@ -279,6 +289,46 @@ class OmnichannelShellController extends ChangeNotifier {
       conversationId,
       notify: notify,
       incrementSelectionVersion: true,
+    );
+  }
+
+  /// Returns true unless the conversation's list item is a known non-WhatsApp
+  /// channel. Defaults to true when unknown so presence is never wrongly
+  /// suppressed — the backend remains the authoritative guard.
+  bool _isWhatsAppConversation(int conversationId) {
+    final items = _conversationList?.items;
+    if (items == null) {
+      return true;
+    }
+    for (final item in items) {
+      if (item.id == conversationId) {
+        return item.channel == 'whatsapp';
+      }
+    }
+    return true;
+  }
+
+  /// Fire-and-forget WhatsApp typing indicator for the active conversation.
+  /// Guards: active WA conversation + non-empty text + >=5s throttle.
+  void notifyAdminTyping(String text) {
+    final conversationId = selectedConversationId;
+    if (conversationId == null) {
+      return;
+    }
+    if (_selectedConversation?.channel != 'whatsapp') {
+      return;
+    }
+    if (text.trim().isEmpty) {
+      return;
+    }
+    final now = DateTime.now();
+    final last = _lastTypingSentAt;
+    if (last != null && now.difference(last) < const Duration(seconds: 5)) {
+      return;
+    }
+    _lastTypingSentAt = now;
+    unawaited(
+      _repository.sendConversationTyping(conversationId: conversationId),
     );
   }
 
