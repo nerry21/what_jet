@@ -1355,6 +1355,74 @@ class _MobileDateSeparator extends StatelessWidget {
   }
 }
 
+class _QuotedReplyPreview extends StatelessWidget {
+  const _QuotedReplyPreview({required this.replyContext});
+
+  final OmnichannelReplyContext replyContext;
+
+  String get _authorLabel =>
+      replyContext.quotedDirection == 'outbound' ? 'Anda' : 'Pelanggan';
+
+  String get _previewText {
+    final preview = replyContext.quotedTextPreview?.trim() ?? '';
+    if (preview.isNotEmpty) {
+      return preview;
+    }
+    switch (replyContext.quotedType) {
+      case 'image':
+        return '📷 Foto';
+      case 'audio':
+        return '🎵 Audio';
+      case 'video':
+        return '🎬 Video';
+      case 'document':
+        return '📄 Dokumen';
+      case 'location':
+        return '📍 Lokasi';
+      default:
+        return 'Pesan tidak tersedia';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
+      decoration: BoxDecoration(
+        color: AppColors.neutral800.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(6),
+        border: const Border(
+          left: BorderSide(color: AppColors.primary, width: 3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            _authorLabel,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            _previewText,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              color: AppColors.neutral800.withValues(alpha: 0.7),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _MobileConversationBubble extends StatelessWidget {
   const _MobileConversationBubble({
     required this.message,
@@ -1399,6 +1467,10 @@ class _MobileConversationBubble extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              if (message.replyContext != null) ...<Widget>[
+                _QuotedReplyPreview(replyContext: message.replyContext!),
+                const SizedBox(height: 6),
+              ],
               if (message.hasImage) ...<Widget>[
                 _ConversationImagePreview(
                   imageUrl: message.imageUrl!,
@@ -2278,6 +2350,10 @@ class _ThreadBubble extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 5),
+              if (message.replyContext != null) ...<Widget>[
+                _QuotedReplyPreview(replyContext: message.replyContext!),
+                const SizedBox(height: 6),
+              ],
               if (message.hasImage) ...<Widget>[
                 _ConversationImagePreview(
                   imageUrl: message.imageUrl!,
