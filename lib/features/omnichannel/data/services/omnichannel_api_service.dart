@@ -169,6 +169,28 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> sendConversationReadReceipt({
+    required String accessToken,
+    required int conversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationReadReceipt(conversationId),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
+
+  Future<Map<String, dynamic>> sendConversationTyping({
+    required String accessToken,
+    required int conversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationTyping(conversationId),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
+
   Future<Map<String, dynamic>> sendAdminImageReply({
     required String accessToken,
     required int conversationId,

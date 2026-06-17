@@ -2450,6 +2450,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
             Expanded(
               child: _buildCenterPaneWithPinnedReadiness(
                 child: OmnichannelCenterPane(
+                  onComposerChanged: (text) =>
+                      _controller.notifyAdminTyping(text),
                   conversation: _controller.selectedConversation,
                   callSession: _effectiveCallSession(
                     _controller.selectedConversation,
@@ -2580,6 +2582,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 _OmnichannelMobilePane.conversation =>
                   _buildCenterPaneWithPinnedReadiness(
                     child: OmnichannelCenterPane(
+                      onComposerChanged: (text) =>
+                          _controller.notifyAdminTyping(text),
                       conversation: _controller.selectedConversation,
                       callSession: _effectiveCallSession(
                         _controller.selectedConversation,

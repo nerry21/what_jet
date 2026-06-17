@@ -59,6 +59,7 @@ class OmnichannelCenterPane extends StatefulWidget {
     this.onOpenCallHistory,
     this.onEndCall,
     this.onOpenInbox,
+    this.onComposerChanged,
     this.selectionVersion = 0,
   });
 
@@ -106,6 +107,7 @@ class OmnichannelCenterPane extends StatefulWidget {
   final VoidCallback? onOpenCallHistory;
   final Future<void> Function()? onEndCall;
   final VoidCallback? onOpenInbox;
+  final ValueChanged<String>? onComposerChanged;
   final int selectionVersion;
 
   @override
@@ -124,6 +126,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
   @override
   void initState() {
     super.initState();
+    _composerController.addListener(_handleComposerChanged);
 
     if (_threadMessageCount(widget.threadGroups) > 0) {
       _scheduleScrollToThreadBottom();
@@ -176,10 +179,15 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
 
   @override
   void dispose() {
+    _composerController.removeListener(_handleComposerChanged);
     _composerController.dispose();
     _threadScrollController.dispose();
     _composerFocusNode.dispose();
     super.dispose();
+  }
+
+  void _handleComposerChanged() {
+    widget.onComposerChanged?.call(_composerController.text);
   }
 
   bool _isNearThreadBottom() {

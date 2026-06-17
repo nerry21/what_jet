@@ -282,6 +282,35 @@ class OmnichannelRepository {
     }
   }
 
+  /// Send a WhatsApp Cloud API read receipt for the conversation's latest
+  /// inbound message. Fire-and-forget — failure never blocks chat UX.
+  Future<void> sendConversationReadReceipt({
+    required int conversationId,
+  }) async {
+    try {
+      final accessToken = await _ensureAdminSession();
+      await _apiService.sendConversationReadReceipt(
+        accessToken: accessToken,
+        conversationId: conversationId,
+      );
+    } catch (_) {
+      // Silent fail — presence is a non-critical enhancement.
+    }
+  }
+
+  /// Send a WhatsApp typing indicator for the conversation. Fire-and-forget.
+  Future<void> sendConversationTyping({required int conversationId}) async {
+    try {
+      final accessToken = await _ensureAdminSession();
+      await _apiService.sendConversationTyping(
+        accessToken: accessToken,
+        conversationId: conversationId,
+      );
+    } catch (_) {
+      // Silent fail — presence is a non-critical enhancement.
+    }
+  }
+
   Future<String> sendAdminImageReply({
     required int conversationId,
     required List<int> fileBytes,
