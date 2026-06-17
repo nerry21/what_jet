@@ -150,11 +150,16 @@ class OmnichannelApiService {
     required String accessToken,
     required int conversationId,
     required String message,
+    int? replyToMessageId,
   }) {
     return _apiClient.post(
       ApiEndpoints.adminConversationReply(conversationId),
       headers: _headers(accessToken),
-      body: <String, Object?>{'message_type': 'text', 'message': message},
+      body: <String, Object?>{
+        'message_type': 'text',
+        'message': message,
+        if (replyToMessageId != null) 'reply_to_message_id': replyToMessageId,
+      },
     );
   }
 
@@ -211,11 +216,14 @@ class OmnichannelApiService {
     required String fileName,
     String? caption,
     String? mimeType,
+    int? replyToMessageId,
   }) {
     final fields = <String, Object?>{
       'message_type': 'image',
       'caption': _normalizedNullableText(caption),
       'mime_type': _normalizedNullableText(mimeType),
+      if (replyToMessageId != null)
+        'reply_to_message_id': replyToMessageId.toString(),
     };
 
     return _apiClient.postMultipart(
@@ -240,6 +248,7 @@ class OmnichannelApiService {
     required String fileName,
     String? mimeType,
     String? caption,
+    int? replyToMessageId,
   }) {
     final normalizedMimeType = _normalizedNullableText(mimeType);
 
@@ -248,6 +257,8 @@ class OmnichannelApiService {
       'caption': _normalizedNullableText(caption),
       'voice': '1',
       'mime_type': normalizedMimeType,
+      if (replyToMessageId != null)
+        'reply_to_message_id': replyToMessageId.toString(),
     };
 
     return _apiClient.postMultipart(
@@ -272,11 +283,14 @@ class OmnichannelApiService {
     required String fileName,
     String? caption,
     String? mimeType,
+    int? replyToMessageId,
   }) {
     final fields = <String, Object?>{
       'message_type': 'document',
       'caption': _normalizedNullableText(caption),
       'mime_type': _normalizedNullableText(mimeType),
+      if (replyToMessageId != null)
+        'reply_to_message_id': replyToMessageId.toString(),
     };
 
     return _apiClient.postMultipart(

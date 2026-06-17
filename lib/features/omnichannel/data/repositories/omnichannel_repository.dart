@@ -250,6 +250,7 @@ class OmnichannelRepository {
   Future<String> sendAdminReply({
     required int conversationId,
     required String message,
+    int? replyToMessageId,
   }) async {
     final accessToken = await _ensureAdminSession();
     final payload = await _readWithRetry(
@@ -257,6 +258,7 @@ class OmnichannelRepository {
         accessToken: accessToken,
         conversationId: conversationId,
         message: message,
+        replyToMessageId: replyToMessageId,
       ),
     );
 
@@ -338,6 +340,7 @@ class OmnichannelRepository {
     required String fileName,
     String? caption,
     String? mimeType,
+    int? replyToMessageId,
   }) async {
     final accessToken = await _ensureAdminSession();
     final payload = await _readWithRetry(
@@ -348,6 +351,7 @@ class OmnichannelRepository {
         fileName: fileName,
         caption: caption,
         mimeType: mimeType,
+        replyToMessageId: replyToMessageId,
       ),
     );
 
@@ -365,6 +369,7 @@ class OmnichannelRepository {
     required String fileName,
     String? mimeType,
     String? caption,
+    int? replyToMessageId,
   }) async {
     final accessToken = await _ensureAdminSession();
     final payload = await _readWithRetry(
@@ -375,6 +380,7 @@ class OmnichannelRepository {
         fileName: fileName,
         mimeType: mimeType,
         caption: caption,
+        replyToMessageId: replyToMessageId,
       ),
     );
 
@@ -392,6 +398,7 @@ class OmnichannelRepository {
     required String fileName,
     String? caption,
     String? mimeType,
+    int? replyToMessageId,
   }) async {
     final accessToken = await _ensureAdminSession();
     final payload = await _readWithRetry(
@@ -402,6 +409,7 @@ class OmnichannelRepository {
         fileName: fileName,
         caption: caption,
         mimeType: mimeType,
+        replyToMessageId: replyToMessageId,
       ),
     );
 
