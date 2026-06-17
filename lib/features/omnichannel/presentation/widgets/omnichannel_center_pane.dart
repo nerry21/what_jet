@@ -24,6 +24,48 @@ import 'whatsapp_emoji_picker.dart';
 
 enum _MobileConversationMenuAction { sendContact, toggleBot }
 
+const List<String> _kReactionEmojis = <String>[
+  '👍',
+  '❤️',
+  '😂',
+  '😮',
+  '😢',
+  '🙏',
+];
+
+Future<void> _showReactionPicker(
+  BuildContext context,
+  int messageId,
+  void Function(int messageId, String emoji) onReact,
+) {
+  return showModalBottomSheet<void>(
+    context: context,
+    builder: (BuildContext sheetContext) {
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: _kReactionEmojis.map((String emoji) {
+              return InkWell(
+                borderRadius: BorderRadius.circular(24),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  onReact(messageId, emoji);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(emoji, style: const TextStyle(fontSize: 30)),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      );
+    },
+  );
+}
+
 class OmnichannelCenterPane extends StatefulWidget {
   const OmnichannelCenterPane({
     super.key,
@@ -60,6 +102,7 @@ class OmnichannelCenterPane extends StatefulWidget {
     this.onEndCall,
     this.onOpenInbox,
     this.onComposerChanged,
+    this.onReactToMessage,
     this.selectionVersion = 0,
   });
 
@@ -108,6 +151,7 @@ class OmnichannelCenterPane extends StatefulWidget {
   final Future<void> Function()? onEndCall;
   final VoidCallback? onOpenInbox;
   final ValueChanged<String>? onComposerChanged;
+  final void Function(int messageId, String emoji)? onReactToMessage;
   final int selectionVersion;
 
   @override
@@ -652,6 +696,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         onVoiceNoteTap: _handleVoiceNoteTap,
         onCancelVoiceNoteTap: _handleCancelVoiceNoteTap,
         onMenuSelected: _handleMobileMenuAction,
+        onReactToMessage: widget.onReactToMessage,
         callBanner: callBanner,
         callHistorySection: _buildCallHistorySection(compact: true),
         callTimelineSection: _buildCallTimelineSection(compact: true),
@@ -747,6 +792,8 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
                                         (message) => _ThreadBubble(
                                           message: message,
                                           maxWidth: bubbleMaxWidth,
+                                          onReactToMessage:
+                                              widget.onReactToMessage,
                                         ),
                                       ),
                                     ],
@@ -805,6 +852,7 @@ class _MobileConversationScaffold extends StatelessWidget {
     required this.onVoiceNoteTap,
     required this.onCancelVoiceNoteTap,
     required this.onMenuSelected,
+    this.onReactToMessage,
     this.callBanner,
     this.callHistorySection,
     this.callTimelineSection,
@@ -832,6 +880,7 @@ class _MobileConversationScaffold extends StatelessWidget {
   final Future<void> Function() onCancelVoiceNoteTap;
   final Future<void> Function(_MobileConversationMenuAction action)
   onMenuSelected;
+  final void Function(int messageId, String emoji)? onReactToMessage;
   final Widget? callBanner;
   final Widget? callHistorySection;
   final Widget? callTimelineSection;
@@ -906,6 +955,7 @@ class _MobileConversationScaffold extends StatelessWidget {
                               (message) => _MobileConversationBubble(
                                 message: message,
                                 maxWidth: bubbleMaxWidth,
+                                onReactToMessage: onReactToMessage,
                               ),
                             ),
                           ],
@@ -1309,17 +1359,19 @@ class _MobileConversationBubble extends StatelessWidget {
   const _MobileConversationBubble({
     required this.message,
     required this.maxWidth,
+    this.onReactToMessage,
   });
 
   final OmnichannelThreadMessageModel message;
   final double maxWidth;
+  final void Function(int messageId, String emoji)? onReactToMessage;
 
   @override
   Widget build(BuildContext context) {
     final timeColor = AppColors.neutral800.withValues(alpha: 0.58);
     final statusIcon = _buildStatusIcon();
 
-    return Align(
+    final Widget align = Align(
       alignment: message.isMine ? Alignment.centerRight : Alignment.centerLeft,
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth),
@@ -1420,6 +1472,15 @@ class _MobileConversationBubble extends StatelessWidget {
           ),
         ),
       ),
+    );
+    if (message.isMine || onReactToMessage == null) {
+      return align;
+    }
+    return GestureDetector(
+      behavior: HitTestBehavior.deferToChild,
+      onLongPress: () =>
+          _showReactionPicker(context, message.id, onReactToMessage!),
+      child: align,
     );
   }
 
@@ -2163,14 +2224,19 @@ class _DateSeparator extends StatelessWidget {
 }
 
 class _ThreadBubble extends StatelessWidget {
-  const _ThreadBubble({required this.message, required this.maxWidth});
+  const _ThreadBubble({
+    required this.message,
+    required this.maxWidth,
+    this.onReactToMessage,
+  });
 
   final OmnichannelThreadMessageModel message;
   final double maxWidth;
+  final void Function(int messageId, String emoji)? onReactToMessage;
 
   @override
   Widget build(BuildContext context) {
-    return Align(
+    final Widget align = Align(
       alignment: message.isMine ? Alignment.centerRight : Alignment.centerLeft,
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth),
@@ -2285,6 +2351,15 @@ class _ThreadBubble extends StatelessWidget {
           ),
         ),
       ),
+    );
+    if (message.isMine || onReactToMessage == null) {
+      return align;
+    }
+    return GestureDetector(
+      behavior: HitTestBehavior.deferToChild,
+      onLongPress: () =>
+          _showReactionPicker(context, message.id, onReactToMessage!),
+      child: align,
     );
   }
 }

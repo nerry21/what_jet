@@ -332,6 +332,26 @@ class OmnichannelShellController extends ChangeNotifier {
     );
   }
 
+  /// Send a WhatsApp reaction emoji to a message in the active conversation.
+  /// Returns 'sent' | 'skipped' | 'failed'. WhatsApp channel only (K-3).
+  Future<String> reactToMessage({
+    required int messageId,
+    required String emoji,
+  }) async {
+    final conversationId = selectedConversationId;
+    if (conversationId == null) {
+      return 'failed';
+    }
+    if (_selectedConversation?.channel != 'whatsapp') {
+      return 'skipped';
+    }
+    return _repository.sendConversationReaction(
+      conversationId: conversationId,
+      messageId: messageId,
+      emoji: emoji,
+    );
+  }
+
   /// Clears unread count locally for a conversation so it appears read immediately.
   void _clearUnreadForConversation(int conversationId) {
     final currentList = _conversationList;
