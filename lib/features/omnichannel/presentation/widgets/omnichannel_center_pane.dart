@@ -103,6 +103,9 @@ class OmnichannelCenterPane extends StatefulWidget {
     this.onOpenInbox,
     this.onComposerChanged,
     this.onReactToMessage,
+    this.onSwipeToReply,
+    this.replyingTo,
+    this.onCancelReply,
     this.selectionVersion = 0,
   });
 
@@ -152,6 +155,9 @@ class OmnichannelCenterPane extends StatefulWidget {
   final VoidCallback? onOpenInbox;
   final ValueChanged<String>? onComposerChanged;
   final void Function(int messageId, String emoji)? onReactToMessage;
+  final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
+  final OmnichannelThreadMessageModel? replyingTo;
+  final VoidCallback? onCancelReply;
   final int selectionVersion;
 
   @override
@@ -697,6 +703,9 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         onCancelVoiceNoteTap: _handleCancelVoiceNoteTap,
         onMenuSelected: _handleMobileMenuAction,
         onReactToMessage: widget.onReactToMessage,
+        onSwipeToReply: widget.onSwipeToReply,
+        replyingTo: widget.replyingTo,
+        onCancelReply: widget.onCancelReply,
         callBanner: callBanner,
         callHistorySection: _buildCallHistorySection(compact: true),
         callTimelineSection: _buildCallTimelineSection(compact: true),
@@ -794,6 +803,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
                                           maxWidth: bubbleMaxWidth,
                                           onReactToMessage:
                                               widget.onReactToMessage,
+                                          onSwipeToReply: widget.onSwipeToReply,
                                         ),
                                       ),
                                     ],
@@ -806,6 +816,11 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
                     ),
             ),
             const SizedBox(height: 12),
+            if (widget.replyingTo != null)
+              _ReplyComposerBanner(
+                message: widget.replyingTo!,
+                onCancel: widget.onCancelReply ?? () {},
+              ),
             SafeArea(
               top: false,
               child: _ActiveComposer(
@@ -853,6 +868,9 @@ class _MobileConversationScaffold extends StatelessWidget {
     required this.onCancelVoiceNoteTap,
     required this.onMenuSelected,
     this.onReactToMessage,
+    this.onSwipeToReply,
+    this.replyingTo,
+    this.onCancelReply,
     this.callBanner,
     this.callHistorySection,
     this.callTimelineSection,
@@ -881,6 +899,9 @@ class _MobileConversationScaffold extends StatelessWidget {
   final Future<void> Function(_MobileConversationMenuAction action)
   onMenuSelected;
   final void Function(int messageId, String emoji)? onReactToMessage;
+  final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
+  final OmnichannelThreadMessageModel? replyingTo;
+  final VoidCallback? onCancelReply;
   final Widget? callBanner;
   final Widget? callHistorySection;
   final Widget? callTimelineSection;
@@ -956,6 +977,7 @@ class _MobileConversationScaffold extends StatelessWidget {
                                 message: message,
                                 maxWidth: bubbleMaxWidth,
                                 onReactToMessage: onReactToMessage,
+                                onSwipeToReply: onSwipeToReply,
                               ),
                             ),
                           ],
@@ -998,6 +1020,11 @@ class _MobileConversationScaffold extends StatelessWidget {
               ],
             ),
           ),
+          if (replyingTo != null)
+            _ReplyComposerBanner(
+              message: replyingTo!,
+              onCancel: onCancelReply ?? () {},
+            ),
           if (conversation != null)
             _MobileConversationComposer(
               controller: composerController,
@@ -1428,7 +1455,6 @@ class _MobileConversationBubble extends StatelessWidget {
     required this.message,
     required this.maxWidth,
     this.onReactToMessage,
-    // ignore: unused_element_parameter
     this.onSwipeToReply,
   });
 
@@ -1594,6 +1620,89 @@ class _MobileConversationBubble extends StatelessWidget {
       Icons.done_all_rounded,
       size: 16,
       color: message.isRead ? AppColors.readReceipt : AppColors.neutral300,
+    );
+  }
+}
+
+class _ReplyComposerBanner extends StatelessWidget {
+  const _ReplyComposerBanner({required this.message, required this.onCancel});
+
+  final OmnichannelThreadMessageModel message;
+  final VoidCallback onCancel;
+
+  String get _authorLabel => message.isMine ? 'Anda' : 'Pelanggan';
+
+  String get _previewText {
+    final text = message.displayText.trim();
+    if (text.isNotEmpty) {
+      return text;
+    }
+    if (message.hasImage) {
+      return '📷 Foto';
+    }
+    if (message.hasAudio) {
+      return '🎵 Audio';
+    }
+    if (message.hasVideo) {
+      return '🎬 Video';
+    }
+    if (message.hasDocument) {
+      return '📄 Dokumen';
+    }
+    if (message.hasLocation) {
+      return '📍 Lokasi';
+    }
+    return 'Pesan';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
+      decoration: BoxDecoration(
+        color: AppColors.neutral800.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(6),
+        border: const Border(
+          left: BorderSide(color: AppColors.primary, width: 3),
+        ),
+      ),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  _authorLabel,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  _previewText,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.neutral800.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, size: 20),
+            color: AppColors.neutral500,
+            onPressed: onCancel,
+            tooltip: 'Batalkan balasan',
+          ),
+        ],
+      ),
     );
   }
 }
@@ -2313,7 +2422,6 @@ class _ThreadBubble extends StatelessWidget {
     required this.message,
     required this.maxWidth,
     this.onReactToMessage,
-    // ignore: unused_element_parameter
     this.onSwipeToReply,
   });
 
