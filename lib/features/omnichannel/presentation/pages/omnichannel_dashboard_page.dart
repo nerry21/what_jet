@@ -20,6 +20,7 @@ import '../../data/models/omnichannel_call_session_model.dart';
 import '../../data/models/omnichannel_call_timeline_item_model.dart';
 import '../../data/models/omnichannel_conversation_detail_model.dart';
 import '../../data/models/omnichannel_conversation_list_model.dart';
+import '../../data/models/omnichannel_thread_model.dart';
 import '../../data/models/omnichannel_workspace_model.dart';
 import '../../data/repositories/omnichannel_repository.dart';
 import '../../data/services/omnichannel_call_media_service.dart';
@@ -81,6 +82,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   bool _isSendingContact = false;
   bool _isTogglingBot = false;
   bool _isRecordingVoiceNote = false;
+  OmnichannelThreadMessageModel? _replyingTo;
+  int? _replyingToConversationId;
   _OmnichannelMobilePane _mobilePane = _OmnichannelMobilePane.inbox;
   OmnichannelCallSessionModel? _lastObservedCallSession;
   OmnichannelCallReadinessModel? _callReadiness;
@@ -101,6 +104,16 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   static const double _floatingBubbleHeight = 46.0;
   static const double _floatingBubbleBaseRight = 14.0;
   static const double _floatingBubbleBaseBottom = 74.0;
+
+  OmnichannelThreadMessageModel? get _activeReplyTo {
+    if (_replyingTo == null) {
+      return null;
+    }
+    if (_replyingToConversationId != _controller.selectedConversation?.id) {
+      return null;
+    }
+    return _replyingTo;
+  }
 
   bool get _shouldAutoExpandCallReadiness {
     final readiness = _callReadiness;
@@ -1644,12 +1657,20 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       final notice = await widget.repository.sendAdminReply(
         conversationId: conversationId,
         message: trimmed,
+        replyToMessageId: _activeReplyTo?.id,
       );
 
       await _controller.softRefreshAfterExternalAction();
 
       if (mounted) {
         _showSnackBar(notice);
+      }
+
+      if (mounted) {
+        setState(() {
+          _replyingTo = null;
+          _replyingToConversationId = null;
+        });
       }
 
       return true;
@@ -1738,12 +1759,20 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
         fileName: normalizedFileName,
         caption: caption,
         mimeType: normalizedMimeType,
+        replyToMessageId: _activeReplyTo?.id,
       );
 
       await _controller.softRefreshAfterExternalAction();
 
       if (mounted) {
         _showSnackBar(notice);
+      }
+
+      if (mounted) {
+        setState(() {
+          _replyingTo = null;
+          _replyingToConversationId = null;
+        });
       }
 
       return true;
@@ -1945,6 +1974,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
             fileBytes: fileBytes,
             fileName: normalizedName,
             mimeType: guessedMimeType,
+            replyToMessageId: _activeReplyTo?.id,
           );
 
           debugPrint('VOICE NOTE SEND SUCCESS => $notice');
@@ -1953,6 +1983,13 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
 
           if (mounted) {
             _showSnackBar(notice);
+          }
+
+          if (mounted) {
+            setState(() {
+              _replyingTo = null;
+              _replyingToConversationId = null;
+            });
           }
 
           return true;
@@ -2135,12 +2172,20 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
         fileName: fileName,
         caption: caption,
         mimeType: mimeType,
+        replyToMessageId: _activeReplyTo?.id,
       );
 
       await _controller.softRefreshAfterExternalAction();
 
       if (mounted) {
         _showSnackBar(notice);
+      }
+
+      if (mounted) {
+        setState(() {
+          _replyingTo = null;
+          _replyingToConversationId = null;
+        });
       }
 
       return true;
@@ -2167,6 +2212,11 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     String? locationName,
     String? locationAddress,
   }) async {
+    if (_activeReplyTo != null) {
+      _showSnackBar('Batalkan balasan dulu untuk kirim lokasi/kontak.');
+      return false;
+    }
+
     final conversation = _controller.selectedConversation;
     final conversationId = conversation?.id;
 
@@ -2225,6 +2275,11 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     String? email,
     String? company,
   }) async {
+    if (_activeReplyTo != null) {
+      _showSnackBar('Batalkan balasan dulu untuk kirim lokasi/kontak.');
+      return false;
+    }
+
     final conversationId = _controller.selectedConversation?.id;
     if (conversationId == null || conversationId <= 0) {
       _showSnackBar('Conversation belum dipilih.');
@@ -2352,6 +2407,14 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     int conversationId, {
     required bool showConversationOnMobile,
   }) {
+    final currentConversationId = _controller.selectedConversation?.id;
+    if (_replyingTo != null && currentConversationId != conversationId) {
+      setState(() {
+        _replyingTo = null;
+        _replyingToConversationId = null;
+      });
+    }
+
     if (showConversationOnMobile) {
       _setMobilePane(_OmnichannelMobilePane.conversation);
     }
@@ -2512,6 +2575,16 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   onOpenCallHistory: () =>
                       unawaited(_openConversationCallHistory()),
                   onEndCall: _endConversationCall,
+                  onSwipeToReply: (message) => setState(() {
+                    _replyingTo = message;
+                    _replyingToConversationId =
+                        _controller.selectedConversation?.id;
+                  }),
+                  replyingTo: _activeReplyTo,
+                  onCancelReply: () => setState(() {
+                    _replyingTo = null;
+                    _replyingToConversationId = null;
+                  }),
                   onOpenInbox: null,
                   selectionVersion: _controller.selectionVersion,
                 ),
@@ -2647,6 +2720,16 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       onOpenCallHistory: () =>
                           unawaited(_openConversationCallHistory()),
                       onEndCall: _endConversationCall,
+                      onSwipeToReply: (message) => setState(() {
+                        _replyingTo = message;
+                        _replyingToConversationId =
+                            _controller.selectedConversation?.id;
+                      }),
+                      replyingTo: _activeReplyTo,
+                      onCancelReply: () => setState(() {
+                        _replyingTo = null;
+                        _replyingToConversationId = null;
+                      }),
                       onOpenInbox: () =>
                           _setMobilePane(_OmnichannelMobilePane.inbox),
                       selectionVersion: _controller.selectionVersion,
