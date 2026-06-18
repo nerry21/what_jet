@@ -1428,11 +1428,14 @@ class _MobileConversationBubble extends StatelessWidget {
     required this.message,
     required this.maxWidth,
     this.onReactToMessage,
+    // ignore: unused_element_parameter
+    this.onSwipeToReply,
   });
 
   final OmnichannelThreadMessageModel message;
   final double maxWidth;
   final void Function(int messageId, String emoji)? onReactToMessage;
+  final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
 
   @override
   Widget build(BuildContext context) {
@@ -1545,13 +1548,23 @@ class _MobileConversationBubble extends StatelessWidget {
         ),
       ),
     );
-    if (message.isMine || onReactToMessage == null) {
+    final bool canReact = !message.isMine && onReactToMessage != null;
+    final bool canSwipeReply = onSwipeToReply != null;
+    if (!canReact && !canSwipeReply) {
       return align;
     }
     return GestureDetector(
       behavior: HitTestBehavior.deferToChild,
-      onLongPress: () =>
-          _showReactionPicker(context, message.id, onReactToMessage!),
+      onLongPress: canReact
+          ? () => _showReactionPicker(context, message.id, onReactToMessage!)
+          : null,
+      onHorizontalDragEnd: canSwipeReply
+          ? (DragEndDetails details) {
+              if ((details.primaryVelocity ?? 0) > 0) {
+                onSwipeToReply!(message);
+              }
+            }
+          : null,
       child: align,
     );
   }
@@ -2300,11 +2313,14 @@ class _ThreadBubble extends StatelessWidget {
     required this.message,
     required this.maxWidth,
     this.onReactToMessage,
+    // ignore: unused_element_parameter
+    this.onSwipeToReply,
   });
 
   final OmnichannelThreadMessageModel message;
   final double maxWidth;
   final void Function(int messageId, String emoji)? onReactToMessage;
+  final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
 
   @override
   Widget build(BuildContext context) {
@@ -2428,13 +2444,23 @@ class _ThreadBubble extends StatelessWidget {
         ),
       ),
     );
-    if (message.isMine || onReactToMessage == null) {
+    final bool canReact = !message.isMine && onReactToMessage != null;
+    final bool canSwipeReply = onSwipeToReply != null;
+    if (!canReact && !canSwipeReply) {
       return align;
     }
     return GestureDetector(
       behavior: HitTestBehavior.deferToChild,
-      onLongPress: () =>
-          _showReactionPicker(context, message.id, onReactToMessage!),
+      onLongPress: canReact
+          ? () => _showReactionPicker(context, message.id, onReactToMessage!)
+          : null,
+      onHorizontalDragEnd: canSwipeReply
+          ? (DragEndDetails details) {
+              if ((details.primaryVelocity ?? 0) > 0) {
+                onSwipeToReply!(message);
+              }
+            }
+          : null,
       child: align,
     );
   }
