@@ -169,6 +169,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
 
   final TextEditingController _composerController = TextEditingController();
   final ScrollController _threadScrollController = ScrollController();
+  final Map<int, GlobalKey> _quotedScrollKeys = <int, GlobalKey>{};
   final FocusNode _composerFocusNode = FocusNode();
 
   bool get _isMobileConversationLayout => widget.onOpenInbox != null;
@@ -199,6 +200,10 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
     final wasNearBottom = _isNearThreadBottom();
     final selectionVersionChanged =
         oldWidget.selectionVersion != widget.selectionVersion;
+
+    if (conversationChanged) {
+      _quotedScrollKeys.clear();
+    }
 
     if (conversationChanged && currentMessageCount > 0) {
       _scheduleScrollToThreadBottom();
@@ -238,6 +243,22 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
 
   void _handleComposerChanged() {
     widget.onComposerChanged?.call(_composerController.text);
+  }
+
+  GlobalKey _keyForMessage(int messageId) =>
+      _quotedScrollKeys.putIfAbsent(messageId, () => GlobalKey());
+
+  void _scrollToMessage(int messageId) {
+    final ctx = _quotedScrollKeys[messageId]?.currentContext;
+    if (ctx == null) {
+      return;
+    }
+    Scrollable.ensureVisible(
+      ctx,
+      duration: const Duration(milliseconds: 300),
+      alignment: 0.3,
+      curve: Curves.easeInOut,
+    );
   }
 
   bool _isNearThreadBottom() {
@@ -706,6 +727,8 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         onSwipeToReply: widget.onSwipeToReply,
         replyingTo: widget.replyingTo,
         onCancelReply: widget.onCancelReply,
+        onTapQuotedReply: _scrollToMessage,
+        keyForMessage: _keyForMessage,
         callBanner: callBanner,
         callHistorySection: _buildCallHistorySection(compact: true),
         callTimelineSection: _buildCallTimelineSection(compact: true),
@@ -799,11 +822,13 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
                                       const SizedBox(height: 12),
                                       ...threadGroups[index].messages.map(
                                         (message) => _ThreadBubble(
+                                          key: _keyForMessage(message.id),
                                           message: message,
                                           maxWidth: bubbleMaxWidth,
                                           onReactToMessage:
                                               widget.onReactToMessage,
                                           onSwipeToReply: widget.onSwipeToReply,
+                                          onTapQuotedReply: _scrollToMessage,
                                         ),
                                       ),
                                     ],
@@ -871,6 +896,8 @@ class _MobileConversationScaffold extends StatelessWidget {
     this.onSwipeToReply,
     this.replyingTo,
     this.onCancelReply,
+    this.onTapQuotedReply,
+    this.keyForMessage,
     this.callBanner,
     this.callHistorySection,
     this.callTimelineSection,
@@ -902,6 +929,8 @@ class _MobileConversationScaffold extends StatelessWidget {
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
   final OmnichannelThreadMessageModel? replyingTo;
   final VoidCallback? onCancelReply;
+  final void Function(int quotedMessageId)? onTapQuotedReply;
+  final GlobalKey Function(int messageId)? keyForMessage;
   final Widget? callBanner;
   final Widget? callHistorySection;
   final Widget? callTimelineSection;
@@ -974,10 +1003,12 @@ class _MobileConversationScaffold extends StatelessWidget {
                             const SizedBox(height: 10),
                             ...threadGroups[index].messages.map(
                               (message) => _MobileConversationBubble(
+                                key: keyForMessage?.call(message.id),
                                 message: message,
                                 maxWidth: bubbleMaxWidth,
                                 onReactToMessage: onReactToMessage,
                                 onSwipeToReply: onSwipeToReply,
+                                onTapQuotedReply: onTapQuotedReply,
                               ),
                             ),
                           ],
@@ -1383,9 +1414,10 @@ class _MobileDateSeparator extends StatelessWidget {
 }
 
 class _QuotedReplyPreview extends StatelessWidget {
-  const _QuotedReplyPreview({required this.replyContext});
+  const _QuotedReplyPreview({required this.replyContext, this.onTap});
 
   final OmnichannelReplyContext replyContext;
+  final VoidCallback? onTap;
 
   String get _authorLabel =>
       replyContext.quotedDirection == 'outbound' ? 'Anda' : 'Pelanggan';
@@ -1413,7 +1445,7 @@ class _QuotedReplyPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final Widget content = Container(
       padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
       decoration: BoxDecoration(
         color: AppColors.neutral800.withValues(alpha: 0.08),
@@ -1447,21 +1479,32 @@ class _QuotedReplyPreview extends StatelessWidget {
         ],
       ),
     );
+    if (onTap == null) {
+      return content;
+    }
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: content,
+    );
   }
 }
 
 class _MobileConversationBubble extends StatelessWidget {
   const _MobileConversationBubble({
+    super.key,
     required this.message,
     required this.maxWidth,
     this.onReactToMessage,
     this.onSwipeToReply,
+    this.onTapQuotedReply,
   });
 
   final OmnichannelThreadMessageModel message;
   final double maxWidth;
   final void Function(int messageId, String emoji)? onReactToMessage;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
+  final void Function(int quotedMessageId)? onTapQuotedReply;
 
   @override
   Widget build(BuildContext context) {
@@ -1497,7 +1540,16 @@ class _MobileConversationBubble extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               if (message.replyContext != null) ...<Widget>[
-                _QuotedReplyPreview(replyContext: message.replyContext!),
+                _QuotedReplyPreview(
+                  replyContext: message.replyContext!,
+                  onTap:
+                      message.replyContext!.quotedMessageId == null ||
+                          onTapQuotedReply == null
+                      ? null
+                      : () => onTapQuotedReply!(
+                          message.replyContext!.quotedMessageId!,
+                        ),
+                ),
                 const SizedBox(height: 6),
               ],
               if (message.hasImage) ...<Widget>[
@@ -2419,16 +2471,19 @@ class _DateSeparator extends StatelessWidget {
 
 class _ThreadBubble extends StatelessWidget {
   const _ThreadBubble({
+    super.key,
     required this.message,
     required this.maxWidth,
     this.onReactToMessage,
     this.onSwipeToReply,
+    this.onTapQuotedReply,
   });
 
   final OmnichannelThreadMessageModel message;
   final double maxWidth;
   final void Function(int messageId, String emoji)? onReactToMessage;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
+  final void Function(int quotedMessageId)? onTapQuotedReply;
 
   @override
   Widget build(BuildContext context) {
@@ -2475,7 +2530,16 @@ class _ThreadBubble extends StatelessWidget {
               ),
               const SizedBox(height: 5),
               if (message.replyContext != null) ...<Widget>[
-                _QuotedReplyPreview(replyContext: message.replyContext!),
+                _QuotedReplyPreview(
+                  replyContext: message.replyContext!,
+                  onTap:
+                      message.replyContext!.quotedMessageId == null ||
+                          onTapQuotedReply == null
+                      ? null
+                      : () => onTapQuotedReply!(
+                          message.replyContext!.quotedMessageId!,
+                        ),
+                ),
                 const SizedBox(height: 6),
               ],
               if (message.hasImage) ...<Widget>[
