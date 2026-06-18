@@ -130,6 +130,26 @@ class OmnichannelReplyContext {
   }
 }
 
+class OmnichannelReactions {
+  const OmnichannelReactions({this.customer, this.admin});
+
+  final String? customer;
+  final String? admin;
+
+  static OmnichannelReactions? fromJson(Object? value) {
+    final map = asOmnichannelMap(value);
+    if (map == null) {
+      return null;
+    }
+    final customer = omnichannelString(map['customer']);
+    final admin = omnichannelString(map['admin']);
+    if (customer == null && admin == null) {
+      return null;
+    }
+    return OmnichannelReactions(customer: customer, admin: admin);
+  }
+}
+
 class OmnichannelThreadMessageModel {
   const OmnichannelThreadMessageModel({
     required this.id,
@@ -170,6 +190,7 @@ class OmnichannelThreadMessageModel {
     this.interactiveFooter,
     this.interactiveListButtonTitle,
     this.replyContext,
+    this.reactions,
   });
 
   final int id;
@@ -210,6 +231,7 @@ class OmnichannelThreadMessageModel {
   final String? interactiveFooter;
   final String? interactiveListButtonTitle;
   final OmnichannelReplyContext? replyContext;
+  final OmnichannelReactions? reactions;
 
   bool get hasImage =>
       messageType == 'image' && (imageUrl?.trim().isNotEmpty ?? false);
@@ -519,6 +541,7 @@ class OmnichannelThreadMessageModel {
         omnichannelString,
       ),
       replyContext: OmnichannelReplyContext.fromJson(json['reply_context']),
+      reactions: OmnichannelReactions.fromJson(json['reactions']),
     );
   }
 }

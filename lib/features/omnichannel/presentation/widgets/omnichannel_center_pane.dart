@@ -1490,6 +1490,29 @@ class _QuotedReplyPreview extends StatelessWidget {
   }
 }
 
+class _ReactionBadge extends StatelessWidget {
+  const _ReactionBadge({required this.reactions});
+
+  final OmnichannelReactions reactions;
+
+  @override
+  Widget build(BuildContext context) {
+    final emojis = <String>[
+      if (reactions.admin != null) reactions.admin!,
+      if (reactions.customer != null) reactions.customer!,
+    ];
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: AppColors.surfacePrimary,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Text(emojis.join(' '), style: const TextStyle(fontSize: 14)),
+    );
+  }
+}
+
 class _MobileConversationBubble extends StatelessWidget {
   const _MobileConversationBubble({
     super.key,
@@ -1621,6 +1644,10 @@ class _MobileConversationBubble extends StatelessWidget {
                   ],
                 ],
               ),
+              if (message.reactions != null) ...<Widget>[
+                const SizedBox(height: 4),
+                _ReactionBadge(reactions: message.reactions!),
+              ],
             ],
           ),
         ),
@@ -2611,6 +2638,10 @@ class _ThreadBubble extends StatelessWidget {
                   ],
                 ],
               ),
+              if (message.reactions != null) ...<Widget>[
+                const SizedBox(height: 4),
+                _ReactionBadge(reactions: message.reactions!),
+              ],
             ],
           ),
         ),
