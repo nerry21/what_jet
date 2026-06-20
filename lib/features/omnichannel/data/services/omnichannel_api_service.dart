@@ -174,6 +174,17 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> markConversationAsUnread({
+    required String accessToken,
+    required int conversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationMarkUnread(conversationId),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
+
   Future<Map<String, dynamic>> sendConversationReadReceipt({
     required String accessToken,
     required int conversationId,

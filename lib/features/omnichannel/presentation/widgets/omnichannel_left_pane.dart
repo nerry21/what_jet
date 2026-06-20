@@ -23,6 +23,7 @@ class OmnichannelLeftPane extends StatelessWidget {
     required this.onScopeChanged,
     required this.onChannelChanged,
     required this.onConversationTap,
+    this.onConversationLongPress,
     required this.isLoading,
     required this.isLoadingMore,
     required this.hasMore,
@@ -41,6 +42,7 @@ class OmnichannelLeftPane extends StatelessWidget {
   final ValueChanged<String> onScopeChanged;
   final ValueChanged<String> onChannelChanged;
   final ValueChanged<int> onConversationTap;
+  final ValueChanged<int>? onConversationLongPress;
   final bool isLoading;
   final bool isLoadingMore;
   final bool hasMore;
@@ -66,6 +68,7 @@ class OmnichannelLeftPane extends StatelessWidget {
         selectedScope: selectedScope,
         onScopeChanged: onScopeChanged,
         onConversationTap: onConversationTap,
+        onConversationLongPress: onConversationLongPress,
         isLoading: isLoading,
         isLoadingMore: isLoadingMore,
         hasMore: hasMore,
@@ -244,6 +247,12 @@ class OmnichannelLeftPane extends StatelessWidget {
                                       selected:
                                           selectedConversationId == item.id,
                                       onTap: () => onConversationTap(item.id),
+                                      onLongPress:
+                                          onConversationLongPress == null
+                                          ? null
+                                          : () => onConversationLongPress!(
+                                              item.id,
+                                            ),
                                     ),
                                   );
                                 },
@@ -610,6 +619,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
     required this.selectedScope,
     required this.onScopeChanged,
     required this.onConversationTap,
+    this.onConversationLongPress,
     required this.isLoading,
     required this.isLoadingMore,
     required this.hasMore,
@@ -625,6 +635,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
   final String selectedScope;
   final ValueChanged<String> onScopeChanged;
   final ValueChanged<int> onConversationTap;
+  final ValueChanged<int>? onConversationLongPress;
   final bool isLoading;
   final bool isLoadingMore;
   final bool hasMore;
@@ -836,6 +847,9 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                                   (selectedConversationId == null &&
                                       index == 0),
                               onTap: () => onConversationTap(item.id),
+                              onLongPress: onConversationLongPress == null
+                                  ? null
+                                  : () => onConversationLongPress!(item.id),
                             ),
                           );
                         },
@@ -1009,11 +1023,13 @@ class _PremiumConversationTile extends StatelessWidget {
     required this.item,
     required this.selected,
     required this.onTap,
+    this.onLongPress,
   });
 
   final OmnichannelConversationListItemModel item;
   final bool selected;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -1026,6 +1042,7 @@ class _PremiumConversationTile extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         child: Container(
           padding: EdgeInsets.fromLTRB(16, 12, 14, 12),
           decoration: BoxDecoration(

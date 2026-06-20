@@ -284,6 +284,20 @@ class OmnichannelRepository {
     }
   }
 
+  /// Mark conversation as unread on the backend (BRIEF 3A).
+  /// Fails silently — eventual consistency: badge recalculated on next poll.
+  Future<void> markConversationAsUnread({required int conversationId}) async {
+    try {
+      final accessToken = await _ensureAdminSession();
+      await _apiService.markConversationAsUnread(
+        accessToken: accessToken,
+        conversationId: conversationId,
+      );
+    } catch (_) {
+      // Silent fail — unread badge will be recalculated on next poll.
+    }
+  }
+
   /// Send a WhatsApp Cloud API read receipt for the conversation's latest
   /// inbound message. Fire-and-forget — failure never blocks chat UX.
   Future<void> sendConversationReadReceipt({

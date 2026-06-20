@@ -8,6 +8,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:record/record.dart';
 
+import 'package:what_jet/core/config/app_config.dart';
 import 'package:what_jet/core/theme/app_colors.dart';
 import 'package:what_jet/core/theme/app_dimensions.dart';
 import '../../../../core/network/api_client.dart';
@@ -33,6 +34,7 @@ import '../pages/omnichannel_call_page.dart';
 import '../pages/omnichannel_call_history_page.dart';
 import '../pages/omnichannel_updates_page.dart';
 import '../utils/omnichannel_call_status_ui.dart';
+import '../widgets/omnichannel_action_sheet.dart';
 import '../widgets/omnichannel_center_pane.dart';
 import '../widgets/omnichannel_call_settings_checklist_sheet.dart';
 import '../widgets/omnichannel_left_pane.dart';
@@ -2422,6 +2424,13 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     unawaited(_controller.selectConversation(conversationId));
   }
 
+  void _handleConversationLongPress(int conversationId) {
+    showConversationActionSheet(
+      context: context,
+      onMarkUnread: () => unawaited(_controller.markUnread(conversationId)),
+    );
+  }
+
   Widget _buildAdaptiveShell({
     required BoxConstraints constraints,
     required OmnichannelWorkspaceModel workspace,
@@ -2522,6 +2531,9 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   conversationId,
                   showConversationOnMobile: false,
                 ),
+                onConversationLongPress: AppConfig.chatManagementEnabled
+                    ? _handleConversationLongPress
+                    : null,
                 isLoading: shellLoading,
                 isLoadingMore: _controller.isLoadingMore,
                 hasMore: _controller.hasMoreConversations,
@@ -2664,6 +2676,9 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                     conversationId,
                     showConversationOnMobile: true,
                   ),
+                  onConversationLongPress: AppConfig.chatManagementEnabled
+                      ? _handleConversationLongPress
+                      : null,
                   isLoading: shellLoading,
                   isLoadingMore: _controller.isLoadingMore,
                   hasMore: _controller.hasMoreConversations,
