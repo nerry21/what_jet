@@ -12,11 +12,13 @@ class OmnichannelConversationCard extends StatelessWidget {
     required this.item,
     required this.selected,
     required this.onTap,
+    this.onLongPress,
   });
 
   final OmnichannelConversationListItemModel item;
   final bool selected;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,7 @@ class OmnichannelConversationCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         borderRadius: AppRadii.borderRadiusLg,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),

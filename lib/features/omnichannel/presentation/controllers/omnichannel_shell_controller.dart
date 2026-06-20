@@ -352,6 +352,14 @@ class OmnichannelShellController extends ChangeNotifier {
     );
   }
 
+  /// Marks a conversation as unread (BRIEF 3A): optimistically bumps the local
+  /// unread badge, then tells the backend (silent-fail). Inverse of the tap
+  /// read-clear flow. Eventual consistency: next poll reconciles with backend.
+  Future<void> markUnread(int conversationId) async {
+    _bumpUnreadForConversation(conversationId);
+    await _repository.markConversationAsUnread(conversationId: conversationId);
+  }
+
   /// Clears unread count locally for a conversation so it appears read immediately.
   void _clearUnreadForConversation(int conversationId) {
     final currentList = _conversationList;
@@ -366,6 +374,36 @@ class OmnichannelShellController extends ChangeNotifier {
           channel: item.channel,
           statusLabel: item.statusLabel,
           unreadCount: 0,
+          lastActivityAt: item.lastActivityAt,
+          mergeKey: item.mergeKey,
+          customerLabel: item.customerLabel,
+          customerPhone: item.customerPhone,
+          mergedConversationCount: item.mergedConversationCount,
+        );
+      }
+      return item;
+    }).toList();
+
+    _conversationList = currentList.copyWith(items: updatedItems);
+    notifyListeners();
+  }
+
+  /// Bumps unread count locally to 1 for a conversation that is currently read
+  /// (unreadCount == 0), so the badge appears immediately (BRIEF 3A). Mirror of
+  /// [_clearUnreadForConversation]; leaves already-unread items untouched.
+  void _bumpUnreadForConversation(int conversationId) {
+    final currentList = _conversationList;
+    if (currentList == null) return;
+
+    final updatedItems = currentList.items.map((item) {
+      if (item.id == conversationId && item.unreadCount == 0) {
+        return OmnichannelConversationListItemModel(
+          id: item.id,
+          title: item.title,
+          preview: item.preview,
+          channel: item.channel,
+          statusLabel: item.statusLabel,
+          unreadCount: 1,
           lastActivityAt: item.lastActivityAt,
           mergeKey: item.mergeKey,
           customerLabel: item.customerLabel,

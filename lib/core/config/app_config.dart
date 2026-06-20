@@ -40,6 +40,12 @@ class AppConfig {
   // Rollback = rebuild dengan nilai false / git revert (bukan toggle runtime).
   static const bool whatsappTextFormattingEnabled = false;
 
+  // BRIEF 3A — Chat management (long-press action sheet + mark-unread).
+  // Compile-time flag, default OFF. ON => long-press kartu/tile buka action
+  // sheet "Tandai belum dibaca". OFF => onLongPress null, kartu/tile identik.
+  // Rollback = rebuild dengan nilai false / git revert.
+  static const bool chatManagementEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {
