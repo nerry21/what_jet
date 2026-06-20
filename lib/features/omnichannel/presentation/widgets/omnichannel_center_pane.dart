@@ -7,6 +7,7 @@ import 'package:video_player/video_player.dart';
 
 import 'package:what_jet/core/theme/app_colors.dart';
 import 'package:what_jet/core/theme/app_dimensions.dart';
+import 'package:what_jet/core/config/app_config.dart';
 import '../../data/models/omnichannel_call_history_item_model.dart';
 import '../../../live_chat/presentation/widgets/channel_badge.dart';
 import '../../data/models/omnichannel_call_session_model.dart';
@@ -1607,13 +1608,11 @@ class _MobileConversationBubble extends StatelessWidget {
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
               if (message.displayText.isNotEmpty)
-                Text(
-                  message.displayText,
-                  style: TextStyle(
-                    fontSize: 15,
-                    height: 1.35,
-                    color: AppColors.neutral800,
-                  ),
+                _FormattedMessageText(
+                  text: message.displayText,
+                  fontSize: 15,
+                  height: 1.35,
+                  color: AppColors.neutral800,
                 ),
               if (message.displayText.isEmpty &&
                   !message.hasImage &&
@@ -2601,13 +2600,11 @@ class _ThreadBubble extends StatelessWidget {
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
               if (message.displayText.isNotEmpty)
-                Text(
-                  message.displayText,
-                  style: TextStyle(
-                    fontSize: 14,
-                    height: 1.5,
-                    color: AppColors.neutral800,
-                  ),
+                _FormattedMessageText(
+                  text: message.displayText,
+                  fontSize: 14,
+                  height: 1.5,
+                  color: AppColors.neutral800,
                 ),
               if (message.displayText.isEmpty &&
                   !message.hasImage &&
@@ -5004,4 +5001,138 @@ String _buildBotResumeLabel(OmnichannelConversationDetailModel conversation) {
   final month = parsed.month.toString().padLeft(2, '0');
 
   return 'Bot aktif otomatis lagi $day/$month $hours:$mins.';
+}
+
+class _FormattedMessageText extends StatelessWidget {
+  const _FormattedMessageText({
+    required this.text,
+    required this.fontSize,
+    required this.height,
+    required this.color,
+  });
+
+  final String text;
+  final double fontSize;
+  final double height;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextStyle base = TextStyle(
+      fontSize: fontSize,
+      height: height,
+      color: color,
+    );
+    // Flag OFF => render lama persis (Text polos, style identik). 0 delta.
+    if (!AppConfig.whatsappTextFormattingEnabled) {
+      return Text(text, style: base);
+    }
+    return Text.rich(
+      TextSpan(style: base, children: _parseWhatsappFormatting(text, base)),
+    );
+  }
+}
+
+bool _isFmtSpace(String ch) {
+  return ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r';
+}
+
+// Cari penutup marker WhatsApp untuk opener di `start`.
+// Rule fallback-safe: inner tidak boleh kosong & tidak diawali/diakhiri spasi.
+int _findFmtClose(String text, int start, String marker) {
+  final int n = text.length;
+  if (start + 1 >= n) {
+    return -1;
+  }
+  if (_isFmtSpace(text[start + 1])) {
+    return -1;
+  }
+  for (int j = start + 1; j < n; j++) {
+    if (text[j] == marker && j > start + 1 && !_isFmtSpace(text[j - 1])) {
+      return j;
+    }
+  }
+  return -1;
+}
+
+TextStyle _fmtStyleFor(String marker, TextStyle base) {
+  switch (marker) {
+    case '*':
+      return base.merge(const TextStyle(fontWeight: FontWeight.bold));
+    case '_':
+      return base.merge(const TextStyle(fontStyle: FontStyle.italic));
+    case '~':
+      return base.merge(
+        const TextStyle(decoration: TextDecoration.lineThrough),
+      );
+    default:
+      return base;
+  }
+}
+
+// Parser WhatsApp fallback-safe, single-pass + rekursi dangkal.
+// *bold* _italic_ ~strike~ boleh nested; ```mono``` literal (tak nested).
+// Marker tak berpasangan / inner kosong / closer didahului spasi => literal.
+// Tidak menghilangkan karakter, tidak melempar exception. Marker = ASCII
+// 1 code-unit => emoji/surrogate-pair aman lewat apa adanya.
+List<InlineSpan> _parseWhatsappFormatting(String text, TextStyle base) {
+  final List<InlineSpan> spans = <InlineSpan>[];
+  final StringBuffer buffer = StringBuffer();
+
+  void flush() {
+    if (buffer.isNotEmpty) {
+      spans.add(TextSpan(text: buffer.toString(), style: base));
+      buffer.clear();
+    }
+  }
+
+  final int n = text.length;
+  int i = 0;
+  while (i < n) {
+    final String ch = text[i];
+
+    // Monospace ```...``` — literal, tidak nested.
+    if (ch == '`' && i + 2 < n && text[i + 1] == '`' && text[i + 2] == '`') {
+      final int close = text.indexOf('```', i + 3);
+      if (close > i + 3) {
+        flush();
+        spans.add(
+          TextSpan(
+            text: text.substring(i + 3, close),
+            style: base.merge(const TextStyle(fontFamily: 'monospace')),
+          ),
+        );
+        i = close + 3;
+        continue;
+      }
+      buffer.write(ch);
+      i++;
+      continue;
+    }
+
+    // Inline marker * _ ~ — boleh nested via rekursi.
+    if (ch == '*' || ch == '_' || ch == '~') {
+      final int close = _findFmtClose(text, i, ch);
+      if (close != -1) {
+        flush();
+        spans.addAll(
+          _parseWhatsappFormatting(
+            text.substring(i + 1, close),
+            _fmtStyleFor(ch, base),
+          ),
+        );
+        i = close + 1;
+        continue;
+      }
+      buffer.write(ch);
+      i++;
+      continue;
+    }
+
+    buffer.write(ch);
+    i++;
+  }
+
+  flush();
+  return spans;
 }

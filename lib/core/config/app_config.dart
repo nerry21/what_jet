@@ -34,6 +34,12 @@ class AppConfig {
   static const Duration defaultPollingInterval = Duration(seconds: 3);
   static const Duration reconnectPollingInterval = Duration(seconds: 5);
 
+  // BRIEF 2 — Format Teks WhatsApp di bubble (render-layer only).
+  // Compile-time flag, default OFF. ON => bubble me-render *bold* / _italic_ /
+  // ~strike~ / ```mono```. OFF => Text polos, visual/perilaku identik (0 delta).
+  // Rollback = rebuild dengan nilai false / git revert (bukan toggle runtime).
+  static const bool whatsappTextFormattingEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {
