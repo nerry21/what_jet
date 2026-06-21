@@ -6,12 +6,14 @@ class OmnichannelWorkspaceModel {
     required this.activeConversations,
     required this.filters,
     required this.channels,
+    this.tags = const <OmnichannelFilterOptionModel>[],
   });
 
   final int unreadTotal;
   final int activeConversations;
   final List<OmnichannelFilterOptionModel> filters;
   final List<OmnichannelFilterOptionModel> channels;
+  final List<OmnichannelFilterOptionModel> tags;
 
   factory OmnichannelWorkspaceModel.fromSources({
     Map<String, dynamic> workspacePayload = const <String, dynamic>{},
@@ -63,6 +65,13 @@ class OmnichannelWorkspaceModel {
         ),
       ],
     );
+    final tags = _parseFilterOptions(sources, const <String>[
+      'filters.tags',
+      'meta.filters.tags',
+      'workspace.filters.tags',
+      'workspace.tags',
+      'tags',
+    ], fallback: const <OmnichannelFilterOptionModel>[]);
 
     return OmnichannelWorkspaceModel(
       unreadTotal:
@@ -89,6 +98,7 @@ class OmnichannelWorkspaceModel {
           _countFromFilters(filters, 'all'),
       filters: filters,
       channels: channels,
+      tags: tags,
     );
   }
 
@@ -139,12 +149,14 @@ class OmnichannelWorkspaceModel {
     int? activeConversations,
     List<OmnichannelFilterOptionModel>? filters,
     List<OmnichannelFilterOptionModel>? channels,
+    List<OmnichannelFilterOptionModel>? tags,
   }) {
     return OmnichannelWorkspaceModel(
       unreadTotal: unreadTotal ?? this.unreadTotal,
       activeConversations: activeConversations ?? this.activeConversations,
       filters: filters ?? this.filters,
       channels: channels ?? this.channels,
+      tags: tags ?? this.tags,
     );
   }
 
@@ -156,6 +168,7 @@ class OmnichannelWorkspaceModel {
           : activeConversations,
       filters: other.filters.isNotEmpty ? other.filters : filters,
       channels: other.channels.isNotEmpty ? other.channels : channels,
+      tags: other.tags.isNotEmpty ? other.tags : tags,
     );
   }
 }

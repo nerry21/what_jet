@@ -3,6 +3,7 @@ class OmnichannelQueryModel {
     this.scope = 'all',
     this.channel = 'all',
     this.search = '',
+    this.tag = '',
     this.page = 1,
     this.perPage = 20,
   });
@@ -10,6 +11,7 @@ class OmnichannelQueryModel {
   final String scope;
   final String channel;
   final String search;
+  final String tag;
   final int page;
   final int perPage;
 
@@ -20,6 +22,7 @@ class OmnichannelQueryModel {
       'scope': scope,
       'channel': channel,
       'search': search.trim().isEmpty ? null : search.trim(),
+      'tag': tag.trim().isEmpty ? null : tag.trim(),
       'page': page,
       'per_page': perPage,
     };
@@ -29,6 +32,7 @@ class OmnichannelQueryModel {
     String? scope,
     String? channel,
     String? search,
+    String? tag,
     int? page,
     int? perPage,
   }) {
@@ -36,6 +40,7 @@ class OmnichannelQueryModel {
       scope: scope ?? this.scope,
       channel: channel ?? this.channel,
       search: search ?? this.search,
+      tag: tag ?? this.tag,
       page: page ?? this.page,
       perPage: perPage ?? this.perPage,
     );

@@ -23,6 +23,8 @@ class OmnichannelLeftPane extends StatelessWidget {
     required this.selectedChannel,
     required this.onScopeChanged,
     required this.onChannelChanged,
+    required this.selectedTag,
+    required this.onTagChanged,
     required this.onConversationTap,
     this.onConversationLongPress,
     required this.isLoading,
@@ -42,6 +44,8 @@ class OmnichannelLeftPane extends StatelessWidget {
   final String selectedChannel;
   final ValueChanged<String> onScopeChanged;
   final ValueChanged<String> onChannelChanged;
+  final String selectedTag;
+  final ValueChanged<String> onTagChanged;
   final ValueChanged<int> onConversationTap;
   final ValueChanged<int>? onConversationLongPress;
   final bool isLoading;
@@ -68,6 +72,8 @@ class OmnichannelLeftPane extends StatelessWidget {
         searchController: searchController,
         selectedScope: selectedScope,
         onScopeChanged: onScopeChanged,
+        selectedTag: selectedTag,
+        onTagChanged: onTagChanged,
         onConversationTap: onConversationTap,
         onConversationLongPress: onConversationLongPress,
         isLoading: isLoading,
@@ -162,6 +168,17 @@ class OmnichannelLeftPane extends StatelessWidget {
                                     onSelected: onChannelChanged,
                                     isLoading: isLoading,
                                   ),
+                                  if (AppConfig.chatManagementEnabled &&
+                                      (workspace.tags.isNotEmpty ||
+                                          selectedTag.isNotEmpty)) ...<Widget>[
+                                    const SizedBox(height: 16),
+                                    _TagFilterMenu(
+                                      options: workspace.tags,
+                                      selectedKey: selectedTag,
+                                      onSelected: onTagChanged,
+                                      isLoading: isLoading,
+                                    ),
+                                  ],
                                   const SizedBox(height: 16),
                                   Row(
                                     children: <Widget>[
@@ -469,6 +486,103 @@ class _FilterGroup extends StatelessWidget {
   }
 }
 
+class _TagFilterMenu extends StatelessWidget {
+  const _TagFilterMenu({
+    required this.options,
+    required this.selectedKey,
+    required this.onSelected,
+    required this.isLoading,
+  });
+
+  final List<OmnichannelFilterOptionModel> options;
+  final String selectedKey;
+  final ValueChanged<String> onSelected;
+  final bool isLoading;
+
+  String _labelForKey(String key) {
+    for (final option in options) {
+      if (option.key == key) {
+        return option.label;
+      }
+    }
+    return key;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool active = selectedKey.isNotEmpty;
+    final String activeLabel = active
+        ? _labelForKey(selectedKey)
+        : 'Semua label';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          'Label',
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: AppColors.neutral500,
+          ),
+        ),
+        const SizedBox(height: 10),
+        PopupMenuButton<String>(
+          enabled: !isLoading,
+          onSelected: onSelected,
+          itemBuilder: (context) => <PopupMenuEntry<String>>[
+            const PopupMenuItem<String>(value: '', child: Text('Semua label')),
+            for (final option in options)
+              PopupMenuItem<String>(
+                value: option.key,
+                child: Text(option.label),
+              ),
+          ],
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+            decoration: BoxDecoration(
+              color: active
+                  ? AppColors.primary.withValues(alpha: 0.10)
+                  : AppColors.surfaceSecondary,
+              borderRadius: AppRadii.borderRadiusPill,
+              border: Border.all(
+                color: active
+                    ? AppColors.primary.withValues(alpha: 0.30)
+                    : AppColors.borderLight.withValues(alpha: 0.5),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Icon(
+                  Icons.label_outline,
+                  size: 16,
+                  color: active ? AppColors.primary : AppColors.neutral400,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  activeLabel,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: active ? AppColors.primary : AppColors.neutral600,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.arrow_drop_down,
+                  size: 18,
+                  color: active ? AppColors.primary : AppColors.neutral400,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _FilterChip extends StatelessWidget {
   const _FilterChip({
     required this.label,
@@ -619,6 +733,8 @@ class _MobileWhatsAppInbox extends StatelessWidget {
     required this.searchController,
     required this.selectedScope,
     required this.onScopeChanged,
+    required this.selectedTag,
+    required this.onTagChanged,
     required this.onConversationTap,
     this.onConversationLongPress,
     required this.isLoading,
@@ -635,6 +751,8 @@ class _MobileWhatsAppInbox extends StatelessWidget {
   final TextEditingController searchController;
   final String selectedScope;
   final ValueChanged<String> onScopeChanged;
+  final String selectedTag;
+  final ValueChanged<String> onTagChanged;
   final ValueChanged<int> onConversationTap;
   final ValueChanged<int>? onConversationLongPress;
   final bool isLoading;
@@ -774,6 +892,17 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                             .toList(),
                       ),
                     ),
+                    if (AppConfig.chatManagementEnabled &&
+                        (workspace.tags.isNotEmpty ||
+                            selectedTag.isNotEmpty)) ...<Widget>[
+                      const SizedBox(height: 12),
+                      _TagFilterMenu(
+                        options: workspace.tags,
+                        selectedKey: selectedTag,
+                        onSelected: onTagChanged,
+                        isLoading: isLoading,
+                      ),
+                    ],
                   ],
                 ),
               ),
