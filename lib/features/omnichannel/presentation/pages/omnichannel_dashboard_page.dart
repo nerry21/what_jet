@@ -140,10 +140,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     // Register callback untuk push notification tap → navigate ke conversation
     PushNotificationService.instance.onNotificationTapped = (conversationId) {
       if (!mounted) return;
-      _handleConversationTap(
-        conversationId,
-        showConversationOnMobile: true,
-      );
+      _handleConversationTap(conversationId, showConversationOnMobile: true);
     };
     _callMediaService = OmnichannelCallMediaService();
     _callController = OmnichannelCallController(
@@ -2428,7 +2425,49 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     showConversationActionSheet(
       context: context,
       onMarkUnread: () => unawaited(_controller.markUnread(conversationId)),
+      onManageLabel: () => unawaited(_handleManageLabel(conversationId)),
     );
+  }
+
+  OmnichannelConversationListItemModel? _findConversationItem(
+    int conversationId,
+  ) {
+    final items =
+        _controller.conversationList?.items ??
+        const <OmnichannelConversationListItemModel>[];
+    for (final item in items) {
+      if (item.id == conversationId) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _handleManageLabel(int conversationId) async {
+    final result = await showDialog<_LabelDialogResult>(
+      context: context,
+      builder: (dialogContext) {
+        return _ManageLabelDialog(
+          findItem: () => _findConversationItem(conversationId),
+        );
+      },
+    );
+
+    if (result == null) {
+      return;
+    }
+
+    if (result.type == _LabelActionType.add) {
+      await _controller.addLabel(conversationId, result.tag);
+    } else {
+      await _controller.removeLabel(conversationId, result.tag);
+    }
+
+    if (mounted) {
+      _showSnackBar(
+        'Permintaan label diproses. Daftar diperbarui setelah sinkronisasi.',
+      );
+    }
   }
 
   Widget _buildAdaptiveShell({
@@ -3129,6 +3168,118 @@ class _MobilePaneButton extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+enum _LabelActionType { add, remove }
+
+class _LabelDialogResult {
+  const _LabelDialogResult(this.type, this.tag);
+
+  final _LabelActionType type;
+  final String tag;
+}
+
+class _ManageLabelDialog extends StatefulWidget {
+  const _ManageLabelDialog({required this.findItem});
+
+  final OmnichannelConversationListItemModel? Function() findItem;
+
+  @override
+  State<_ManageLabelDialog> createState() => _ManageLabelDialogState();
+}
+
+class _ManageLabelDialogState extends State<_ManageLabelDialog> {
+  final TextEditingController _textController = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
+
+  String? _validate(String raw) {
+    final value = raw.trim();
+    if (value.length < 2 || value.length > 40) {
+      return 'Label harus 2–40 karakter.';
+    }
+    if (!RegExp(r'[A-Za-z0-9]').hasMatch(value)) {
+      return 'Label harus memuat minimal satu huruf atau angka.';
+    }
+    return null;
+  }
+
+  void _submit() {
+    final value = _textController.text.trim();
+    final error = _validate(value);
+    if (error != null) {
+      setState(() => _error = error);
+      return;
+    }
+    Navigator.of(context).pop(_LabelDialogResult(_LabelActionType.add, value));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final item = widget.findItem();
+
+    if (item == null) {
+      return AlertDialog(
+        title: const Text('Kelola label'),
+        content: const Text('Percakapan belum tersedia di daftar saat ini.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Tutup'),
+          ),
+        ],
+      );
+    }
+
+    return AlertDialog(
+      title: const Text('Kelola label'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          if (item.tags.isEmpty)
+            const Text('Belum ada label.')
+          else
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: <Widget>[
+                for (final tag in item.tags)
+                  InputChip(
+                    label: Text(tag.value),
+                    onDeleted: () => Navigator.of(context).pop(
+                      _LabelDialogResult(_LabelActionType.remove, tag.value),
+                    ),
+                  ),
+              ],
+            ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _textController,
+            autofocus: true,
+            decoration: InputDecoration(
+              labelText: 'Tambah label',
+              hintText: 'mis. follow-up-vip',
+              errorText: _error,
+            ),
+            onSubmitted: (_) => _submit(),
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Tutup'),
+        ),
+        ElevatedButton(onPressed: _submit, child: const Text('Simpan')),
+      ],
     );
   }
 }

@@ -1,5 +1,29 @@
 import 'omnichannel_payload_parser.dart';
 
+class ConversationTagModel {
+  const ConversationTagModel({
+    required this.id,
+    required this.value,
+    this.createdAt,
+  });
+
+  final int id;
+  final String value;
+  final DateTime? createdAt;
+
+  factory ConversationTagModel.fromJson(Map<String, dynamic> json) {
+    return ConversationTagModel(
+      id: omnichannelInt(json['id']) ?? 0,
+      value:
+          omnichannelString(json['value']) ??
+          omnichannelString(json['tag']) ??
+          omnichannelString(json['name']) ??
+          '',
+      createdAt: omnichannelDateTime(json['created_at']),
+    );
+  }
+}
+
 class OmnichannelConversationListModel {
   const OmnichannelConversationListModel({
     required this.items,
@@ -135,6 +159,7 @@ class OmnichannelConversationListItemModel {
     this.customerLabel,
     this.customerPhone,
     this.mergedConversationCount = 1,
+    this.tags = const <ConversationTagModel>[],
   });
 
   final int id;
@@ -148,6 +173,7 @@ class OmnichannelConversationListItemModel {
   final String? customerLabel;
   final String? customerPhone;
   final int mergedConversationCount;
+  final List<ConversationTagModel> tags;
 
   bool get hasUnread => unreadCount > 0;
 
@@ -183,11 +209,7 @@ class OmnichannelConversationListItemModel {
     );
     final customerPhone = omnichannelFirstMappedFromSources<String>(
       <Map<String, dynamic>>[json, customer],
-      const <String>[
-        'customer_phone_e164',
-        'phone_e164',
-        'display_contact',
-      ],
+      const <String>['customer_phone_e164', 'phone_e164', 'display_contact'],
       omnichannelString,
     );
     final statusLabel =
@@ -265,6 +287,9 @@ class OmnichannelConversationListItemModel {
             'merged_conversation_count',
           ], omnichannelInt) ??
           1,
+      tags: omnichannelFirstMapList(json, const <String>[
+        'tags',
+      ]).map(ConversationTagModel.fromJson).toList(),
     );
   }
 }
@@ -317,12 +342,11 @@ List<OmnichannelConversationListItemModel> _mergeConversationItems(
     }
   }
 
-  return _dedupeConversationItems(merged.values.toList())
-    ..sort(
-      (left, right) => right.lastActivityAt.millisecondsSinceEpoch.compareTo(
-        left.lastActivityAt.millisecondsSinceEpoch,
-      ),
-    );
+  return _dedupeConversationItems(merged.values.toList())..sort(
+    (left, right) => right.lastActivityAt.millisecondsSinceEpoch.compareTo(
+      left.lastActivityAt.millisecondsSinceEpoch,
+    ),
+  );
 }
 
 List<OmnichannelConversationListItemModel> _appendConversationItems(
@@ -346,12 +370,11 @@ List<OmnichannelConversationListItemModel> _appendConversationItems(
     }
   }
 
-  return _dedupeConversationItems(merged.values.toList())
-    ..sort(
-      (left, right) => right.lastActivityAt.millisecondsSinceEpoch.compareTo(
-        left.lastActivityAt.millisecondsSinceEpoch,
-      ),
-    );
+  return _dedupeConversationItems(merged.values.toList())..sort(
+    (left, right) => right.lastActivityAt.millisecondsSinceEpoch.compareTo(
+      left.lastActivityAt.millisecondsSinceEpoch,
+    ),
+  );
 }
 
 List<OmnichannelConversationListItemModel> _dedupeConversationItems(
@@ -368,12 +391,11 @@ List<OmnichannelConversationListItemModel> _dedupeConversationItems(
     }
   }
 
-  return deduped.values.toList()
-    ..sort(
-      (left, right) => right.lastActivityAt.millisecondsSinceEpoch.compareTo(
-        left.lastActivityAt.millisecondsSinceEpoch,
-      ),
-    );
+  return deduped.values.toList()..sort(
+    (left, right) => right.lastActivityAt.millisecondsSinceEpoch.compareTo(
+      left.lastActivityAt.millisecondsSinceEpoch,
+    ),
+  );
 }
 
 int? _resolveSelectedConversationId(

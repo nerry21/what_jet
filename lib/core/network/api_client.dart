@@ -76,6 +76,21 @@ class ApiClient {
     );
   }
 
+  Future<Map<String, dynamic>> delete(
+    String path, {
+    Map<String, Object?> queryParameters = const <String, Object?>{},
+    Map<String, Object?> body = const <String, Object?>{},
+    Map<String, String> headers = const <String, String>{},
+  }) {
+    return _send(
+      method: 'DELETE',
+      path: path,
+      queryParameters: queryParameters,
+      body: body,
+      headers: headers,
+    );
+  }
+
   Future<Map<String, dynamic>> postMultipart(
     String path, {
     Map<String, Object?> queryParameters = const <String, Object?>{},
@@ -116,6 +131,12 @@ class ApiClient {
         response = await _httpClient.get(uri, headers: _headers(headers));
       } else if (method == 'POST') {
         response = await _httpClient.post(
+          uri,
+          headers: _headers(headers),
+          body: jsonEncode(body ?? const <String, Object?>{}),
+        );
+      } else if (method == 'DELETE') {
+        response = await _httpClient.delete(
           uri,
           headers: _headers(headers),
           body: jsonEncode(body ?? const <String, Object?>{}),

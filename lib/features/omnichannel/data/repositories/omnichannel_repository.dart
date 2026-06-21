@@ -298,6 +298,41 @@ class OmnichannelRepository {
     }
   }
 
+  /// Add a label/tag to a conversation (BRIEF 3B-1). Fails silently —
+  /// eventual consistency: chip reconciled on next poll.
+  Future<void> addTag({
+    required int conversationId,
+    required String tag,
+  }) async {
+    try {
+      final accessToken = await _ensureAdminSession();
+      await _apiService.addConversationTag(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        tag: tag,
+      );
+    } catch (_) {
+      // Silent fail — label list reconciled on next poll.
+    }
+  }
+
+  /// Remove a label/tag from a conversation (BRIEF 3B-1). Fails silently.
+  Future<void> removeTag({
+    required int conversationId,
+    required String tag,
+  }) async {
+    try {
+      final accessToken = await _ensureAdminSession();
+      await _apiService.removeConversationTag(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        tag: tag,
+      );
+    } catch (_) {
+      // Silent fail — label list reconciled on next poll.
+    }
+  }
+
   /// Send a WhatsApp Cloud API read receipt for the conversation's latest
   /// inbound message. Fire-and-forget — failure never blocks chat UX.
   Future<void> sendConversationReadReceipt({
@@ -506,9 +541,11 @@ class OmnichannelRepository {
 
     return raw
         .whereType<Map>()
-        .map((e) => WhatsAppContactModel.fromJson(
-              e.map((k, v) => MapEntry(k.toString(), v)),
-            ))
+        .map(
+          (e) => WhatsAppContactModel.fromJson(
+            e.map((k, v) => MapEntry(k.toString(), v)),
+          ),
+        )
         .toList();
   }
 
