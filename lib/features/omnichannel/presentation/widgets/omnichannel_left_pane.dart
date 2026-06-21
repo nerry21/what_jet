@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:what_jet/core/config/app_config.dart';
 import 'package:what_jet/core/theme/app_animations.dart';
 import 'package:what_jet/core/theme/app_colors.dart';
 import 'package:what_jet/core/theme/app_dimensions.dart';
@@ -1181,6 +1182,11 @@ class _PremiumConversationTile extends StatelessWidget {
                         ],
                       ],
                     ),
+                    if (AppConfig.chatManagementEnabled &&
+                        item.tags.isNotEmpty) ...<Widget>[
+                      const SizedBox(height: 6),
+                      _ConversationLabelChips(tags: item.tags),
+                    ],
                   ],
                 ),
               ),
@@ -1188,6 +1194,41 @@ class _PremiumConversationTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ConversationLabelChips extends StatelessWidget {
+  const _ConversationLabelChips({required this.tags});
+
+  final List<ConversationTagModel> tags;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: <Widget>[
+        for (final tag in tags)
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.10),
+              borderRadius: AppRadii.borderRadiusPill,
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.18),
+              ),
+            ),
+            child: Text(
+              tag.value,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primary,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

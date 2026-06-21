@@ -43,6 +43,9 @@ class ApiEndpoints {
   static String adminConversationMarkUnread(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/mark-unread';
 
+  static String adminConversationTags(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/tags';
+
   static String adminConversationReadReceipt(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/read-receipt';
 

@@ -360,6 +360,19 @@ class OmnichannelShellController extends ChangeNotifier {
     await _repository.markConversationAsUnread(conversationId: conversationId);
   }
 
+  /// Adds a label/tag to a conversation (BRIEF 3B-1), then poll-refreshes so
+  /// the chip appears. Mirror of the external-action refresh pattern.
+  Future<void> addLabel(int conversationId, String tag) async {
+    await _repository.addTag(conversationId: conversationId, tag: tag);
+    await softRefreshAfterExternalAction();
+  }
+
+  /// Removes a label/tag from a conversation (BRIEF 3B-1), then poll-refreshes.
+  Future<void> removeLabel(int conversationId, String tag) async {
+    await _repository.removeTag(conversationId: conversationId, tag: tag);
+    await softRefreshAfterExternalAction();
+  }
+
   /// Clears unread count locally for a conversation so it appears read immediately.
   void _clearUnreadForConversation(int conversationId) {
     final currentList = _conversationList;
@@ -379,6 +392,7 @@ class OmnichannelShellController extends ChangeNotifier {
           customerLabel: item.customerLabel,
           customerPhone: item.customerPhone,
           mergedConversationCount: item.mergedConversationCount,
+          tags: item.tags,
         );
       }
       return item;
@@ -409,6 +423,7 @@ class OmnichannelShellController extends ChangeNotifier {
           customerLabel: item.customerLabel,
           customerPhone: item.customerPhone,
           mergedConversationCount: item.mergedConversationCount,
+          tags: item.tags,
         );
       }
       return item;

@@ -8,20 +8,28 @@ import 'package:what_jet/core/theme/app_dimensions.dart';
 Future<void> showConversationActionSheet({
   required BuildContext context,
   required VoidCallback onMarkUnread,
+  required VoidCallback onManageLabel,
 }) {
   return showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     builder: (context) {
-      return _ConversationActionSheet(onMarkUnread: onMarkUnread);
+      return _ConversationActionSheet(
+        onMarkUnread: onMarkUnread,
+        onManageLabel: onManageLabel,
+      );
     },
   );
 }
 
 class _ConversationActionSheet extends StatelessWidget {
-  const _ConversationActionSheet({required this.onMarkUnread});
+  const _ConversationActionSheet({
+    required this.onMarkUnread,
+    required this.onManageLabel,
+  });
 
   final VoidCallback onMarkUnread;
+  final VoidCallback onManageLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +60,14 @@ class _ConversationActionSheet extends StatelessWidget {
                   onTap: () {
                     Navigator.of(context).pop();
                     onMarkUnread();
+                  },
+                ),
+                _ConversationActionTile(
+                  icon: Icons.label_outline,
+                  label: 'Kelola label',
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    onManageLabel();
                   },
                 ),
                 // Slot aksi berikut (3B label / 3C pin / 3D arsip / 3E mute)
