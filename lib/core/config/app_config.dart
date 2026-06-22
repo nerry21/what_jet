@@ -44,7 +44,7 @@ class AppConfig {
   // Compile-time flag, default OFF. ON => long-press kartu/tile buka action
   // sheet "Tandai belum dibaca". OFF => onLongPress null, kartu/tile identik.
   // Rollback = rebuild dengan nilai false / git revert.
-  static const bool chatManagementEnabled = false;
+  static const bool chatManagementEnabled = true;
 
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
