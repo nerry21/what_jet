@@ -1243,6 +1243,14 @@ class _PremiumConversationTile extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                         ],
+                        if (item.isMuted) ...<Widget>[
+                          Icon(
+                            Icons.notifications_off,
+                            size: 13,
+                            color: AppColors.neutral400,
+                          ),
+                          const SizedBox(width: 4),
+                        ],
                         const SizedBox(width: 8),
                         Text(
                           formatOmnichannelListTime(item.lastActivityAt),

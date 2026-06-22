@@ -400,6 +400,18 @@ class OmnichannelShellController extends ChangeNotifier {
     await softRefreshAfterExternalAction();
   }
 
+  /// Mutes a conversation (BRIEF 3E), then poll-refreshes. Mirror of archive().
+  Future<void> mute(int conversationId) async {
+    await _repository.muteConversation(conversationId: conversationId);
+    await softRefreshAfterExternalAction();
+  }
+
+  /// Unmutes a conversation (BRIEF 3E), then poll-refreshes.
+  Future<void> unmute(int conversationId) async {
+    await _repository.unmuteConversation(conversationId: conversationId);
+    await softRefreshAfterExternalAction();
+  }
+
   /// Clears unread count locally for a conversation so it appears read immediately.
   void _clearUnreadForConversation(int conversationId) {
     final currentList = _conversationList;
@@ -421,6 +433,7 @@ class OmnichannelShellController extends ChangeNotifier {
           mergedConversationCount: item.mergedConversationCount,
           tags: item.tags,
           isPinned: item.isPinned,
+          isMuted: item.isMuted,
         );
       }
       return item;
@@ -453,6 +466,7 @@ class OmnichannelShellController extends ChangeNotifier {
           mergedConversationCount: item.mergedConversationCount,
           tags: item.tags,
           isPinned: item.isPinned,
+          isMuted: item.isMuted,
         );
       }
       return item;

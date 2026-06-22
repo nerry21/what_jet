@@ -229,6 +229,28 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> muteConversation({
+    required String accessToken,
+    required int conversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationMute(conversationId),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
+
+  Future<Map<String, dynamic>> unmuteConversation({
+    required String accessToken,
+    required int conversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationUnmute(conversationId),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
+
   Future<Map<String, dynamic>> addConversationTag({
     required String accessToken,
     required int conversationId,

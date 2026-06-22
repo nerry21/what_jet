@@ -161,6 +161,7 @@ class OmnichannelConversationListItemModel {
     this.mergedConversationCount = 1,
     this.tags = const <ConversationTagModel>[],
     this.isPinned = false,
+    this.isMuted = false,
   });
 
   final int id;
@@ -176,6 +177,7 @@ class OmnichannelConversationListItemModel {
   final int mergedConversationCount;
   final List<ConversationTagModel> tags;
   final bool isPinned;
+  final bool isMuted;
 
   bool get hasUnread => unreadCount > 0;
 
@@ -295,6 +297,11 @@ class OmnichannelConversationListItemModel {
       isPinned:
           omnichannelFirstMapped<bool>(json, const <String>[
             'is_pinned',
+          ], omnichannelBool) ??
+          false,
+      isMuted:
+          omnichannelFirstMapped<bool>(json, const <String>[
+            'is_muted',
           ], omnichannelBool) ??
           false,
     );
