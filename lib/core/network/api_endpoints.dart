@@ -43,6 +43,12 @@ class ApiEndpoints {
   static String adminConversationMarkUnread(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/mark-unread';
 
+  static String adminConversationPin(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/pin';
+
+  static String adminConversationUnpin(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/unpin';
+
   static String adminConversationTags(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/tags';
 

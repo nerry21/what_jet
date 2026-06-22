@@ -374,6 +374,19 @@ class OmnichannelShellController extends ChangeNotifier {
     await softRefreshAfterExternalAction();
   }
 
+  /// Pins a conversation (BRIEF 3C), then poll-refreshes so it rises to the top.
+  /// Mirror of the external-action refresh pattern (addLabel/removeLabel).
+  Future<void> pin(int conversationId) async {
+    await _repository.pinConversation(conversationId: conversationId);
+    await softRefreshAfterExternalAction();
+  }
+
+  /// Unpins a conversation (BRIEF 3C), then poll-refreshes so ordering returns to normal.
+  Future<void> unpin(int conversationId) async {
+    await _repository.unpinConversation(conversationId: conversationId);
+    await softRefreshAfterExternalAction();
+  }
+
   /// Clears unread count locally for a conversation so it appears read immediately.
   void _clearUnreadForConversation(int conversationId) {
     final currentList = _conversationList;
@@ -394,6 +407,7 @@ class OmnichannelShellController extends ChangeNotifier {
           customerPhone: item.customerPhone,
           mergedConversationCount: item.mergedConversationCount,
           tags: item.tags,
+          isPinned: item.isPinned,
         );
       }
       return item;
@@ -425,6 +439,7 @@ class OmnichannelShellController extends ChangeNotifier {
           customerPhone: item.customerPhone,
           mergedConversationCount: item.mergedConversationCount,
           tags: item.tags,
+          isPinned: item.isPinned,
         );
       }
       return item;
