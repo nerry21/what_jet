@@ -51,6 +51,8 @@ void main() {
                       onTogglePin: () {},
                       isArchived: isArchived,
                       onToggleArchive: () => archivedTapped++,
+                      isMuted: false,
+                      onToggleMute: () {},
                     ),
                     child: const Text('open'),
                   );

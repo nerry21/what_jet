@@ -55,6 +55,12 @@ class ApiEndpoints {
   static String adminConversationUnarchive(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/unarchive';
 
+  static String adminConversationMute(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/mute';
+
+  static String adminConversationUnmute(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/unmute';
+
   static String adminConversationTags(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/tags';
 

@@ -13,6 +13,8 @@ Future<void> showConversationActionSheet({
   required VoidCallback onTogglePin,
   required bool isArchived,
   required VoidCallback onToggleArchive,
+  required bool isMuted,
+  required VoidCallback onToggleMute,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -25,6 +27,8 @@ Future<void> showConversationActionSheet({
         onTogglePin: onTogglePin,
         isArchived: isArchived,
         onToggleArchive: onToggleArchive,
+        isMuted: isMuted,
+        onToggleMute: onToggleMute,
       );
     },
   );
@@ -38,6 +42,8 @@ class _ConversationActionSheet extends StatelessWidget {
     required this.onTogglePin,
     required this.isArchived,
     required this.onToggleArchive,
+    required this.isMuted,
+    required this.onToggleMute,
   });
 
   final VoidCallback onMarkUnread;
@@ -46,6 +52,8 @@ class _ConversationActionSheet extends StatelessWidget {
   final VoidCallback onTogglePin;
   final bool isArchived;
   final VoidCallback onToggleArchive;
+  final bool isMuted;
+  final VoidCallback onToggleMute;
 
   @override
   Widget build(BuildContext context) {
@@ -104,8 +112,16 @@ class _ConversationActionSheet extends StatelessWidget {
                     onToggleArchive();
                   },
                 ),
-                // Slot aksi berikut (3E mute)
-                // ditambahkan di sini sebagai _ConversationActionTile.
+                _ConversationActionTile(
+                  icon: isMuted
+                      ? Icons.notifications_outlined
+                      : Icons.notifications_off_outlined,
+                  label: isMuted ? 'Bunyikan' : 'Bisukan',
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    onToggleMute();
+                  },
+                ),
               ],
             ),
           ),
