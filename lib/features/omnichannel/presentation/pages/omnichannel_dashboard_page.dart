@@ -2566,6 +2566,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 selectedChannel: _controller.channelFilter,
                 onScopeChanged: _controller.setScopeFilter,
                 onChannelChanged: _controller.setChannelFilter,
+                selectedTag: _controller.tagFilter,
+                onTagChanged: _controller.setTagFilter,
                 onConversationTap: (conversationId) => _handleConversationTap(
                   conversationId,
                   showConversationOnMobile: false,
@@ -2711,6 +2713,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   selectedChannel: _controller.channelFilter,
                   onScopeChanged: _controller.setScopeFilter,
                   onChannelChanged: _controller.setChannelFilter,
+                  selectedTag: _controller.tagFilter,
+                  onTagChanged: _controller.setTagFilter,
                   onConversationTap: (conversationId) => _handleConversationTap(
                     conversationId,
                     showConversationOnMobile: true,

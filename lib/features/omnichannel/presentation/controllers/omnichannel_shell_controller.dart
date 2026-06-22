@@ -113,6 +113,7 @@ class OmnichannelShellController extends ChangeNotifier {
   String get scopeFilter => _query.scope;
   String get channelFilter => _query.channel;
   String get searchQuery => _query.search;
+  String get tagFilter => _query.tag;
 
   bool get hasShellData => _workspace != null && _conversationList != null;
   bool get hasMoreConversations => _conversationList?.hasMore == true;
@@ -594,6 +595,16 @@ class OmnichannelShellController extends ChangeNotifier {
     }
 
     _query = _query.copyWith(channel: value).resetPage();
+    notifyListeners();
+    unawaited(refresh());
+  }
+
+  void setTagFilter(String value) {
+    if (_query.tag == value) {
+      return;
+    }
+
+    _query = _query.copyWith(tag: value).resetPage();
     notifyListeners();
     unawaited(refresh());
   }
