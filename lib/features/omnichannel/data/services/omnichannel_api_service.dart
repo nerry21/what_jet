@@ -207,6 +207,28 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> archiveConversation({
+    required String accessToken,
+    required int conversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationArchive(conversationId),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
+
+  Future<Map<String, dynamic>> unarchiveConversation({
+    required String accessToken,
+    required int conversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationUnarchive(conversationId),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
+
   Future<Map<String, dynamic>> addConversationTag({
     required String accessToken,
     required int conversationId,

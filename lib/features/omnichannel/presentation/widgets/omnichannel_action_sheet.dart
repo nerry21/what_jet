@@ -11,6 +11,8 @@ Future<void> showConversationActionSheet({
   required VoidCallback onManageLabel,
   required bool isPinned,
   required VoidCallback onTogglePin,
+  required bool isArchived,
+  required VoidCallback onToggleArchive,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -21,6 +23,8 @@ Future<void> showConversationActionSheet({
         onManageLabel: onManageLabel,
         isPinned: isPinned,
         onTogglePin: onTogglePin,
+        isArchived: isArchived,
+        onToggleArchive: onToggleArchive,
       );
     },
   );
@@ -32,12 +36,16 @@ class _ConversationActionSheet extends StatelessWidget {
     required this.onManageLabel,
     required this.isPinned,
     required this.onTogglePin,
+    required this.isArchived,
+    required this.onToggleArchive,
   });
 
   final VoidCallback onMarkUnread;
   final VoidCallback onManageLabel;
   final bool isPinned;
   final VoidCallback onTogglePin;
+  final bool isArchived;
+  final VoidCallback onToggleArchive;
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +94,17 @@ class _ConversationActionSheet extends StatelessWidget {
                     onTogglePin();
                   },
                 ),
-                // Slot aksi berikut (3D arsip / 3E mute)
+                _ConversationActionTile(
+                  icon: isArchived
+                      ? Icons.unarchive_outlined
+                      : Icons.archive_outlined,
+                  label: isArchived ? 'Batalkan arsip' : 'Arsip',
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    onToggleArchive();
+                  },
+                ),
+                // Slot aksi berikut (3E mute)
                 // ditambahkan di sini sebagai _ConversationActionTile.
               ],
             ),

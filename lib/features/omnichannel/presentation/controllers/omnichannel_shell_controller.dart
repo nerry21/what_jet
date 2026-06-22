@@ -387,6 +387,19 @@ class OmnichannelShellController extends ChangeNotifier {
     await softRefreshAfterExternalAction();
   }
 
+  /// Archives a conversation (BRIEF 3D), then poll-refreshes (server-driven:
+  /// archived drops from active scopes). Mirror of addLabel/removeLabel.
+  Future<void> archive(int conversationId) async {
+    await _repository.archiveConversation(conversationId: conversationId);
+    await softRefreshAfterExternalAction();
+  }
+
+  /// Unarchives a conversation (BRIEF 3D), then poll-refreshes.
+  Future<void> unarchive(int conversationId) async {
+    await _repository.unarchiveConversation(conversationId: conversationId);
+    await softRefreshAfterExternalAction();
+  }
+
   /// Clears unread count locally for a conversation so it appears read immediately.
   void _clearUnreadForConversation(int conversationId) {
     final currentList = _conversationList;

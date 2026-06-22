@@ -49,6 +49,12 @@ class ApiEndpoints {
   static String adminConversationUnpin(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/unpin';
 
+  static String adminConversationArchive(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/archive';
+
+  static String adminConversationUnarchive(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/unarchive';
+
   static String adminConversationTags(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/tags';
 
