@@ -2424,6 +2424,12 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   void _handleConversationLongPress(int conversationId) {
     final item = _findConversationItem(conversationId);
     final isPinned = item?.isPinned ?? false;
+    // coupling: BE ConversationStatus::Archived->label() == 'Archived'.
+    // Scope 'all'/'closed' memuat archived → derive juga dari statusLabel,
+    // bukan scope saja (lihat PCAC 3D v2 OQ-A4').
+    final isArchived =
+        _controller.scopeFilter == 'archived' ||
+        (item?.statusLabel.trim().toLowerCase() == 'archived');
     showConversationActionSheet(
       context: context,
       onMarkUnread: () => unawaited(_controller.markUnread(conversationId)),
@@ -2433,6 +2439,12 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
         isPinned
             ? _controller.unpin(conversationId)
             : _controller.pin(conversationId),
+      ),
+      isArchived: isArchived,
+      onToggleArchive: () => unawaited(
+        isArchived
+            ? _controller.unarchive(conversationId)
+            : _controller.archive(conversationId),
       ),
     );
   }

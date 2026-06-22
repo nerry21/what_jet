@@ -326,6 +326,34 @@ class OmnichannelRepository {
     }
   }
 
+  /// Archive a conversation (BRIEF 3D). Fails silently — eventual consistency:
+  /// list reconciled on next poll.
+  Future<void> archiveConversation({required int conversationId}) async {
+    try {
+      final accessToken = await _ensureAdminSession();
+      await _apiService.archiveConversation(
+        accessToken: accessToken,
+        conversationId: conversationId,
+      );
+    } catch (_) {
+      // Silent fail — list reconciled on next poll.
+    }
+  }
+
+  /// Unarchive a conversation (BRIEF 3D). Fails silently — eventual consistency:
+  /// list reconciled on next poll.
+  Future<void> unarchiveConversation({required int conversationId}) async {
+    try {
+      final accessToken = await _ensureAdminSession();
+      await _apiService.unarchiveConversation(
+        accessToken: accessToken,
+        conversationId: conversationId,
+      );
+    } catch (_) {
+      // Silent fail — list reconciled on next poll.
+    }
+  }
+
   /// Add a label/tag to a conversation (BRIEF 3B-1). Fails silently —
   /// eventual consistency: chip reconciled on next poll.
   Future<void> addTag({
