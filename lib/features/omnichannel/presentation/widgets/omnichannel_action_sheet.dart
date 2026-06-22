@@ -9,6 +9,8 @@ Future<void> showConversationActionSheet({
   required BuildContext context,
   required VoidCallback onMarkUnread,
   required VoidCallback onManageLabel,
+  required bool isPinned,
+  required VoidCallback onTogglePin,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -17,6 +19,8 @@ Future<void> showConversationActionSheet({
       return _ConversationActionSheet(
         onMarkUnread: onMarkUnread,
         onManageLabel: onManageLabel,
+        isPinned: isPinned,
+        onTogglePin: onTogglePin,
       );
     },
   );
@@ -26,10 +30,14 @@ class _ConversationActionSheet extends StatelessWidget {
   const _ConversationActionSheet({
     required this.onMarkUnread,
     required this.onManageLabel,
+    required this.isPinned,
+    required this.onTogglePin,
   });
 
   final VoidCallback onMarkUnread;
   final VoidCallback onManageLabel;
+  final bool isPinned;
+  final VoidCallback onTogglePin;
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +78,15 @@ class _ConversationActionSheet extends StatelessWidget {
                     onManageLabel();
                   },
                 ),
-                // Slot aksi berikut (3B label / 3C pin / 3D arsip / 3E mute)
+                _ConversationActionTile(
+                  icon: isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                  label: isPinned ? 'Lepas sematan' : 'Sematkan',
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    onTogglePin();
+                  },
+                ),
+                // Slot aksi berikut (3D arsip / 3E mute)
                 // ditambahkan di sini sebagai _ConversationActionTile.
               ],
             ),

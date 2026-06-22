@@ -185,6 +185,28 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> pinConversation({
+    required String accessToken,
+    required int conversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationPin(conversationId),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
+
+  Future<Map<String, dynamic>> unpinConversation({
+    required String accessToken,
+    required int conversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationUnpin(conversationId),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
+
   Future<Map<String, dynamic>> addConversationTag({
     required String accessToken,
     required int conversationId,

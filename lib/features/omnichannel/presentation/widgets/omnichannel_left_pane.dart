@@ -1235,6 +1235,14 @@ class _PremiumConversationTile extends StatelessWidget {
                             ),
                           ),
                         ),
+                        if (item.isPinned) ...<Widget>[
+                          Icon(
+                            Icons.push_pin,
+                            size: 13,
+                            color: AppColors.primary,
+                          ),
+                          const SizedBox(width: 4),
+                        ],
                         const SizedBox(width: 8),
                         Text(
                           formatOmnichannelListTime(item.lastActivityAt),

@@ -160,6 +160,7 @@ class OmnichannelConversationListItemModel {
     this.customerPhone,
     this.mergedConversationCount = 1,
     this.tags = const <ConversationTagModel>[],
+    this.isPinned = false,
   });
 
   final int id;
@@ -174,6 +175,7 @@ class OmnichannelConversationListItemModel {
   final String? customerPhone;
   final int mergedConversationCount;
   final List<ConversationTagModel> tags;
+  final bool isPinned;
 
   bool get hasUnread => unreadCount > 0;
 
@@ -290,6 +292,11 @@ class OmnichannelConversationListItemModel {
       tags: omnichannelFirstMapList(json, const <String>[
         'tags',
       ]).map(ConversationTagModel.fromJson).toList(),
+      isPinned:
+          omnichannelFirstMapped<bool>(json, const <String>[
+            'is_pinned',
+          ], omnichannelBool) ??
+          false,
     );
   }
 }
@@ -321,6 +328,18 @@ List<OmnichannelConversationListItemModel> _parseItems(
   );
 }
 
+int _conversationSortComparator(
+  OmnichannelConversationListItemModel left,
+  OmnichannelConversationListItemModel right,
+) {
+  if (left.isPinned != right.isPinned) {
+    return left.isPinned ? -1 : 1;
+  }
+  return right.lastActivityAt.millisecondsSinceEpoch.compareTo(
+    left.lastActivityAt.millisecondsSinceEpoch,
+  );
+}
+
 List<OmnichannelConversationListItemModel> _mergeConversationItems(
   List<OmnichannelConversationListItemModel> primary,
   List<OmnichannelConversationListItemModel> fallback,
@@ -342,11 +361,8 @@ List<OmnichannelConversationListItemModel> _mergeConversationItems(
     }
   }
 
-  return _dedupeConversationItems(merged.values.toList())..sort(
-    (left, right) => right.lastActivityAt.millisecondsSinceEpoch.compareTo(
-      left.lastActivityAt.millisecondsSinceEpoch,
-    ),
-  );
+  return _dedupeConversationItems(merged.values.toList())
+    ..sort(_conversationSortComparator);
 }
 
 List<OmnichannelConversationListItemModel> _appendConversationItems(
@@ -370,11 +386,8 @@ List<OmnichannelConversationListItemModel> _appendConversationItems(
     }
   }
 
-  return _dedupeConversationItems(merged.values.toList())..sort(
-    (left, right) => right.lastActivityAt.millisecondsSinceEpoch.compareTo(
-      left.lastActivityAt.millisecondsSinceEpoch,
-    ),
-  );
+  return _dedupeConversationItems(merged.values.toList())
+    ..sort(_conversationSortComparator);
 }
 
 List<OmnichannelConversationListItemModel> _dedupeConversationItems(
@@ -391,11 +404,7 @@ List<OmnichannelConversationListItemModel> _dedupeConversationItems(
     }
   }
 
-  return deduped.values.toList()..sort(
-    (left, right) => right.lastActivityAt.millisecondsSinceEpoch.compareTo(
-      left.lastActivityAt.millisecondsSinceEpoch,
-    ),
-  );
+  return deduped.values.toList()..sort(_conversationSortComparator);
 }
 
 int? _resolveSelectedConversationId(

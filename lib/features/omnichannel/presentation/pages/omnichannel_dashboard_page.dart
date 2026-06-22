@@ -2422,10 +2422,18 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   }
 
   void _handleConversationLongPress(int conversationId) {
+    final item = _findConversationItem(conversationId);
+    final isPinned = item?.isPinned ?? false;
     showConversationActionSheet(
       context: context,
       onMarkUnread: () => unawaited(_controller.markUnread(conversationId)),
       onManageLabel: () => unawaited(_handleManageLabel(conversationId)),
+      isPinned: isPinned,
+      onTogglePin: () => unawaited(
+        isPinned
+            ? _controller.unpin(conversationId)
+            : _controller.pin(conversationId),
+      ),
     );
   }
 
