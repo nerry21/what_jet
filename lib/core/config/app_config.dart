@@ -46,6 +46,13 @@ class AppConfig {
   // Rollback = rebuild dengan nilai false / git revert.
   static const bool chatManagementEnabled = true;
 
+  // BRIEF 3F — Pencarian dalam-chat (in-chat message search).
+  // Compile-time flag, default OFF. ON => ikon search di header (mobile+desktop)
+  // buka search bar; pesan cocok disorot; ↑/↓ lompat antar-match (reuse
+  // _scrollToMessage). OFF => nol ikon/bar/wrapper/state, runtime identik (0 delta).
+  // Rollback = rebuild dengan nilai false / git revert.
+  static const bool inChatSearchEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {
