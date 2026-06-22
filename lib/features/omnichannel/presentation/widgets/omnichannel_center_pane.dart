@@ -173,6 +173,13 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
   final Map<int, GlobalKey> _quotedScrollKeys = <int, GlobalKey>{};
   final FocusNode _composerFocusNode = FocusNode();
 
+  // BRIEF 3F — state pencarian dalam-chat (gated AppConfig.inChatSearchEnabled).
+  // Hidup lokal per conversation; reset saat ganti/tutup (lihat 2C/2D).
+  final TextEditingController _searchController = TextEditingController();
+  bool _searchActive = false;
+  List<int> _searchMatchIds = const <int>[];
+  int _searchActiveIndex = -1;
+
   bool get _isMobileConversationLayout => widget.onOpenInbox != null;
 
   @override
@@ -204,6 +211,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
 
     if (conversationChanged) {
       _quotedScrollKeys.clear();
+      _resetSearchState();
     }
 
     if (conversationChanged && currentMessageCount > 0) {
@@ -228,7 +236,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         currentLatestMessageId != null &&
         currentLatestMessageId > previousLatestMessageId;
 
-    if (hasNewLatestMessage && wasNearBottom) {
+    if (hasNewLatestMessage && wasNearBottom && !_searchActive) {
       _scheduleScrollToThreadBottom(animated: true);
     }
   }
@@ -239,6 +247,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
     _composerController.dispose();
     _threadScrollController.dispose();
     _composerFocusNode.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -260,6 +269,86 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
       alignment: 0.3,
       curve: Curves.easeInOut,
     );
+  }
+
+  // BRIEF 3F — pencarian dalam-chat. Semua simbol baru; reuse _scrollToMessage.
+  bool get _searchEntryEnabled =>
+      AppConfig.inChatSearchEnabled && widget.conversation != null;
+
+  int? get _activeMatchId =>
+      (_searchActiveIndex >= 0 && _searchActiveIndex < _searchMatchIds.length)
+      ? _searchMatchIds[_searchActiveIndex]
+      : null;
+
+  // Bungkus konstan saat flag ON (DecoratedBox selalu hadir di _SearchHighlight),
+  // sehingga tree-shape stabil (nol reparent GlobalKey) & non-match layout-neutral.
+  // Flag OFF => kembalikan child apa adanya (runtime identik).
+  Widget _wrapSearchHighlight(int messageId, Widget child) {
+    if (!AppConfig.inChatSearchEnabled) {
+      return child;
+    }
+    return _SearchHighlight(
+      matched: _searchMatchIds.contains(messageId),
+      active: _activeMatchId == messageId,
+      child: child,
+    );
+  }
+
+  void _toggleSearch() {
+    setState(() {
+      _searchActive = !_searchActive;
+      if (!_searchActive) {
+        _resetSearchState();
+      }
+    });
+  }
+
+  void _resetSearchState() {
+    _searchActive = false;
+    _searchMatchIds = const <int>[];
+    _searchActiveIndex = -1;
+    _searchController.clear();
+  }
+
+  void _onSearchQueryChanged(String value) {
+    setState(() {
+      _searchMatchIds = omnichannelInChatSearchMatchIds(
+        widget.threadGroups,
+        value,
+      );
+      _searchActiveIndex = _searchMatchIds.isEmpty ? -1 : 0;
+    });
+    _scrollToActiveMatch();
+  }
+
+  void _searchNext() {
+    if (_searchMatchIds.isEmpty) {
+      return;
+    }
+    setState(() {
+      _searchActiveIndex = (_searchActiveIndex + 1) % _searchMatchIds.length;
+    });
+    _scrollToActiveMatch();
+  }
+
+  void _searchPrev() {
+    if (_searchMatchIds.isEmpty) {
+      return;
+    }
+    setState(() {
+      _searchActiveIndex =
+          (_searchActiveIndex - 1 + _searchMatchIds.length) %
+          _searchMatchIds.length;
+    });
+    _scrollToActiveMatch();
+  }
+
+  void _scrollToActiveMatch() {
+    final id = _activeMatchId;
+    if (id == null) {
+      return;
+    }
+    _scrollToMessage(id);
   }
 
   bool _isNearThreadBottom() {
@@ -730,6 +819,15 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         onCancelReply: widget.onCancelReply,
         onTapQuotedReply: _scrollToMessage,
         keyForMessage: _keyForMessage,
+        onSearchTap: _searchEntryEnabled ? _toggleSearch : null,
+        searchActive: _searchActive,
+        searchController: _searchController,
+        searchMatchIds: _searchMatchIds,
+        searchActiveIndex: _searchActiveIndex,
+        searchActiveId: _activeMatchId,
+        onSearchChanged: _onSearchQueryChanged,
+        onSearchNext: _searchNext,
+        onSearchPrev: _searchPrev,
         callBanner: callBanner,
         callHistorySection: _buildCallHistorySection(compact: true),
         callTimelineSection: _buildCallTimelineSection(compact: true),
@@ -758,7 +856,21 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
               isTogglingBot: widget.isTogglingBot,
               onToggleBot: widget.onToggleBot,
               onOpenInbox: widget.onOpenInbox,
+              onSearchTap: _searchEntryEnabled ? _toggleSearch : null,
             ),
+            if (_searchActive)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: _InChatSearchBar(
+                  controller: _searchController,
+                  matchCount: _searchMatchIds.length,
+                  activeIndex: _searchActiveIndex,
+                  onChanged: _onSearchQueryChanged,
+                  onNext: _searchNext,
+                  onPrev: _searchPrev,
+                  onClose: _toggleSearch,
+                ),
+              ),
             const SizedBox(height: 14),
             if (callBanner != null) ...<Widget>[
               callBanner,
@@ -822,14 +934,18 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
                                       ),
                                       const SizedBox(height: 12),
                                       ...threadGroups[index].messages.map(
-                                        (message) => _ThreadBubble(
-                                          key: _keyForMessage(message.id),
-                                          message: message,
-                                          maxWidth: bubbleMaxWidth,
-                                          onReactToMessage:
-                                              widget.onReactToMessage,
-                                          onSwipeToReply: widget.onSwipeToReply,
-                                          onTapQuotedReply: _scrollToMessage,
+                                        (message) => _wrapSearchHighlight(
+                                          message.id,
+                                          _ThreadBubble(
+                                            key: _keyForMessage(message.id),
+                                            message: message,
+                                            maxWidth: bubbleMaxWidth,
+                                            onReactToMessage:
+                                                widget.onReactToMessage,
+                                            onSwipeToReply:
+                                                widget.onSwipeToReply,
+                                            onTapQuotedReply: _scrollToMessage,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -899,6 +1015,15 @@ class _MobileConversationScaffold extends StatelessWidget {
     this.onCancelReply,
     this.onTapQuotedReply,
     this.keyForMessage,
+    this.onSearchTap,
+    this.searchActive = false,
+    this.searchController,
+    this.searchMatchIds = const <int>[],
+    this.searchActiveIndex = -1,
+    this.searchActiveId,
+    this.onSearchChanged,
+    this.onSearchNext,
+    this.onSearchPrev,
     this.callBanner,
     this.callHistorySection,
     this.callTimelineSection,
@@ -932,6 +1057,15 @@ class _MobileConversationScaffold extends StatelessWidget {
   final VoidCallback? onCancelReply;
   final void Function(int quotedMessageId)? onTapQuotedReply;
   final GlobalKey Function(int messageId)? keyForMessage;
+  final VoidCallback? onSearchTap;
+  final bool searchActive;
+  final TextEditingController? searchController;
+  final List<int> searchMatchIds;
+  final int searchActiveIndex;
+  final int? searchActiveId;
+  final ValueChanged<String>? onSearchChanged;
+  final VoidCallback? onSearchNext;
+  final VoidCallback? onSearchPrev;
   final Widget? callBanner;
   final Widget? callHistorySection;
   final Widget? callTimelineSection;
@@ -1002,16 +1136,24 @@ class _MobileConversationScaffold extends StatelessWidget {
                               label: threadGroups[index].label,
                             ),
                             const SizedBox(height: 10),
-                            ...threadGroups[index].messages.map(
-                              (message) => _MobileConversationBubble(
+                            ...threadGroups[index].messages.map((message) {
+                              final Widget bubble = _MobileConversationBubble(
                                 key: keyForMessage?.call(message.id),
                                 message: message,
                                 maxWidth: bubbleMaxWidth,
                                 onReactToMessage: onReactToMessage,
                                 onSwipeToReply: onSwipeToReply,
                                 onTapQuotedReply: onTapQuotedReply,
-                              ),
-                            ),
+                              );
+                              if (!AppConfig.inChatSearchEnabled) {
+                                return bubble;
+                              }
+                              return _SearchHighlight(
+                                matched: searchMatchIds.contains(message.id),
+                                active: searchActiveId == message.id,
+                                child: bubble,
+                              );
+                            }),
                           ],
                         ),
                       ),
@@ -1032,7 +1174,18 @@ class _MobileConversationScaffold extends StatelessWidget {
             onVideoTap: onVideoTap,
             onCallTap: onCallTap,
             onMenuSelected: onMenuSelected,
+            onSearchTap: onSearchTap,
           ),
+          if (searchActive && searchController != null)
+            _InChatSearchBar(
+              controller: searchController!,
+              matchCount: searchMatchIds.length,
+              activeIndex: searchActiveIndex,
+              onChanged: onSearchChanged ?? (_) {},
+              onNext: onSearchNext ?? () {},
+              onPrev: onSearchPrev ?? () {},
+              onClose: onSearchTap ?? () {},
+            ),
           Expanded(
             child: Stack(
               children: <Widget>[
@@ -1086,6 +1239,7 @@ class _MobileConversationAppBar extends StatelessWidget {
     required this.onVideoTap,
     required this.onCallTap,
     required this.onMenuSelected,
+    this.onSearchTap,
   });
 
   final OmnichannelConversationDetailModel? conversation;
@@ -1096,6 +1250,7 @@ class _MobileConversationAppBar extends StatelessWidget {
   final VoidCallback onCallTap;
   final Future<void> Function(_MobileConversationMenuAction action)
   onMenuSelected;
+  final VoidCallback? onSearchTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1196,6 +1351,11 @@ class _MobileConversationAppBar extends StatelessWidget {
                 ),
               ),
               if (conversation != null) ...<Widget>[
+                if (onSearchTap != null)
+                  _MobileAppBarIconButton(
+                    icon: Icons.search_rounded,
+                    onTap: onSearchTap!,
+                  ),
                 _MobileAppBarIconButton(
                   icon: Icons.videocam_outlined,
                   onTap: onVideoTap,
@@ -2227,6 +2387,7 @@ class _CenterHeader extends StatelessWidget {
     required this.isTogglingBot,
     required this.onToggleBot,
     this.onOpenInbox,
+    this.onSearchTap,
   });
 
   final OmnichannelConversationDetailModel conversation;
@@ -2234,6 +2395,7 @@ class _CenterHeader extends StatelessWidget {
   final bool isTogglingBot;
   final Future<bool> Function(bool turnOn) onToggleBot;
   final VoidCallback? onOpenInbox;
+  final VoidCallback? onSearchTap;
 
   @override
   Widget build(BuildContext context) {
@@ -2353,6 +2515,14 @@ class _CenterHeader extends StatelessWidget {
                   ],
                 ),
               ),
+              if (onSearchTap != null)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: _MobileAppBarIconButton(
+                    icon: Icons.search_rounded,
+                    onTap: onSearchTap!,
+                  ),
+                ),
               if (isConversationLoading)
                 const Padding(
                   padding: EdgeInsets.only(left: 12),
@@ -5135,4 +5305,151 @@ List<InlineSpan> _parseWhatsappFormatting(String text, TextStyle base) {
 
   flush();
   return spans;
+}
+
+/// BRIEF 3F — In-chat search murni: cari [query] (trim + case-insensitive
+/// `contains`) pada `text` tiap pesan di [groups]; kembalikan id pesan cocok
+/// **berurutan** sesuai urutan thread. Query kosong/spasi => daftar kosong.
+/// Pure, NOL efek samping, NOL BE. Cakupan = pesan yang sudah dimuat (v1).
+List<int> omnichannelInChatSearchMatchIds(
+  List<OmnichannelThreadGroupModel> groups,
+  String query,
+) {
+  final q = query.trim().toLowerCase();
+  if (q.isEmpty) {
+    return const <int>[];
+  }
+  final ids = <int>[];
+  for (final group in groups) {
+    for (final message in group.messages) {
+      if (message.text.toLowerCase().contains(q)) {
+        ids.add(message.id);
+      }
+    }
+  }
+  return ids;
+}
+
+// BRIEF 3F — pembungkus sorot. KONSTAN saat flag ON: DecoratedBox selalu hadir
+// (tree-shape stabil, nol reparent GlobalKey). Non-match => const BoxDecoration()
+// = nol paint & nol delta layout (layout-neutral mutlak). NOL sentuh isi bubble.
+class _SearchHighlight extends StatelessWidget {
+  const _SearchHighlight({
+    required this.matched,
+    required this.active,
+    required this.child,
+  });
+
+  final bool matched;
+  final bool active;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: matched
+          ? BoxDecoration(
+              color: AppColors.primary.withValues(alpha: active ? 0.18 : 0.08),
+              borderRadius: AppRadii.borderRadiusMd,
+              border: Border.all(
+                color: AppColors.primary.withValues(
+                  alpha: active ? 0.55 : 0.25,
+                ),
+              ),
+            )
+          : const BoxDecoration(),
+      child: child,
+    );
+  }
+}
+
+// BRIEF 3F — search bar dalam-chat (mobile+desktop). Counter "n/total", ↑/↓
+// lompat antar-match, close. Hint cakupan kecil "Mencari pesan yang sudah
+// dimuat". 0-hasil => "0/0" + tombol nav no-op (netral, nol crash).
+class _InChatSearchBar extends StatelessWidget {
+  const _InChatSearchBar({
+    required this.controller,
+    required this.matchCount,
+    required this.activeIndex,
+    required this.onChanged,
+    required this.onNext,
+    required this.onPrev,
+    required this.onClose,
+  });
+
+  final TextEditingController controller;
+  final int matchCount;
+  final int activeIndex;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onNext;
+  final VoidCallback onPrev;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasMatch = matchCount > 0;
+    final counter = hasMatch ? '${activeIndex + 1}/$matchCount' : '0/0';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: const BoxDecoration(
+        color: AppColors.surfaceSecondary,
+        border: Border(bottom: BorderSide(color: AppColors.borderLight)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              const Icon(
+                Icons.search_rounded,
+                size: 20,
+                color: AppColors.neutral500,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  onChanged: onChanged,
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    isDense: true,
+                    border: InputBorder.none,
+                    hintText: 'Cari di percakapan ini…',
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                counter,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.neutral500,
+                ),
+              ),
+              _MobileAppBarIconButton(
+                icon: Icons.keyboard_arrow_up_rounded,
+                onTap: hasMatch ? onPrev : () {},
+              ),
+              _MobileAppBarIconButton(
+                icon: Icons.keyboard_arrow_down_rounded,
+                onTap: hasMatch ? onNext : () {},
+              ),
+              _MobileAppBarIconButton(
+                icon: Icons.close_rounded,
+                onTap: onClose,
+              ),
+            ],
+          ),
+          const Padding(
+            padding: EdgeInsets.only(top: 2, left: 28),
+            child: Text(
+              'Mencari pesan yang sudah dimuat',
+              style: TextStyle(fontSize: 11, color: AppColors.neutral500),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
