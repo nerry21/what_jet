@@ -38,7 +38,7 @@ class AppConfig {
   // Compile-time flag, default OFF. ON => bubble me-render *bold* / _italic_ /
   // ~strike~ / ```mono```. OFF => Text polos, visual/perilaku identik (0 delta).
   // Rollback = rebuild dengan nilai false / git revert (bukan toggle runtime).
-  static const bool whatsappTextFormattingEnabled = false;
+  static const bool whatsappTextFormattingEnabled = true;
 
   // BRIEF 3A — Chat management (long-press action sheet + mark-unread).
   // Compile-time flag, default OFF. ON => long-press kartu/tile buka action
@@ -51,7 +51,7 @@ class AppConfig {
   // buka search bar; pesan cocok disorot; ↑/↓ lompat antar-match (reuse
   // _scrollToMessage). OFF => nol ikon/bar/wrapper/state, runtime identik (0 delta).
   // Rollback = rebuild dengan nilai false / git revert.
-  static const bool inChatSearchEnabled = false;
+  static const bool inChatSearchEnabled = true;
 
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
