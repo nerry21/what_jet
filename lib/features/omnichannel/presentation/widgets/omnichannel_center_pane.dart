@@ -1585,7 +1585,9 @@ class _QuotedReplyPreview extends StatelessWidget {
 
   String get _previewText {
     final preview = replyContext.quotedTextPreview?.trim() ?? '';
-    if (preview.isNotEmpty) {
+    if (preview.isNotEmpty &&
+        !(AppConfig.stickerInboundEnabled &&
+            replyContext.quotedType == 'sticker')) {
       return preview;
     }
     switch (replyContext.quotedType) {
@@ -1599,6 +1601,10 @@ class _QuotedReplyPreview extends StatelessWidget {
         return '📄 Dokumen';
       case 'location':
         return '📍 Lokasi';
+      case 'sticker':
+        return AppConfig.stickerInboundEnabled
+            ? '🩷 Stiker'
+            : 'Pesan tidak tersedia';
       default:
         return 'Pesan tidak tersedia';
     }
@@ -1744,6 +1750,10 @@ class _MobileConversationBubble extends StatelessWidget {
                 ),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
+              if (AppConfig.stickerInboundEnabled &&
+                  message.hasSticker) ...<Widget>[
+                _ConversationStickerPreview(stickerUrl: message.stickerUrl!),
+              ],
               if (message.hasAudio) ...<Widget>[
                 _ConversationAudioBubble(message: message, compact: true),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
@@ -1767,7 +1777,8 @@ class _MobileConversationBubble extends StatelessWidget {
                 _ConversationInteractiveCard(message: message),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
-              if (message.displayText.isNotEmpty)
+              if (message.displayText.isNotEmpty &&
+                  !(AppConfig.stickerInboundEnabled && message.hasSticker))
                 _FormattedMessageText(
                   text: message.displayText,
                   fontSize: 15,
@@ -1780,7 +1791,8 @@ class _MobileConversationBubble extends StatelessWidget {
                   !message.hasVideo &&
                   !message.hasDocument &&
                   !message.hasLocation &&
-                  !message.hasInteractive)
+                  !message.hasInteractive &&
+                  !(AppConfig.stickerInboundEnabled && message.hasSticker))
                 const Text(
                   '-',
                   style: TextStyle(
@@ -1872,7 +1884,8 @@ class _ReplyComposerBanner extends StatelessWidget {
 
   String get _previewText {
     final text = message.displayText.trim();
-    if (text.isNotEmpty) {
+    if (text.isNotEmpty &&
+        !(AppConfig.stickerInboundEnabled && message.hasSticker)) {
       return text;
     }
     if (message.hasImage) {
@@ -1889,6 +1902,9 @@ class _ReplyComposerBanner extends StatelessWidget {
     }
     if (message.hasLocation) {
       return '📍 Lokasi';
+    }
+    if (AppConfig.stickerInboundEnabled && message.hasSticker) {
+      return '🩷 Stiker';
     }
     return 'Pesan';
   }
@@ -2746,6 +2762,10 @@ class _ThreadBubble extends StatelessWidget {
                 ),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
+              if (AppConfig.stickerInboundEnabled &&
+                  message.hasSticker) ...<Widget>[
+                _ConversationStickerPreview(stickerUrl: message.stickerUrl!),
+              ],
               if (message.hasAudio) ...<Widget>[
                 _ConversationAudioBubble(message: message, compact: false),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
@@ -2769,7 +2789,8 @@ class _ThreadBubble extends StatelessWidget {
                 _ConversationInteractiveCard(message: message),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
-              if (message.displayText.isNotEmpty)
+              if (message.displayText.isNotEmpty &&
+                  !(AppConfig.stickerInboundEnabled && message.hasSticker))
                 _FormattedMessageText(
                   text: message.displayText,
                   fontSize: 14,
@@ -2782,7 +2803,8 @@ class _ThreadBubble extends StatelessWidget {
                   !message.hasVideo &&
                   !message.hasDocument &&
                   !message.hasLocation &&
-                  !message.hasInteractive)
+                  !message.hasInteractive &&
+                  !(AppConfig.stickerInboundEnabled && message.hasSticker))
                 const Text(
                   '-',
                   style: TextStyle(
@@ -3262,6 +3284,49 @@ class _ConversationImagePreview extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ConversationStickerPreview extends StatelessWidget {
+  const _ConversationStickerPreview({required this.stickerUrl});
+
+  final String stickerUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 140,
+      height: 140,
+      child: Image.network(
+        stickerUrl,
+        fit: BoxFit.contain,
+        webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) {
+            return child;
+          }
+
+          return const Center(
+            child: SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.primary,
+              ),
+            ),
+          );
+        },
+        errorBuilder: (_, __, ___) {
+          return const Center(
+            child: Icon(
+              Icons.broken_image_outlined,
+              color: AppColors.neutral300,
+            ),
+          );
+        },
       ),
     );
   }

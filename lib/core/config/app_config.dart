@@ -53,6 +53,14 @@ class AppConfig {
   // Rollback = rebuild dengan nilai false / git revert.
   static const bool inChatSearchEnabled = true;
 
+  // BRIEF 4A — Render stiker inbound (webp dari media.sticker_url).
+  // Compile-time flag, default OFF. ON => stiker webp tampil (≈140px transparan)
+  // di thread (2 layout); placeholder teks "[Stiker]" disembunyikan di body,
+  // banner komposer, & quoted reply-preview => label "🩷 Stiker"; guard "-"
+  // mengecualikan stiker. OFF => tampil teks "[Stiker]" dari BE (state lama, 0
+  // delta). Rollback = rebuild false / git revert.
+  static const bool stickerInboundEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {

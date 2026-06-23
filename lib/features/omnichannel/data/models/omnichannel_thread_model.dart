@@ -172,6 +172,9 @@ class OmnichannelThreadMessageModel {
     this.documentUrl,
     this.documentDownloadUrl,
     this.documentId,
+    this.stickerUrl,
+    this.stickerDownloadUrl,
+    this.stickerAnimated = false,
     this.mediaCaption,
     this.mimeType,
     this.originalName,
@@ -213,6 +216,9 @@ class OmnichannelThreadMessageModel {
   final String? documentUrl;
   final String? documentDownloadUrl;
   final String? documentId;
+  final String? stickerUrl;
+  final String? stickerDownloadUrl;
+  final bool stickerAnimated;
   final String? mediaCaption;
   final String? mimeType;
   final String? originalName;
@@ -261,6 +267,9 @@ class OmnichannelThreadMessageModel {
           (interactiveType?.trim().isNotEmpty ?? false)) &&
       (interactiveButtonOptions.isNotEmpty ||
           interactiveListOptions.isNotEmpty);
+
+  bool get hasSticker =>
+      messageType == 'sticker' && (stickerUrl?.trim().isNotEmpty ?? false);
 
   String? get preferredImageDownloadUrl => imageDownloadUrl ?? imageUrl;
   String? get preferredAudioDownloadUrl => audioDownloadUrl ?? audioUrl;
@@ -461,6 +470,27 @@ class OmnichannelThreadMessageModel {
         const <String>['document_id', 'media.document_id'],
         omnichannelString,
       ),
+      stickerUrl: _normalizeMediaUrl(
+        omnichannelFirstMappedFromSources<String>(
+          <Map<String, dynamic>>[media, json],
+          const <String>['sticker_url', 'media.sticker_url'],
+          omnichannelString,
+        ),
+      ),
+      stickerDownloadUrl: _normalizeMediaUrl(
+        omnichannelFirstMappedFromSources<String>(
+          <Map<String, dynamic>>[media, json],
+          const <String>['sticker_download_url', 'media.sticker_download_url'],
+          omnichannelString,
+        ),
+      ),
+      stickerAnimated:
+          omnichannelFirstMappedFromSources<bool>(
+            <Map<String, dynamic>>[media, json],
+            const <String>['sticker_animated', 'media.sticker_animated'],
+            omnichannelBool,
+          ) ??
+          false,
       mediaCaption: omnichannelFirstMappedFromSources<String>(
         <Map<String, dynamic>>[media, json],
         const <String>['caption', 'media.caption'],
