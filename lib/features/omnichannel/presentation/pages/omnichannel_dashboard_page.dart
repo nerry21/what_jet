@@ -1847,6 +1847,182 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     };
   }
 
+  Future<bool> _sendAdminGalleryVideo(String? caption) async {
+    return _sendAdminVideo(caption, ImageSource.gallery);
+  }
+
+  Future<bool> _sendAdminCameraVideo(String? caption) async {
+    return _sendAdminVideo(caption, ImageSource.camera);
+  }
+
+  Future<bool> _sendAdminVideo(String? caption, ImageSource source) async {
+    final conversation = _controller.selectedConversation;
+    final conversationId = conversation?.id;
+
+    if (conversationId == null || conversationId <= 0) {
+      _showSnackBar('Conversation belum dipilih.');
+      return false;
+    }
+
+    if (conversation?.channel != 'whatsapp') {
+      _showSnackBar('Video saat ini hanya aktif untuk conversation WhatsApp.');
+      return false;
+    }
+
+    if (_isSendingReply || _isSendingContact) {
+      return false;
+    }
+
+    final pickedVideo = await _imagePicker.pickVideo(
+      source: source,
+      preferredCameraDevice: CameraDevice.rear,
+    );
+
+    if (pickedVideo == null) {
+      return false;
+    }
+
+    final normalizedMimeType = _normalizeSendableVideoMimeType(
+      pickedVideo.mimeType,
+      pickedVideo.name,
+    );
+
+    if (normalizedMimeType == null) {
+      _showSnackBar(
+        'Format video ini belum didukung untuk kirim WhatsApp. Gunakan MP4.',
+      );
+      return false;
+    }
+
+    // WhatsApp video size limit: 16 MB (mirror precedent dokumen :2156-2161).
+    const int maxBytes = 16 * 1024 * 1024;
+
+    // R1 (DEC-APP-1) — pre-check ukuran SEBELUM readAsBytes (cegah OOM saat
+    // admin pilih video besar). BE tetap otoritas final.
+    final fileLength = await pickedVideo.length();
+    if (fileLength > maxBytes) {
+      _showSnackBar('Video maksimal 16MB. Kompres atau kirim sebagai dokumen.');
+      return false;
+    }
+
+    final fileBytes = await pickedVideo.readAsBytes();
+    if (fileBytes.isEmpty) {
+      _showSnackBar('File video kosong atau gagal dibaca.');
+      return false;
+    }
+
+    // Safety net pasca-read (platform yang length()-nya tak akurat).
+    if (fileBytes.length > maxBytes) {
+      _showSnackBar('Video maksimal 16MB. Kompres atau kirim sebagai dokumen.');
+      return false;
+    }
+
+    final normalizedFileName = _normalizedVideoFileName(
+      pickedVideo.name,
+      normalizedMimeType,
+    );
+
+    setState(() => _isSendingReply = true);
+
+    try {
+      final notice = await widget.repository.sendAdminVideoReply(
+        conversationId: conversationId,
+        fileBytes: fileBytes,
+        fileName: normalizedFileName,
+        caption: caption,
+        mimeType: normalizedMimeType,
+        replyToMessageId: _activeReplyTo?.id,
+      );
+
+      await _controller.softRefreshAfterExternalAction();
+
+      if (mounted) {
+        _showSnackBar(notice);
+      }
+
+      if (mounted) {
+        setState(() {
+          _replyingTo = null;
+          _replyingToConversationId = null;
+        });
+      }
+
+      return true;
+    } on ApiException catch (error) {
+      if (mounted) {
+        _showSnackBar(error.message);
+      }
+      return false;
+    } catch (error) {
+      if (mounted) {
+        final sourceLabel = source == ImageSource.camera ? 'kamera' : 'galeri';
+        _showSnackBar('Gagal mengirim video dari $sourceLabel: $error');
+      }
+      return false;
+    } finally {
+      if (mounted) {
+        setState(() => _isSendingReply = false);
+      }
+    }
+  }
+
+  String? _normalizeSendableVideoMimeType(String? mimeType, String fileName) {
+    final normalized = (mimeType ?? '').trim().toLowerCase();
+    final byMime = switch (normalized) {
+      'video/mp4' => 'video/mp4',
+      'video/3gpp' || 'video/3gp' => 'video/3gpp',
+      'video/quicktime' || 'video/mov' => 'video/quicktime',
+      _ => null,
+    };
+    if (byMime != null) {
+      return byMime;
+    }
+
+    // Fallback ekstensi (Android galeri sering mimeType null).
+    final parts = fileName.split('.');
+    if (parts.length < 2) {
+      return null;
+    }
+    return switch (parts.last.toLowerCase()) {
+      'mp4' || 'm4v' => 'video/mp4',
+      '3gp' || '3gpp' => 'video/3gpp',
+      'mov' || 'qt' => 'video/quicktime',
+      _ => null,
+    };
+  }
+
+  String _normalizedVideoFileName(String fileName, String mimeType) {
+    final trimmed = fileName.trim();
+    final fallbackExtension = switch (mimeType) {
+      'video/3gpp' => '3gp',
+      'video/quicktime' => 'mov',
+      _ => 'mp4',
+    };
+
+    if (trimmed.isEmpty) {
+      return 'whatsapp-video.$fallbackExtension';
+    }
+
+    final lastDot = trimmed.lastIndexOf('.');
+    if (lastDot <= 0 || lastDot == trimmed.length - 1) {
+      return '$trimmed.$fallbackExtension';
+    }
+
+    final ext = trimmed.substring(lastDot + 1).toLowerCase();
+    if (mimeType == 'video/mp4' && (ext == 'mp4' || ext == 'm4v')) {
+      return trimmed;
+    }
+    if (mimeType == 'video/3gpp' && (ext == '3gp' || ext == '3gpp')) {
+      return trimmed;
+    }
+    if (mimeType == 'video/quicktime' && (ext == 'mov' || ext == 'qt')) {
+      return trimmed;
+    }
+
+    final baseName = trimmed.substring(0, lastDot);
+    return '$baseName.$fallbackExtension';
+  }
+
   Future<bool> _toggleBot(bool turnOn) async {
     final conversationId = _controller.selectedConversation?.id;
     if (conversationId == null || conversationId <= 0 || _isTogglingBot) {
@@ -2640,6 +2816,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   onSendReply: _sendAdminReply,
                   onSendGalleryImage: _sendAdminGalleryImage,
                   onSendCameraImage: _sendAdminCameraImage,
+                  onSendGalleryVideo: _sendAdminGalleryVideo,
+                  onSendCameraVideo: _sendAdminCameraVideo,
                   onSendDocument: _sendAdminDocument,
                   onSendLocation: _sendAdminLocation,
                   onSendVoiceNote: _toggleVoiceNoteRecording,
@@ -2790,6 +2968,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       onSendReply: _sendAdminReply,
                       onSendGalleryImage: _sendAdminGalleryImage,
                       onSendCameraImage: _sendAdminCameraImage,
+                      onSendGalleryVideo: _sendAdminGalleryVideo,
+                      onSendCameraVideo: _sendAdminCameraVideo,
                       onSendDocument: _sendAdminDocument,
                       onSendLocation: _sendAdminLocation,
                       onSendVoiceNote: _toggleVoiceNoteRecording,
