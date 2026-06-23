@@ -66,7 +66,7 @@ class AppConfig {
   // tray (source picker Galeri/Kamera) -> guard 16MB UX -> multipart video_file.
   // OFF => entry "Video" tak dirender, tray identik lama (0 delta). Rollback =
   // rebuild false / git revert.
-  static const bool videoOutboundEnabled = false;
+  static const bool videoOutboundEnabled = true;
 
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
