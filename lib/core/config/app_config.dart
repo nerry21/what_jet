@@ -59,7 +59,7 @@ class AppConfig {
   // banner komposer, & quoted reply-preview => label "🩷 Stiker"; guard "-"
   // mengecualikan stiker. OFF => tampil teks "[Stiker]" dari BE (state lama, 0
   // delta). Rollback = rebuild false / git revert.
-  static const bool stickerInboundEnabled = false;
+  static const bool stickerInboundEnabled = true;
 
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
