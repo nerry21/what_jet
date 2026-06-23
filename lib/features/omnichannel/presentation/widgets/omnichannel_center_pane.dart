@@ -79,6 +79,8 @@ class OmnichannelCenterPane extends StatefulWidget {
     required this.onSendReply,
     required this.onSendGalleryImage,
     required this.onSendCameraImage,
+    required this.onSendGalleryVideo,
+    required this.onSendCameraVideo,
     required this.onSendContact,
     required this.onSendDocument,
     required this.onSendLocation,
@@ -119,6 +121,8 @@ class OmnichannelCenterPane extends StatefulWidget {
   final Future<bool> Function(String message) onSendReply;
   final Future<bool> Function(String? caption) onSendGalleryImage;
   final Future<bool> Function(String? caption) onSendCameraImage;
+  final Future<bool> Function(String? caption) onSendGalleryVideo;
+  final Future<bool> Function(String? caption) onSendCameraVideo;
   final Future<bool> Function({
     required String fullName,
     required String phone,
@@ -533,6 +537,66 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
     }
   }
 
+  Future<void> _handleVideoFileAttachment() async {
+    if (widget.conversation == null ||
+        widget.isSendingReply ||
+        widget.isSendingContact) {
+      return;
+    }
+
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) {
+        return SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.photo_library_rounded),
+                title: const Text('Galeri'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  unawaited(_handleVideoGalleryAttachment());
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.videocam_rounded),
+                title: const Text('Kamera'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  unawaited(_handleVideoCameraAttachment());
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _handleVideoGalleryAttachment() async {
+    final caption = _composerController.text.trim();
+    final success = await widget.onSendGalleryVideo(
+      caption.isEmpty ? null : caption,
+    );
+
+    if (success && mounted) {
+      await _finalizeSuccessfulComposerSend();
+    }
+  }
+
+  Future<void> _handleVideoCameraAttachment() async {
+    final caption = _composerController.text.trim();
+    final success = await widget.onSendCameraVideo(
+      caption.isEmpty ? null : caption,
+    );
+
+    if (success && mounted) {
+      await _finalizeSuccessfulComposerSend();
+    }
+  }
+
   Future<void> _handleDirectCameraTap() async {
     if (widget.conversation == null ||
         widget.isSendingReply ||
@@ -709,6 +773,9 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
       onAudioTap: _handleAudioFileAttachment,
       onPollTap: _handlePollAttachment,
       onEventTap: _handleEventAttachment,
+      onVideoFileTap: AppConfig.videoOutboundEnabled
+          ? _handleVideoFileAttachment
+          : null,
     );
   }
 

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,10 +8,12 @@ import 'package:what_jet/features/admin_auth/data/repositories/admin_auth_reposi
 import 'package:what_jet/features/admin_auth/data/services/admin_auth_api_service.dart';
 import 'package:what_jet/features/omnichannel/data/repositories/omnichannel_repository.dart';
 import 'package:what_jet/features/omnichannel/data/services/omnichannel_api_service.dart';
+import 'package:what_jet/features/omnichannel/presentation/widgets/whatsapp_attachment_sheet.dart';
 
 class _CapturingApiClient extends ApiClient {
   Map<String, Object?>? lastBody;
   Map<String, Object?>? lastFields;
+  List<ApiMultipartFile>? lastFiles;
 
   @override
   Future<Map<String, dynamic>> post(
@@ -32,6 +35,7 @@ class _CapturingApiClient extends ApiClient {
     Map<String, String> headers = const <String, String>{},
   }) {
     lastFields = fields;
+    lastFiles = files;
     return Future<Map<String, dynamic>>.value(<String, dynamic>{});
   }
 }
@@ -192,4 +196,132 @@ void main() {
       );
     },
   );
+
+  group('OmnichannelApiService video reply (BRIEF 4B-APP)', () {
+    late _CapturingApiClient client;
+    late OmnichannelApiService service;
+
+    setUp(() {
+      client = _CapturingApiClient();
+      service = OmnichannelApiService(client);
+    });
+
+    tearDown(() {
+      client.dispose();
+    });
+
+    test(
+      '8. video sets message_type video + multipart video_file + reply id',
+      () async {
+        await service.sendAdminVideoReply(
+          accessToken: 'token',
+          conversationId: 1,
+          fileBytes: <int>[1, 2, 3],
+          fileName: 'clip.mp4',
+          mimeType: 'video/mp4',
+          replyToMessageId: 9,
+        );
+
+        expect(client.lastFields!['message_type'], 'video');
+        expect(client.lastFields!['reply_to_message_id'], '9');
+
+        final file = client.lastFiles!.single;
+        expect(file.field, 'video_file');
+        expect(file.filename, 'clip.mp4');
+        expect(file.contentType, 'video/mp4');
+        expect(file.bytes, <int>[1, 2, 3]);
+      },
+    );
+
+    test('9. video omits reply_to_message_id when null', () async {
+      await service.sendAdminVideoReply(
+        accessToken: 'token',
+        conversationId: 1,
+        fileBytes: <int>[1, 2, 3],
+        fileName: 'clip.mp4',
+        mimeType: 'video/mp4',
+      );
+
+      expect(client.lastFields!.containsKey('reply_to_message_id'), isFalse);
+      expect(client.lastFields!['message_type'], 'video');
+      expect(client.lastFiles!.single.field, 'video_file');
+    });
+  });
+
+  group('Attachment tray video gate (BRIEF 4B-APP)', () {
+    testWidgets('10. tray ON: tile Video hadir (setelah Kamera)', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (ctx) => ElevatedButton(
+                onPressed: () => showWhatsAppAttachmentSheet(
+                  context: ctx,
+                  onGalleryTap: () async {},
+                  onCameraTap: () async {},
+                  onLocationTap: () async {},
+                  onContactTap: () async {},
+                  onDocumentTap: () async {},
+                  onAudioTap: () async {},
+                  onPollTap: () async {},
+                  onEventTap: () async {},
+                  onVideoFileTap: () async {},
+                ),
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Kamera'), findsOneWidget);
+      expect(find.text('Video'), findsOneWidget);
+    });
+
+    testWidgets('11. tray OFF: tile Video absen, tray lama identik', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (ctx) => ElevatedButton(
+                onPressed: () => showWhatsAppAttachmentSheet(
+                  context: ctx,
+                  onGalleryTap: () async {},
+                  onCameraTap: () async {},
+                  onLocationTap: () async {},
+                  onContactTap: () async {},
+                  onDocumentTap: () async {},
+                  onAudioTap: () async {},
+                  onPollTap: () async {},
+                  onEventTap: () async {},
+                ),
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Kamera'), findsOneWidget);
+      expect(find.text('Video'), findsNothing);
+    });
+  });
 }

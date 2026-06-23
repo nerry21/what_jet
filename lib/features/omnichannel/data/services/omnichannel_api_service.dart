@@ -342,6 +342,38 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> sendAdminVideoReply({
+    required String accessToken,
+    required int conversationId,
+    required List<int> fileBytes,
+    required String fileName,
+    String? caption,
+    String? mimeType,
+    int? replyToMessageId,
+  }) {
+    final fields = <String, Object?>{
+      'message_type': 'video',
+      'caption': _normalizedNullableText(caption),
+      'mime_type': _normalizedNullableText(mimeType),
+      if (replyToMessageId != null)
+        'reply_to_message_id': replyToMessageId.toString(),
+    };
+
+    return _apiClient.postMultipart(
+      ApiEndpoints.adminConversationReply(conversationId),
+      headers: _headers(accessToken),
+      fields: fields,
+      files: <ApiMultipartFile>[
+        ApiMultipartFile(
+          field: 'video_file',
+          bytes: fileBytes,
+          filename: fileName,
+          contentType: mimeType,
+        ),
+      ],
+    );
+  }
+
   Future<Map<String, dynamic>> sendAdminAudioReply({
     required String accessToken,
     required int conversationId,

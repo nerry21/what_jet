@@ -13,6 +13,7 @@ Future<void> showWhatsAppAttachmentSheet({
   required Future<void> Function() onAudioTap,
   required Future<void> Function() onPollTap,
   required Future<void> Function() onEventTap,
+  Future<void> Function()? onVideoFileTap,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -27,6 +28,7 @@ Future<void> showWhatsAppAttachmentSheet({
         onAudioTap: onAudioTap,
         onPollTap: onPollTap,
         onEventTap: onEventTap,
+        onVideoFileTap: onVideoFileTap,
       );
     },
   );
@@ -42,6 +44,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
     required this.onAudioTap,
     required this.onPollTap,
     required this.onEventTap,
+    this.onVideoFileTap,
   });
 
   final Future<void> Function() onGalleryTap;
@@ -52,6 +55,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
   final Future<void> Function() onAudioTap;
   final Future<void> Function() onPollTap;
   final Future<void> Function() onEventTap;
+  final Future<void> Function()? onVideoFileTap;
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +72,13 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
         color: const Color(0xFFED3A8A),
         onTap: onCameraTap,
       ),
+      if (onVideoFileTap != null)
+        _AttachmentAction(
+          label: 'Video',
+          icon: Icons.videocam_rounded,
+          color: const Color(0xFFE5484D),
+          onTap: onVideoFileTap!,
+        ),
       _AttachmentAction(
         label: 'Lokasi',
         icon: Icons.location_on_rounded,

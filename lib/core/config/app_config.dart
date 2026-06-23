@@ -61,6 +61,13 @@ class AppConfig {
   // delta). Rollback = rebuild false / git revert.
   static const bool stickerInboundEnabled = true;
 
+  // BRIEF 4B-APP — Video outbound (kirim video admin->pelanggan).
+  // Compile-time flag, default OFF. ON => entry "Video" muncul di attachment
+  // tray (source picker Galeri/Kamera) -> guard 16MB UX -> multipart video_file.
+  // OFF => entry "Video" tak dirender, tray identik lama (0 delta). Rollback =
+  // rebuild false / git revert.
+  static const bool videoOutboundEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {
