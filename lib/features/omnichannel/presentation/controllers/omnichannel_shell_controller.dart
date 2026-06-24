@@ -13,6 +13,7 @@ import '../../data/models/omnichannel_query_model.dart';
 import '../../data/models/omnichannel_shell_snapshot_model.dart';
 import '../../data/models/omnichannel_thread_model.dart';
 import '../../data/models/omnichannel_workspace_model.dart';
+import '../../data/models/sticker_favorite_item.dart';
 import '../../data/repositories/omnichannel_repository.dart';
 
 /// Event yang dipancarkan saat ada pesan masuk baru terdeteksi via polling.
@@ -373,6 +374,30 @@ class OmnichannelShellController extends ChangeNotifier {
   /// Returns BE message. NOT conversation-scoped (any sticker, any channel).
   Future<String> saveStickerFavorite({required int sourceMessageId}) async {
     return _repository.saveStickerFavorite(sourceMessageId: sourceMessageId);
+  }
+
+  /// Loads the shared sticker favorites collection (BRIEF 4C-3). Fetch each
+  /// open (always fresh); throws on BE error -> picker error-state. Not
+  /// conversation-scoped (mirror saveStickerFavorite).
+  Future<List<StickerFavoriteItem>> loadStickerFavorites() {
+    return _repository.fetchStickerFavorites();
+  }
+
+  /// Sends a favorite sticker to the selected conversation (BRIEF 4C-3).
+  /// Returns BE message (success) | 'skipped' | 'failed'. WhatsApp only
+  /// (mirror resendSticker guard).
+  Future<String> sendStickerFavorite({required int favoriteId}) async {
+    final conversationId = selectedConversationId;
+    if (conversationId == null) {
+      return 'failed';
+    }
+    if (_selectedConversation?.channel != 'whatsapp') {
+      return 'skipped';
+    }
+    return _repository.sendStickerFavorite(
+      conversationId: conversationId,
+      favoriteId: favoriteId,
+    );
   }
 
   /// Marks a conversation as unread (BRIEF 3A): optimistically bumps the local

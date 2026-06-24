@@ -14,6 +14,7 @@ Future<void> showWhatsAppAttachmentSheet({
   required Future<void> Function() onPollTap,
   required Future<void> Function() onEventTap,
   Future<void> Function()? onVideoFileTap,
+  Future<void> Function()? onStickerTap,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -29,6 +30,7 @@ Future<void> showWhatsAppAttachmentSheet({
         onPollTap: onPollTap,
         onEventTap: onEventTap,
         onVideoFileTap: onVideoFileTap,
+        onStickerTap: onStickerTap,
       );
     },
   );
@@ -45,6 +47,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
     required this.onPollTap,
     required this.onEventTap,
     this.onVideoFileTap,
+    this.onStickerTap,
   });
 
   final Future<void> Function() onGalleryTap;
@@ -56,6 +59,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
   final Future<void> Function() onPollTap;
   final Future<void> Function() onEventTap;
   final Future<void> Function()? onVideoFileTap;
+  final Future<void> Function()? onStickerTap;
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +119,13 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
         color: const Color(0xFFFF3B8D),
         onTap: onEventTap,
       ),
+      if (onStickerTap != null)
+        _AttachmentAction(
+          label: 'Stiker',
+          icon: Icons.emoji_emotions_rounded,
+          color: const Color(0xFF00B8D4),
+          onTap: onStickerTap!,
+        ),
     ];
 
     return SafeArea(

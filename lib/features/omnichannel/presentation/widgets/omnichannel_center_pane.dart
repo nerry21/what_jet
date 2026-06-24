@@ -108,6 +108,7 @@ class OmnichannelCenterPane extends StatefulWidget {
     this.onReactToMessage,
     this.onResendSticker,
     this.onSaveSticker,
+    this.onStickerPickerRequested,
     this.onSwipeToReply,
     this.replyingTo,
     this.onCancelReply,
@@ -164,6 +165,7 @@ class OmnichannelCenterPane extends StatefulWidget {
   final void Function(int messageId, String emoji)? onReactToMessage;
   final void Function(int sourceMessageId)? onResendSticker;
   final void Function(int sourceMessageId)? onSaveSticker;
+  final Future<void> Function()? onStickerPickerRequested;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
   final OmnichannelThreadMessageModel? replyingTo;
   final VoidCallback? onCancelReply;
@@ -779,6 +781,9 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
       onEventTap: _handleEventAttachment,
       onVideoFileTap: AppConfig.videoOutboundEnabled
           ? _handleVideoFileAttachment
+          : null,
+      onStickerTap: AppConfig.stickerPickerEnabled
+          ? widget.onStickerPickerRequested
           : null,
     );
   }

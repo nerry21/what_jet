@@ -14,6 +14,7 @@ import '../models/omnichannel_shell_snapshot_model.dart';
 import '../models/omnichannel_status_update_model.dart';
 import '../models/omnichannel_thread_model.dart';
 import '../models/omnichannel_workspace_model.dart';
+import '../models/sticker_favorite_item.dart';
 import '../models/whatsapp_contact_model.dart';
 import '../services/omnichannel_api_service.dart';
 
@@ -306,6 +307,54 @@ class OmnichannelRepository {
     }
 
     return 'Stiker disimpan ke koleksi.';
+  }
+
+  /// Loads the shared sticker favorites collection (BRIEF 4C-3, BE-1).
+  /// Throws on BE error (`_readWithRetry` rethrow) -> picker error-state;
+  /// filters malformed `id<=0`. NB: ApiClient._decodeResponse FLATTENS the
+  /// successResponse `data` into top-level, so favorites are read via
+  /// `_extractPayloadData(payload)['favorites']` (mirror loadStatusUpdates),
+  /// NOT payload['data']['favorites'].
+  Future<List<StickerFavoriteItem>> fetchStickerFavorites() async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.fetchStickerFavorites(accessToken: accessToken),
+    );
+
+    final data = _extractPayloadData(payload);
+    final rawFavorites = data['favorites'];
+    if (rawFavorites is! List) {
+      return const <StickerFavoriteItem>[];
+    }
+
+    return rawFavorites
+        .whereType<Map<String, dynamic>>()
+        .map(StickerFavoriteItem.fromJson)
+        .where((item) => item.id > 0)
+        .toList();
+  }
+
+  /// Sends a favorite sticker to a conversation (BRIEF 4C-3, BE-2).
+  /// successResponse -> notice di top-level `message`. Mirror saveStickerFavorite.
+  Future<String> sendStickerFavorite({
+    required int conversationId,
+    required int favoriteId,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.sendStickerFavorite(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        favoriteId: favoriteId,
+      ),
+    );
+
+    final message = payload['message']?.toString().trim();
+    if (message != null && message.isNotEmpty) {
+      return message;
+    }
+
+    return 'Stiker favorit berhasil dikirim.';
   }
 
   /// Mark conversation as read on the backend.
