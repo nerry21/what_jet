@@ -270,6 +270,27 @@ class OmnichannelRepository {
     return 'Balasan admin berhasil diproses.';
   }
 
+  Future<String> sendAdminStickerReply({
+    required int conversationId,
+    required int sourceMessageId,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.sendAdminStickerReply(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        sourceMessageId: sourceMessageId,
+      ),
+    );
+
+    final notice = payload['notice']?.toString().trim();
+    if (notice != null && notice.isNotEmpty) {
+      return notice;
+    }
+
+    return 'Stiker berhasil diproses.';
+  }
+
   /// Mark conversation as read on the backend.
   /// Fails silently — this is a non-critical UX enhancement.
   Future<void> markConversationAsRead({required int conversationId}) async {

@@ -68,6 +68,13 @@ class AppConfig {
   // rebuild false / git revert.
   static const bool videoOutboundEnabled = true;
 
+  // BRIEF 4C-1-APP — Sticker resend (kirim ulang stiker diterima dari HP).
+  // Compile-time flag, default OFF. ON => tombol overlay "kirim ulang" muncul di
+  // preview stiker DITERIMA (!isMine) -> JSON reply {message_type:'sticker',
+  // source_message_id}. OFF => tombol tak dirender, preview identik 4A (0 delta).
+  // Rollback = rebuild false / git revert.
+  static const bool stickerOutboundEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {

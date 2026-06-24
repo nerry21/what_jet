@@ -106,6 +106,7 @@ class OmnichannelCenterPane extends StatefulWidget {
     this.onOpenInbox,
     this.onComposerChanged,
     this.onReactToMessage,
+    this.onResendSticker,
     this.onSwipeToReply,
     this.replyingTo,
     this.onCancelReply,
@@ -160,6 +161,7 @@ class OmnichannelCenterPane extends StatefulWidget {
   final VoidCallback? onOpenInbox;
   final ValueChanged<String>? onComposerChanged;
   final void Function(int messageId, String emoji)? onReactToMessage;
+  final void Function(int sourceMessageId)? onResendSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
   final OmnichannelThreadMessageModel? replyingTo;
   final VoidCallback? onCancelReply;
@@ -881,6 +883,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         onCancelVoiceNoteTap: _handleCancelVoiceNoteTap,
         onMenuSelected: _handleMobileMenuAction,
         onReactToMessage: widget.onReactToMessage,
+        onResendSticker: widget.onResendSticker,
         onSwipeToReply: widget.onSwipeToReply,
         replyingTo: widget.replyingTo,
         onCancelReply: widget.onCancelReply,
@@ -1009,6 +1012,8 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
                                             maxWidth: bubbleMaxWidth,
                                             onReactToMessage:
                                                 widget.onReactToMessage,
+                                            onResendSticker:
+                                                widget.onResendSticker,
                                             onSwipeToReply:
                                                 widget.onSwipeToReply,
                                             onTapQuotedReply: _scrollToMessage,
@@ -1077,6 +1082,7 @@ class _MobileConversationScaffold extends StatelessWidget {
     required this.onCancelVoiceNoteTap,
     required this.onMenuSelected,
     this.onReactToMessage,
+    this.onResendSticker,
     this.onSwipeToReply,
     this.replyingTo,
     this.onCancelReply,
@@ -1119,6 +1125,7 @@ class _MobileConversationScaffold extends StatelessWidget {
   final Future<void> Function(_MobileConversationMenuAction action)
   onMenuSelected;
   final void Function(int messageId, String emoji)? onReactToMessage;
+  final void Function(int sourceMessageId)? onResendSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
   final OmnichannelThreadMessageModel? replyingTo;
   final VoidCallback? onCancelReply;
@@ -1209,6 +1216,7 @@ class _MobileConversationScaffold extends StatelessWidget {
                                 message: message,
                                 maxWidth: bubbleMaxWidth,
                                 onReactToMessage: onReactToMessage,
+                                onResendSticker: onResendSticker,
                                 onSwipeToReply: onSwipeToReply,
                                 onTapQuotedReply: onTapQuotedReply,
                               );
@@ -1753,6 +1761,7 @@ class _MobileConversationBubble extends StatelessWidget {
     required this.message,
     required this.maxWidth,
     this.onReactToMessage,
+    this.onResendSticker,
     this.onSwipeToReply,
     this.onTapQuotedReply,
   });
@@ -1760,6 +1769,7 @@ class _MobileConversationBubble extends StatelessWidget {
   final OmnichannelThreadMessageModel message;
   final double maxWidth;
   final void Function(int messageId, String emoji)? onReactToMessage;
+  final void Function(int sourceMessageId)? onResendSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
   final void Function(int quotedMessageId)? onTapQuotedReply;
 
@@ -1819,7 +1829,15 @@ class _MobileConversationBubble extends StatelessWidget {
               ],
               if (AppConfig.stickerInboundEnabled &&
                   message.hasSticker) ...<Widget>[
-                _ConversationStickerPreview(stickerUrl: message.stickerUrl!),
+                ConversationStickerPreview(
+                  stickerUrl: message.stickerUrl!,
+                  onResend:
+                      (AppConfig.stickerOutboundEnabled &&
+                          !message.isMine &&
+                          onResendSticker != null)
+                      ? () => onResendSticker!(message.id)
+                      : null,
+                ),
               ],
               if (message.hasAudio) ...<Widget>[
                 _ConversationAudioBubble(message: message, compact: true),
@@ -2754,6 +2772,7 @@ class _ThreadBubble extends StatelessWidget {
     required this.message,
     required this.maxWidth,
     this.onReactToMessage,
+    this.onResendSticker,
     this.onSwipeToReply,
     this.onTapQuotedReply,
   });
@@ -2761,6 +2780,7 @@ class _ThreadBubble extends StatelessWidget {
   final OmnichannelThreadMessageModel message;
   final double maxWidth;
   final void Function(int messageId, String emoji)? onReactToMessage;
+  final void Function(int sourceMessageId)? onResendSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
   final void Function(int quotedMessageId)? onTapQuotedReply;
 
@@ -2831,7 +2851,15 @@ class _ThreadBubble extends StatelessWidget {
               ],
               if (AppConfig.stickerInboundEnabled &&
                   message.hasSticker) ...<Widget>[
-                _ConversationStickerPreview(stickerUrl: message.stickerUrl!),
+                ConversationStickerPreview(
+                  stickerUrl: message.stickerUrl!,
+                  onResend:
+                      (AppConfig.stickerOutboundEnabled &&
+                          !message.isMine &&
+                          onResendSticker != null)
+                      ? () => onResendSticker!(message.id)
+                      : null,
+                ),
               ],
               if (message.hasAudio) ...<Widget>[
                 _ConversationAudioBubble(message: message, compact: false),
@@ -3356,44 +3384,77 @@ class _ConversationImagePreview extends StatelessWidget {
   }
 }
 
-class _ConversationStickerPreview extends StatelessWidget {
-  const _ConversationStickerPreview({required this.stickerUrl});
+@visibleForTesting
+class ConversationStickerPreview extends StatelessWidget {
+  const ConversationStickerPreview({
+    super.key,
+    required this.stickerUrl,
+    this.onResend,
+  });
 
   final String stickerUrl;
+  final VoidCallback? onResend;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: 140,
       height: 140,
-      child: Image.network(
-        stickerUrl,
-        fit: BoxFit.contain,
-        webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) {
-            return child;
-          }
+      child: Stack(
+        children: <Widget>[
+          Positioned.fill(
+            child: Image.network(
+              stickerUrl,
+              fit: BoxFit.contain,
+              webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) {
+                  return child;
+                }
 
-          return const Center(
-            child: SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: AppColors.primary,
+                return const Center(
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                );
+              },
+              errorBuilder: (_, __, ___) {
+                return const Center(
+                  child: Icon(
+                    Icons.broken_image_outlined,
+                    color: AppColors.neutral300,
+                  ),
+                );
+              },
+            ),
+          ),
+          if (onResend != null)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Material(
+                color: AppColors.neutral800.withValues(alpha: 0.45),
+                borderRadius: AppRadii.borderRadiusPill,
+                child: InkWell(
+                  onTap: onResend,
+                  borderRadius: AppRadii.borderRadiusPill,
+                  child: const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Icon(
+                      Icons.send_rounded,
+                      size: 18,
+                      color: AppColors.surfacePrimary,
+                    ),
+                  ),
+                ),
               ),
             ),
-          );
-        },
-        errorBuilder: (_, __, ___) {
-          return const Center(
-            child: Icon(
-              Icons.broken_image_outlined,
-              color: AppColors.neutral300,
-            ),
-          );
-        },
+        ],
       ),
     );
   }
