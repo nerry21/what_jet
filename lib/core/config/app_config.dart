@@ -75,6 +75,11 @@ class AppConfig {
   // Rollback = rebuild false / git revert.
   static const bool stickerOutboundEnabled = true;
 
+  // BRIEF 4C-2-APP — tombol "Simpan ke koleksi" di preview stiker DITERIMA
+  // (!isMine). OFF => tombol tak dirender, preview identik 4C-1 (0 delta).
+  // BE sticker-favorites sudah live. Rollback = rebuild false / git revert.
+  static const bool stickerFavoritesEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {

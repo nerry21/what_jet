@@ -369,6 +369,12 @@ class OmnichannelShellController extends ChangeNotifier {
     );
   }
 
+  /// Saves a sticker to the shared favorites collection (BRIEF 4C-2).
+  /// Returns BE message. NOT conversation-scoped (any sticker, any channel).
+  Future<String> saveStickerFavorite({required int sourceMessageId}) async {
+    return _repository.saveStickerFavorite(sourceMessageId: sourceMessageId);
+  }
+
   /// Marks a conversation as unread (BRIEF 3A): optimistically bumps the local
   /// unread badge, then tells the backend (silent-fail). Inverse of the tap
   /// read-clear flow. Eventual consistency: next poll reconciles with backend.
