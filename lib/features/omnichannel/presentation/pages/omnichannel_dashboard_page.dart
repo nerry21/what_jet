@@ -2547,6 +2547,25 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
   }
 
+  Future<void> _handleSaveSticker(int sourceMessageId) async {
+    try {
+      final result = await _controller.saveStickerFavorite(
+        sourceMessageId: sourceMessageId,
+      );
+      if (mounted) {
+        _showSnackBar(result);
+      }
+    } on ApiException catch (error) {
+      if (mounted) {
+        _showSnackBar(error.message);
+      }
+    } catch (error) {
+      if (mounted) {
+        _showSnackBar('Gagal menyimpan stiker: $error');
+      }
+    }
+  }
+
   String _resendStickerFeedbackMessage(String status) {
     if (status == 'skipped') {
       return 'Kirim ulang stiker hanya untuk percakapan WhatsApp.';
@@ -2827,6 +2846,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       unawaited(_handleReactToMessage(messageId, emoji)),
                   onResendSticker: (sourceMessageId) =>
                       unawaited(_handleResendSticker(sourceMessageId)),
+                  onSaveSticker: (sourceMessageId) =>
+                      unawaited(_handleSaveSticker(sourceMessageId)),
                   onComposerChanged: (text) =>
                       _controller.notifyAdminTyping(text),
                   conversation: _controller.selectedConversation,
@@ -2980,6 +3001,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                           unawaited(_handleReactToMessage(messageId, emoji)),
                       onResendSticker: (sourceMessageId) =>
                           unawaited(_handleResendSticker(sourceMessageId)),
+                      onSaveSticker: (sourceMessageId) =>
+                          unawaited(_handleSaveSticker(sourceMessageId)),
                       onComposerChanged: (text) =>
                           _controller.notifyAdminTyping(text),
                       conversation: _controller.selectedConversation,

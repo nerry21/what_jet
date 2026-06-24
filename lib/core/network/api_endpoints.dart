@@ -25,6 +25,9 @@ class ApiEndpoints {
 
   static String adminConversations() => '$_adminMobileBase/conversations';
 
+  static String adminStickerFavorites() =>
+      '$_adminMobileBase/sticker-favorites';
+
   static String adminConversationDetail(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId';
 

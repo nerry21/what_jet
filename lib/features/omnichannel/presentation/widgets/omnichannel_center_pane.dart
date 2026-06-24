@@ -107,6 +107,7 @@ class OmnichannelCenterPane extends StatefulWidget {
     this.onComposerChanged,
     this.onReactToMessage,
     this.onResendSticker,
+    this.onSaveSticker,
     this.onSwipeToReply,
     this.replyingTo,
     this.onCancelReply,
@@ -162,6 +163,7 @@ class OmnichannelCenterPane extends StatefulWidget {
   final ValueChanged<String>? onComposerChanged;
   final void Function(int messageId, String emoji)? onReactToMessage;
   final void Function(int sourceMessageId)? onResendSticker;
+  final void Function(int sourceMessageId)? onSaveSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
   final OmnichannelThreadMessageModel? replyingTo;
   final VoidCallback? onCancelReply;
@@ -884,6 +886,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         onMenuSelected: _handleMobileMenuAction,
         onReactToMessage: widget.onReactToMessage,
         onResendSticker: widget.onResendSticker,
+        onSaveSticker: widget.onSaveSticker,
         onSwipeToReply: widget.onSwipeToReply,
         replyingTo: widget.replyingTo,
         onCancelReply: widget.onCancelReply,
@@ -1014,6 +1017,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
                                                 widget.onReactToMessage,
                                             onResendSticker:
                                                 widget.onResendSticker,
+                                            onSaveSticker: widget.onSaveSticker,
                                             onSwipeToReply:
                                                 widget.onSwipeToReply,
                                             onTapQuotedReply: _scrollToMessage,
@@ -1083,6 +1087,7 @@ class _MobileConversationScaffold extends StatelessWidget {
     required this.onMenuSelected,
     this.onReactToMessage,
     this.onResendSticker,
+    this.onSaveSticker,
     this.onSwipeToReply,
     this.replyingTo,
     this.onCancelReply,
@@ -1126,6 +1131,7 @@ class _MobileConversationScaffold extends StatelessWidget {
   onMenuSelected;
   final void Function(int messageId, String emoji)? onReactToMessage;
   final void Function(int sourceMessageId)? onResendSticker;
+  final void Function(int sourceMessageId)? onSaveSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
   final OmnichannelThreadMessageModel? replyingTo;
   final VoidCallback? onCancelReply;
@@ -1217,6 +1223,7 @@ class _MobileConversationScaffold extends StatelessWidget {
                                 maxWidth: bubbleMaxWidth,
                                 onReactToMessage: onReactToMessage,
                                 onResendSticker: onResendSticker,
+                                onSaveSticker: onSaveSticker,
                                 onSwipeToReply: onSwipeToReply,
                                 onTapQuotedReply: onTapQuotedReply,
                               );
@@ -1762,6 +1769,7 @@ class _MobileConversationBubble extends StatelessWidget {
     required this.maxWidth,
     this.onReactToMessage,
     this.onResendSticker,
+    this.onSaveSticker,
     this.onSwipeToReply,
     this.onTapQuotedReply,
   });
@@ -1770,6 +1778,7 @@ class _MobileConversationBubble extends StatelessWidget {
   final double maxWidth;
   final void Function(int messageId, String emoji)? onReactToMessage;
   final void Function(int sourceMessageId)? onResendSticker;
+  final void Function(int sourceMessageId)? onSaveSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
   final void Function(int quotedMessageId)? onTapQuotedReply;
 
@@ -1836,6 +1845,12 @@ class _MobileConversationBubble extends StatelessWidget {
                           !message.isMine &&
                           onResendSticker != null)
                       ? () => onResendSticker!(message.id)
+                      : null,
+                  onSave:
+                      (AppConfig.stickerFavoritesEnabled &&
+                          !message.isMine &&
+                          onSaveSticker != null)
+                      ? () => onSaveSticker!(message.id)
                       : null,
                 ),
               ],
@@ -2773,6 +2788,7 @@ class _ThreadBubble extends StatelessWidget {
     required this.maxWidth,
     this.onReactToMessage,
     this.onResendSticker,
+    this.onSaveSticker,
     this.onSwipeToReply,
     this.onTapQuotedReply,
   });
@@ -2781,6 +2797,7 @@ class _ThreadBubble extends StatelessWidget {
   final double maxWidth;
   final void Function(int messageId, String emoji)? onReactToMessage;
   final void Function(int sourceMessageId)? onResendSticker;
+  final void Function(int sourceMessageId)? onSaveSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
   final void Function(int quotedMessageId)? onTapQuotedReply;
 
@@ -2858,6 +2875,12 @@ class _ThreadBubble extends StatelessWidget {
                           !message.isMine &&
                           onResendSticker != null)
                       ? () => onResendSticker!(message.id)
+                      : null,
+                  onSave:
+                      (AppConfig.stickerFavoritesEnabled &&
+                          !message.isMine &&
+                          onSaveSticker != null)
+                      ? () => onSaveSticker!(message.id)
                       : null,
                 ),
               ],
@@ -3390,10 +3413,12 @@ class ConversationStickerPreview extends StatelessWidget {
     super.key,
     required this.stickerUrl,
     this.onResend,
+    this.onSave,
   });
 
   final String stickerUrl;
   final VoidCallback? onResend;
+  final VoidCallback? onSave;
 
   @override
   Widget build(BuildContext context) {
@@ -3447,6 +3472,27 @@ class ConversationStickerPreview extends StatelessWidget {
                     padding: EdgeInsets.all(8),
                     child: Icon(
                       Icons.send_rounded,
+                      size: 18,
+                      color: AppColors.surfacePrimary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          if (onSave != null)
+            Positioned(
+              top: 8,
+              right: 44,
+              child: Material(
+                color: AppColors.neutral800.withValues(alpha: 0.45),
+                borderRadius: AppRadii.borderRadiusPill,
+                child: InkWell(
+                  onTap: onSave,
+                  borderRadius: AppRadii.borderRadiusPill,
+                  child: const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Icon(
+                      Icons.bookmark_add_outlined,
                       size: 18,
                       color: AppColors.surfacePrimary,
                     ),

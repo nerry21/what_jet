@@ -291,6 +291,23 @@ class OmnichannelRepository {
     return 'Stiker berhasil diproses.';
   }
 
+  Future<String> saveStickerFavorite({required int sourceMessageId}) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.saveStickerFavorite(
+        accessToken: accessToken,
+        sourceMessageId: sourceMessageId,
+      ),
+    );
+
+    final message = payload['message']?.toString().trim();
+    if (message != null && message.isNotEmpty) {
+      return message;
+    }
+
+    return 'Stiker disimpan ke koleksi.';
+  }
+
   /// Mark conversation as read on the backend.
   /// Fails silently — this is a non-critical UX enhancement.
   Future<void> markConversationAsRead({required int conversationId}) async {
