@@ -2520,6 +2520,40 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     return 'Gagal mengirim reaksi.';
   }
 
+  Future<void> _handleResendSticker(int sourceMessageId) async {
+    try {
+      final result = await _controller.resendSticker(
+        sourceMessageId: sourceMessageId,
+      );
+      if (!mounted) {
+        return;
+      }
+      if (result == 'failed' || result == 'skipped') {
+        _showSnackBar(_resendStickerFeedbackMessage(result));
+        return;
+      }
+      await _controller.softRefreshAfterExternalAction();
+      if (mounted) {
+        _showSnackBar(result);
+      }
+    } on ApiException catch (error) {
+      if (mounted) {
+        _showSnackBar(error.message);
+      }
+    } catch (error) {
+      if (mounted) {
+        _showSnackBar('Gagal mengirim ulang stiker: $error');
+      }
+    }
+  }
+
+  String _resendStickerFeedbackMessage(String status) {
+    if (status == 'skipped') {
+      return 'Kirim ulang stiker hanya untuk percakapan WhatsApp.';
+    }
+    return 'Gagal mengirim ulang stiker.';
+  }
+
   void _showSnackBar(String message) {
     final text = message.trim();
     if (text.isEmpty || !mounted) {
@@ -2791,6 +2825,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 child: OmnichannelCenterPane(
                   onReactToMessage: (messageId, emoji) =>
                       unawaited(_handleReactToMessage(messageId, emoji)),
+                  onResendSticker: (sourceMessageId) =>
+                      unawaited(_handleResendSticker(sourceMessageId)),
                   onComposerChanged: (text) =>
                       _controller.notifyAdminTyping(text),
                   conversation: _controller.selectedConversation,
@@ -2942,6 +2978,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                     child: OmnichannelCenterPane(
                       onReactToMessage: (messageId, emoji) =>
                           unawaited(_handleReactToMessage(messageId, emoji)),
+                      onResendSticker: (sourceMessageId) =>
+                          unawaited(_handleResendSticker(sourceMessageId)),
                       onComposerChanged: (text) =>
                           _controller.notifyAdminTyping(text),
                       conversation: _controller.selectedConversation,

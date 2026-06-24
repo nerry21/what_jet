@@ -163,6 +163,21 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> sendAdminStickerReply({
+    required String accessToken,
+    required int conversationId,
+    required int sourceMessageId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationReply(conversationId),
+      headers: _headers(accessToken),
+      body: <String, Object?>{
+        'message_type': 'sticker',
+        'source_message_id': sourceMessageId,
+      },
+    );
+  }
+
   Future<Map<String, dynamic>> markConversationAsRead({
     required String accessToken,
     required int conversationId,
