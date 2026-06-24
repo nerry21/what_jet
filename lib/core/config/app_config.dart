@@ -73,7 +73,7 @@ class AppConfig {
   // preview stiker DITERIMA (!isMine) -> JSON reply {message_type:'sticker',
   // source_message_id}. OFF => tombol tak dirender, preview identik 4A (0 delta).
   // Rollback = rebuild false / git revert.
-  static const bool stickerOutboundEnabled = false;
+  static const bool stickerOutboundEnabled = true;
 
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
