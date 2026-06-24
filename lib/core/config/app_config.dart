@@ -80,6 +80,14 @@ class AppConfig {
   // BE sticker-favorites sudah live. Rollback = rebuild false / git revert.
   static const bool stickerFavoritesEnabled = true;
 
+  // BRIEF 4C-3-APP-1 — UI picker stiker favorit (grid favorit -> kirim).
+  // Compile-time flag, default OFF (dark-launch). ON => tile "Stiker" muncul di
+  // attachment sheet -> picker grid (GET favorit) -> tap kirim (POST
+  // send-favorite). OFF => tile tak dirender (onStickerTap null), sheet identik
+  // (0 delta). Aktivasi end-to-end butuh BE chatbot.whatsapp.sticker_picker_enabled
+  // ON juga. Rollback = rebuild false / git revert.
+  static const bool stickerPickerEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {

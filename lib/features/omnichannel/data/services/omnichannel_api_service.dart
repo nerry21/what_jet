@@ -189,6 +189,27 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> fetchStickerFavorites({
+    required String accessToken,
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminStickerFavorites(),
+      headers: _headers(accessToken),
+    );
+  }
+
+  Future<Map<String, dynamic>> sendStickerFavorite({
+    required String accessToken,
+    required int conversationId,
+    required int favoriteId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationSendFavorite(conversationId),
+      headers: _headers(accessToken),
+      body: <String, Object?>{'favorite_id': favoriteId},
+    );
+  }
+
   Future<Map<String, dynamic>> markConversationAsRead({
     required String accessToken,
     required int conversationId,

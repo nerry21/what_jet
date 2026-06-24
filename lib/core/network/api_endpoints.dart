@@ -79,6 +79,9 @@ class ApiEndpoints {
   static String adminConversationSendContact(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/send-contact';
 
+  static String adminConversationSendFavorite(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/send-favorite';
+
   static String adminConversationBotControl(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/bot-control';
 

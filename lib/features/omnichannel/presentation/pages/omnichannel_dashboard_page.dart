@@ -42,6 +42,7 @@ import '../widgets/omnichannel_right_pane.dart';
 import '../widgets/omnichannel_shell_header.dart';
 import '../widgets/omnichannel_surface.dart';
 import '../widgets/omnichannel_call_analytics_panel.dart';
+import '../widgets/sticker_picker_sheet.dart';
 
 enum _OmnichannelMobilePane {
   inbox,
@@ -2573,6 +2574,48 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     return 'Gagal mengirim ulang stiker.';
   }
 
+  Future<void> _handleOpenStickerPicker() async {
+    await showStickerPickerSheet(
+      context: context,
+      onLoad: _controller.loadStickerFavorites,
+      onPick: (favoriteId) => unawaited(_handleSendStickerFavorite(favoriteId)),
+    );
+  }
+
+  Future<void> _handleSendStickerFavorite(int favoriteId) async {
+    try {
+      final result = await _controller.sendStickerFavorite(
+        favoriteId: favoriteId,
+      );
+      if (!mounted) {
+        return;
+      }
+      if (result == 'failed' || result == 'skipped') {
+        _showSnackBar(_sendStickerFavoriteFeedbackMessage(result));
+        return;
+      }
+      await _controller.softRefreshAfterExternalAction();
+      if (mounted) {
+        _showSnackBar(result);
+      }
+    } on ApiException catch (error) {
+      if (mounted) {
+        _showSnackBar(error.message);
+      }
+    } catch (error) {
+      if (mounted) {
+        _showSnackBar('Gagal mengirim stiker favorit: $error');
+      }
+    }
+  }
+
+  String _sendStickerFavoriteFeedbackMessage(String status) {
+    if (status == 'skipped') {
+      return 'Kirim stiker favorit hanya untuk percakapan WhatsApp.';
+    }
+    return 'Gagal mengirim stiker favorit.';
+  }
+
   void _showSnackBar(String message) {
     final text = message.trim();
     if (text.isEmpty || !mounted) {
@@ -2848,6 +2891,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       unawaited(_handleResendSticker(sourceMessageId)),
                   onSaveSticker: (sourceMessageId) =>
                       unawaited(_handleSaveSticker(sourceMessageId)),
+                  onStickerPickerRequested: _handleOpenStickerPicker,
                   onComposerChanged: (text) =>
                       _controller.notifyAdminTyping(text),
                   conversation: _controller.selectedConversation,
@@ -3003,6 +3047,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                           unawaited(_handleResendSticker(sourceMessageId)),
                       onSaveSticker: (sourceMessageId) =>
                           unawaited(_handleSaveSticker(sourceMessageId)),
+                      onStickerPickerRequested: _handleOpenStickerPicker,
                       onComposerChanged: (text) =>
                           _controller.notifyAdminTyping(text),
                       conversation: _controller.selectedConversation,
