@@ -86,7 +86,7 @@ class AppConfig {
   // send-favorite). OFF => tile tak dirender (onStickerTap null), sheet identik
   // (0 delta). Aktivasi end-to-end butuh BE chatbot.whatsapp.sticker_picker_enabled
   // ON juga. Rollback = rebuild false / git revert.
-  static const bool stickerPickerEnabled = false;
+  static const bool stickerPickerEnabled = true;
 
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
