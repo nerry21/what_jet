@@ -354,6 +354,23 @@ class OmnichannelShellController extends ChangeNotifier {
     );
   }
 
+  /// Toggle bintang pesan di conversation aktif (BRIEF 5C-APP-1). Internal-only
+  /// (NOL WhatsApp). Channel-agnostic (beda dari reaction). Return true bila sukses.
+  Future<bool> toggleStar({
+    required int messageId,
+    required bool currentlyStarred,
+  }) async {
+    final conversationId = selectedConversationId;
+    if (conversationId == null) {
+      return false;
+    }
+    return _repository.setConversationMessageStar(
+      conversationId: conversationId,
+      messageId: messageId,
+      starred: !currentlyStarred,
+    );
+  }
+
   /// Resends a received WhatsApp sticker to the customer (BRIEF 4C-1).
   /// Returns BE notice string (success) | 'skipped' | 'failed'. WhatsApp only.
   Future<String> resendSticker({required int sourceMessageId}) async {

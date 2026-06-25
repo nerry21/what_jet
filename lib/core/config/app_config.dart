@@ -88,6 +88,14 @@ class AppConfig {
   // ON juga. Rollback = rebuild false / git revert.
   static const bool stickerPickerEnabled = true;
 
+  // BRIEF 5C-APP-1 — Star/bintang pesan (render ikon + toggle long-press).
+  // Compile-time flag, default OFF (dark-launch). ON => ikon bintang render di
+  // bubble berbintang + aksi "Bintangi/Lepas bintang" muncul di long-press sheet.
+  // OFF => ikon tak render, gesture identik lama (0 delta). Aktivasi end-to-end
+  // butuh BE chatbot.whatsapp.message_star_enabled ON juga. Rollback = rebuild
+  // false / git revert.
+  static const bool messageStarEnabled = true;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {

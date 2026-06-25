@@ -76,6 +76,18 @@ class ApiEndpoints {
   static String adminConversationReaction(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/reaction';
 
+  static String adminConversationMessageStar(
+    int conversationId,
+    int messageId,
+  ) =>
+      '$_adminMobileBase/conversations/$conversationId/messages/$messageId/star';
+
+  static String adminConversationMessageUnstar(
+    int conversationId,
+    int messageId,
+  ) =>
+      '$_adminMobileBase/conversations/$conversationId/messages/$messageId/unstar';
+
   static String adminConversationSendContact(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/send-contact';
 

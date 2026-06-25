@@ -67,6 +67,64 @@ Future<void> _showReactionPicker(
   );
 }
 
+Future<void> _showMessageActions(
+  BuildContext context,
+  OmnichannelThreadMessageModel message,
+  void Function(int messageId, String emoji)? onReact,
+  void Function(int messageId, bool currentlyStarred) onToggleStar,
+) {
+  return showModalBottomSheet<void>(
+    context: context,
+    builder: (BuildContext sheetContext) {
+      return SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            if (onReact != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 8,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: _kReactionEmojis.map((String emoji) {
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(24),
+                      onTap: () {
+                        Navigator.of(sheetContext).pop();
+                        onReact(message.id, emoji);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Text(
+                          emoji,
+                          style: const TextStyle(fontSize: 30),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ListTile(
+              leading: Icon(
+                message.starred
+                    ? Icons.star_rounded
+                    : Icons.star_border_rounded,
+              ),
+              title: Text(message.starred ? 'Lepas bintang' : 'Bintangi pesan'),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                onToggleStar(message.id, message.starred);
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 class OmnichannelCenterPane extends StatefulWidget {
   const OmnichannelCenterPane({
     super.key,
@@ -106,6 +164,7 @@ class OmnichannelCenterPane extends StatefulWidget {
     this.onOpenInbox,
     this.onComposerChanged,
     this.onReactToMessage,
+    this.onToggleStar,
     this.onResendSticker,
     this.onSaveSticker,
     this.onStickerPickerRequested,
@@ -163,6 +222,7 @@ class OmnichannelCenterPane extends StatefulWidget {
   final VoidCallback? onOpenInbox;
   final ValueChanged<String>? onComposerChanged;
   final void Function(int messageId, String emoji)? onReactToMessage;
+  final void Function(int messageId, bool currentlyStarred)? onToggleStar;
   final void Function(int sourceMessageId)? onResendSticker;
   final void Function(int sourceMessageId)? onSaveSticker;
   final Future<void> Function()? onStickerPickerRequested;
@@ -890,6 +950,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         onCancelVoiceNoteTap: _handleCancelVoiceNoteTap,
         onMenuSelected: _handleMobileMenuAction,
         onReactToMessage: widget.onReactToMessage,
+        onToggleStar: widget.onToggleStar,
         onResendSticker: widget.onResendSticker,
         onSaveSticker: widget.onSaveSticker,
         onSwipeToReply: widget.onSwipeToReply,
@@ -1020,6 +1081,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
                                             maxWidth: bubbleMaxWidth,
                                             onReactToMessage:
                                                 widget.onReactToMessage,
+                                            onToggleStar: widget.onToggleStar,
                                             onResendSticker:
                                                 widget.onResendSticker,
                                             onSaveSticker: widget.onSaveSticker,
@@ -1091,6 +1153,7 @@ class _MobileConversationScaffold extends StatelessWidget {
     required this.onCancelVoiceNoteTap,
     required this.onMenuSelected,
     this.onReactToMessage,
+    this.onToggleStar,
     this.onResendSticker,
     this.onSaveSticker,
     this.onSwipeToReply,
@@ -1135,6 +1198,7 @@ class _MobileConversationScaffold extends StatelessWidget {
   final Future<void> Function(_MobileConversationMenuAction action)
   onMenuSelected;
   final void Function(int messageId, String emoji)? onReactToMessage;
+  final void Function(int messageId, bool currentlyStarred)? onToggleStar;
   final void Function(int sourceMessageId)? onResendSticker;
   final void Function(int sourceMessageId)? onSaveSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
@@ -1227,6 +1291,7 @@ class _MobileConversationScaffold extends StatelessWidget {
                                 message: message,
                                 maxWidth: bubbleMaxWidth,
                                 onReactToMessage: onReactToMessage,
+                                onToggleStar: onToggleStar,
                                 onResendSticker: onResendSticker,
                                 onSaveSticker: onSaveSticker,
                                 onSwipeToReply: onSwipeToReply,
@@ -1773,6 +1838,7 @@ class _MobileConversationBubble extends StatelessWidget {
     required this.message,
     required this.maxWidth,
     this.onReactToMessage,
+    this.onToggleStar,
     this.onResendSticker,
     this.onSaveSticker,
     this.onSwipeToReply,
@@ -1782,6 +1848,7 @@ class _MobileConversationBubble extends StatelessWidget {
   final OmnichannelThreadMessageModel message;
   final double maxWidth;
   final void Function(int messageId, String emoji)? onReactToMessage;
+  final void Function(int messageId, bool currentlyStarred)? onToggleStar;
   final void Function(int sourceMessageId)? onResendSticker;
   final void Function(int sourceMessageId)? onSaveSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
@@ -1924,20 +1991,36 @@ class _MobileConversationBubble extends StatelessWidget {
                 const SizedBox(height: 4),
                 _ReactionBadge(reactions: message.reactions!),
               ],
+              if (AppConfig.messageStarEnabled && message.starred) ...<Widget>[
+                const SizedBox(height: 4),
+                const Icon(Icons.star_rounded, size: 16, color: Colors.amber),
+              ],
             ],
           ),
         ),
       ),
     );
     final bool canReact = !message.isMine && onReactToMessage != null;
+    final bool canStar = AppConfig.messageStarEnabled && onToggleStar != null;
     final bool canSwipeReply = onSwipeToReply != null;
-    if (!canReact && !canSwipeReply) {
+    if (!canReact && !canStar && !canSwipeReply) {
       return align;
     }
     return GestureDetector(
       behavior: HitTestBehavior.deferToChild,
-      onLongPress: canReact
-          ? () => _showReactionPicker(context, message.id, onReactToMessage!)
+      onLongPress: (canReact || canStar)
+          ? () {
+              if (canStar) {
+                _showMessageActions(
+                  context,
+                  message,
+                  canReact ? onReactToMessage : null,
+                  onToggleStar!,
+                );
+              } else {
+                _showReactionPicker(context, message.id, onReactToMessage!);
+              }
+            }
           : null,
       onHorizontalDragEnd: canSwipeReply
           ? (DragEndDetails details) {
@@ -2792,6 +2875,7 @@ class _ThreadBubble extends StatelessWidget {
     required this.message,
     required this.maxWidth,
     this.onReactToMessage,
+    this.onToggleStar,
     this.onResendSticker,
     this.onSaveSticker,
     this.onSwipeToReply,
@@ -2801,6 +2885,7 @@ class _ThreadBubble extends StatelessWidget {
   final OmnichannelThreadMessageModel message;
   final double maxWidth;
   final void Function(int messageId, String emoji)? onReactToMessage;
+  final void Function(int messageId, bool currentlyStarred)? onToggleStar;
   final void Function(int sourceMessageId)? onResendSticker;
   final void Function(int sourceMessageId)? onSaveSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
@@ -2954,20 +3039,36 @@ class _ThreadBubble extends StatelessWidget {
                 const SizedBox(height: 4),
                 _ReactionBadge(reactions: message.reactions!),
               ],
+              if (AppConfig.messageStarEnabled && message.starred) ...<Widget>[
+                const SizedBox(height: 4),
+                const Icon(Icons.star_rounded, size: 16, color: Colors.amber),
+              ],
             ],
           ),
         ),
       ),
     );
     final bool canReact = !message.isMine && onReactToMessage != null;
+    final bool canStar = AppConfig.messageStarEnabled && onToggleStar != null;
     final bool canSwipeReply = onSwipeToReply != null;
-    if (!canReact && !canSwipeReply) {
+    if (!canReact && !canStar && !canSwipeReply) {
       return align;
     }
     return GestureDetector(
       behavior: HitTestBehavior.deferToChild,
-      onLongPress: canReact
-          ? () => _showReactionPicker(context, message.id, onReactToMessage!)
+      onLongPress: (canReact || canStar)
+          ? () {
+              if (canStar) {
+                _showMessageActions(
+                  context,
+                  message,
+                  canReact ? onReactToMessage : null,
+                  onToggleStar!,
+                );
+              } else {
+                _showReactionPicker(context, message.id, onReactToMessage!);
+              }
+            }
           : null,
       onHorizontalDragEnd: canSwipeReply
           ? (DragEndDetails details) {

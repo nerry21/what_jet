@@ -2521,6 +2521,21 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     return 'Gagal mengirim reaksi.';
   }
 
+  Future<void> _handleToggleStar(int messageId, bool currentlyStarred) async {
+    final ok = await _controller.toggleStar(
+      messageId: messageId,
+      currentlyStarred: currentlyStarred,
+    );
+    if (!mounted) {
+      return;
+    }
+    if (!ok) {
+      _showSnackBar('Gagal memperbarui bintang pesan.');
+      return;
+    }
+    await _controller.softRefreshAfterExternalAction();
+  }
+
   Future<void> _handleResendSticker(int sourceMessageId) async {
     try {
       final result = await _controller.resendSticker(
@@ -2887,6 +2902,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                 child: OmnichannelCenterPane(
                   onReactToMessage: (messageId, emoji) =>
                       unawaited(_handleReactToMessage(messageId, emoji)),
+                  onToggleStar: (messageId, currentlyStarred) =>
+                      unawaited(_handleToggleStar(messageId, currentlyStarred)),
                   onResendSticker: (sourceMessageId) =>
                       unawaited(_handleResendSticker(sourceMessageId)),
                   onSaveSticker: (sourceMessageId) =>
@@ -3043,6 +3060,9 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                     child: OmnichannelCenterPane(
                       onReactToMessage: (messageId, emoji) =>
                           unawaited(_handleReactToMessage(messageId, emoji)),
+                      onToggleStar: (messageId, currentlyStarred) => unawaited(
+                        _handleToggleStar(messageId, currentlyStarred),
+                      ),
                       onResendSticker: (sourceMessageId) =>
                           unawaited(_handleResendSticker(sourceMessageId)),
                       onSaveSticker: (sourceMessageId) =>
