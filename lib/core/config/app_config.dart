@@ -94,7 +94,7 @@ class AppConfig {
   // OFF => ikon tak render, gesture identik lama (0 delta). Aktivasi end-to-end
   // butuh BE chatbot.whatsapp.message_star_enabled ON juga. Rollback = rebuild
   // false / git revert.
-  static const bool messageStarEnabled = false;
+  static const bool messageStarEnabled = true;
 
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
