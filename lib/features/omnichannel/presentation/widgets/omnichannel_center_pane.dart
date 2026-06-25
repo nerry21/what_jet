@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 
@@ -118,6 +119,22 @@ Future<void> _showMessageActions(
                 onToggleStar(message.id, message.starred);
               },
             ),
+            if (message.displayText.trim().isNotEmpty)
+              ListTile(
+                leading: const Icon(Icons.copy_rounded),
+                title: const Text('Salin pesan'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  unawaited(
+                    Clipboard.setData(ClipboardData(text: message.displayText)),
+                  );
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      const SnackBar(content: Text('Pesan disalin.')),
+                    );
+                },
+              ),
           ],
         ),
       );
