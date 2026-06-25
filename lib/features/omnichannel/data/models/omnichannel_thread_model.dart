@@ -194,6 +194,7 @@ class OmnichannelThreadMessageModel {
     this.interactiveListButtonTitle,
     this.replyContext,
     this.reactions,
+    this.starred = false,
   });
 
   final int id;
@@ -238,6 +239,7 @@ class OmnichannelThreadMessageModel {
   final String? interactiveListButtonTitle;
   final OmnichannelReplyContext? replyContext;
   final OmnichannelReactions? reactions;
+  final bool starred;
 
   bool get hasImage =>
       messageType == 'image' && (imageUrl?.trim().isNotEmpty ?? false);
@@ -572,8 +574,18 @@ class OmnichannelThreadMessageModel {
       ),
       replyContext: OmnichannelReplyContext.fromJson(json['reply_context']),
       reactions: OmnichannelReactions.fromJson(json['reactions']),
+      starred: _parseStarred(json['starred']),
     );
   }
+}
+
+/// Parse field `starred` (BRIEF 5C-APP-1) secara defensif terhadap evolusi
+/// kontrak BE. Kontrak saat ini: null (OFF/tak-berbintang) | {starred:true,...}.
+/// Tahan masa depan: bool langsung, atau map dengan starred:false => false.
+bool _parseStarred(Object? value) {
+  if (value is bool) return value;
+  if (value is Map) return value['starred'] == true;
+  return false;
 }
 
 /// Helper: accept int, double, or string and return a double.

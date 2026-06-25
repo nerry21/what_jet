@@ -554,6 +554,28 @@ class OmnichannelRepository {
     }
   }
 
+  /// Set/lepas bintang pesan (BRIEF 5C-APP-1). Internal-only, channel-agnostic.
+  /// Return true bila BE 2xx (tak throw), false bila gagal — UI surface snackbar.
+  /// Tak baca body (404 BE-OFF => ApiException => catch => false; nol false-success).
+  Future<bool> setConversationMessageStar({
+    required int conversationId,
+    required int messageId,
+    required bool starred,
+  }) async {
+    try {
+      final accessToken = await _ensureAdminSession();
+      await _apiService.setConversationMessageStar(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        messageId: messageId,
+        starred: starred,
+      );
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<String> sendAdminImageReply({
     required int conversationId,
     required List<int> fileBytes,

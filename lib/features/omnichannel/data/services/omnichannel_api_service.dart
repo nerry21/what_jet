@@ -357,6 +357,24 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> setConversationMessageStar({
+    required String accessToken,
+    required int conversationId,
+    required int messageId,
+    required bool starred,
+  }) {
+    return _apiClient.post(
+      starred
+          ? ApiEndpoints.adminConversationMessageStar(conversationId, messageId)
+          : ApiEndpoints.adminConversationMessageUnstar(
+              conversationId,
+              messageId,
+            ),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
+
   Future<Map<String, dynamic>> sendAdminImageReply({
     required String accessToken,
     required int conversationId,
