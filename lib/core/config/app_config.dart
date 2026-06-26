@@ -96,6 +96,14 @@ class AppConfig {
   // false / git revert.
   static const bool messageStarEnabled = true;
 
+  // BRIEF 5C-2-APP — Layar daftar "Pesan Berbintang" (read-only, lintas conv).
+  // Compile-time flag, default OFF (dark-launch). ON => entry "Berbintang" di
+  // bottom-nav mobile dashboard -> push layar daftar pesan berbintang. OFF =>
+  // entry tak dirender, dashboard identik lama (0 delta). Aktivasi end-to-end
+  // butuh BE message_star_enabled ON juga (sudah ON).
+  // Rollback = rebuild false / git revert.
+  static const bool starredListEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {

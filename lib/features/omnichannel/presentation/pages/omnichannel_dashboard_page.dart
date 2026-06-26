@@ -32,6 +32,7 @@ import '../notifications/in_app_notification_overlay.dart';
 import '../../../../core/services/push_notification_service.dart';
 import '../pages/omnichannel_call_page.dart';
 import '../pages/omnichannel_call_history_page.dart';
+import '../pages/omnichannel_starred_messages_page.dart';
 import '../pages/omnichannel_updates_page.dart';
 import '../utils/omnichannel_call_status_ui.dart';
 import '../widgets/omnichannel_action_sheet.dart';
@@ -1603,6 +1604,15 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   Future<void> _retryBootstrap() {
     _hasRedirected = false;
     return _controller.initialize(initialUser: widget.initialUser);
+  }
+
+  Future<void> _openStarredMessages() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) =>
+            OmnichannelStarredMessagesPage(repository: widget.repository),
+      ),
+    );
   }
 
   Future<void> _openConversationCallHistory() async {
@@ -3194,6 +3204,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
         _MobilePaneSelector(
           selectedPane: _mobilePane,
           onPaneSelected: _setMobilePane,
+          onStarredMessagesTap: _openStarredMessages,
         ),
       ],
     );
@@ -3363,10 +3374,12 @@ class _MobilePaneSelector extends StatelessWidget {
   const _MobilePaneSelector({
     required this.selectedPane,
     required this.onPaneSelected,
+    required this.onStarredMessagesTap,
   });
 
   final _OmnichannelMobilePane selectedPane;
   final ValueChanged<_OmnichannelMobilePane> onPaneSelected;
+  final VoidCallback onStarredMessagesTap;
 
   @override
   Widget build(BuildContext context) {
@@ -3421,6 +3434,15 @@ class _MobilePaneSelector extends StatelessWidget {
                 onTap: () => onPaneSelected(_OmnichannelMobilePane.callHistory),
               ),
             ),
+            if (AppConfig.starredListEnabled)
+              Expanded(
+                child: _MobilePaneButton(
+                  label: 'Berbintang',
+                  icon: Icons.star_rounded,
+                  selected: false,
+                  onTap: onStarredMessagesTap,
+                ),
+              ),
           ],
         ),
       ),

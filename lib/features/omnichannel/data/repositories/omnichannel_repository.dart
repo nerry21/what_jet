@@ -11,6 +11,7 @@ import '../models/omnichannel_conversation_list_model.dart';
 import '../models/omnichannel_insight_model.dart';
 import '../models/omnichannel_query_model.dart';
 import '../models/omnichannel_shell_snapshot_model.dart';
+import '../models/omnichannel_starred_message_item.dart';
 import '../models/omnichannel_status_update_model.dart';
 import '../models/omnichannel_thread_model.dart';
 import '../models/omnichannel_workspace_model.dart';
@@ -1001,6 +1002,24 @@ class OmnichannelRepository {
     return rawItems
         .whereType<Map<String, dynamic>>()
         .map(OmnichannelStatusUpdateModel.fromJson)
+        .toList(growable: false);
+  }
+
+  Future<List<OmnichannelStarredMessageItem>> loadStarredMessages() async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.fetchStarredMessages(accessToken: accessToken),
+    );
+
+    final data = _extractPayloadData(payload);
+    final rawItems = data['starred_messages'];
+    if (rawItems is! List) {
+      return const <OmnichannelStarredMessageItem>[];
+    }
+
+    return rawItems
+        .whereType<Map<String, dynamic>>()
+        .map(OmnichannelStarredMessageItem.fromJson)
         .toList(growable: false);
   }
 
