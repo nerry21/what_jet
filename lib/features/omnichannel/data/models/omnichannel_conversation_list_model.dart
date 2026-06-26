@@ -233,14 +233,15 @@ class OmnichannelConversationListItemModel {
           customerLabel,
           channelLabelForOmnichannel(channel),
         ], fallback: channelLabelForOmnichannel(channel));
+    final id =
+        omnichannelFirstMapped<int>(json, const <String>[
+          'id',
+          'conversation_id',
+        ], omnichannelInt) ??
+        0;
 
     return OmnichannelConversationListItemModel(
-      id:
-          omnichannelFirstMapped<int>(json, const <String>[
-            'id',
-            'conversation_id',
-          ], omnichannelInt) ??
-          0,
+      id: id,
       title: title,
       preview:
           omnichannelFirstMappedFromSources<String>(
@@ -283,7 +284,7 @@ class OmnichannelConversationListItemModel {
           omnichannelFirstMapped<String>(json, const <String>[
             'merge_key',
           ], omnichannelString) ??
-          _fallbackMergeKey(channel, customerPhone, customerLabel, title),
+          _fallbackMergeKey(channel, customerPhone, customerLabel, title, id),
       customerLabel: customerLabel,
       customerPhone: customerPhone,
       mergedConversationCount:
@@ -431,12 +432,11 @@ String _fallbackMergeKey(
   String? customerPhone,
   String? customerLabel,
   String title,
+  int id,
 ) {
   final phone = (customerPhone ?? '').trim();
   if (channel == 'whatsapp' && phone.isNotEmpty) {
     return 'whatsapp:phone:${phone.toLowerCase()}';
   }
-
-  final label = (customerLabel ?? title).trim();
-  return '$channel:${label.toLowerCase()}';
+  return '$channel:conversation:$id';
 }
