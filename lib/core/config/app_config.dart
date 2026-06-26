@@ -102,7 +102,7 @@ class AppConfig {
   // entry tak dirender, dashboard identik lama (0 delta). Aktivasi end-to-end
   // butuh BE message_star_enabled ON juga (sudah ON).
   // Rollback = rebuild false / git revert.
-  static const bool starredListEnabled = false;
+  static const bool starredListEnabled = true;
 
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
