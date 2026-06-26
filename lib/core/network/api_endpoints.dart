@@ -131,6 +131,8 @@ class ApiEndpoints {
 
   static String adminStatusUpdates() => '$_adminMobileBase/status-updates';
 
+  static String adminStarredMessages() => '$_adminMobileBase/starred-messages';
+
   static String adminStatusUpdateDetail(int statusId) =>
       '$_adminMobileBase/status-updates/$statusId';
 

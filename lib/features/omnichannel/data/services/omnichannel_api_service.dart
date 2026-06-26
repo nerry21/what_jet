@@ -650,6 +650,15 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> fetchStarredMessages({
+    required String accessToken,
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminStarredMessages(),
+      headers: _headers(accessToken),
+    );
+  }
+
   Future<Map<String, dynamic>> createStatusUpdate({
     required String accessToken,
     required Map<String, Object?> fields,
