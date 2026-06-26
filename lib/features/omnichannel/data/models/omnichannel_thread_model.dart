@@ -65,10 +65,19 @@ class OmnichannelThreadGroupModel {
       'thread.groups',
       'groups',
     ]);
-    final mergedGroups = directGroups.isNotEmpty ? directGroups : polledGroups;
-
-    if (mergedGroups.isNotEmpty) {
-      return mergedGroups.map(OmnichannelThreadGroupModel.fromJson).toList();
+    final groupItems = <Map<String, dynamic>>[...directGroups, ...polledGroups];
+    if (groupItems.isNotEmpty) {
+      final mergedMessages = <int, OmnichannelThreadMessageModel>{};
+      for (final group in groupItems.map(
+        OmnichannelThreadGroupModel.fromJson,
+      )) {
+        for (final message in group.messages) {
+          mergedMessages[message.id] = message;
+        }
+      }
+      if (mergedMessages.isNotEmpty) {
+        return _buildGroupsFromMessages(mergedMessages.values.toList());
+      }
     }
 
     final messageItems = <Map<String, dynamic>>[
@@ -616,10 +625,36 @@ List<String> _stringList(Object? value) {
 }
 
 String _groupLabel(DateTime date) {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final that = DateTime(date.year, date.month, date.day);
+  final diff = today.difference(that).inDays;
+  if (diff == 0) {
+    return 'Hari Ini';
+  }
+  if (diff == 1) {
+    return 'Kemarin';
+  }
   final day = date.day.toString().padLeft(2, '0');
-  final month = date.month.toString().padLeft(2, '0');
-  final year = date.year.toString();
-  return '$day/$month/$year';
+  return '$day ${_monthShortId(date.month)} ${date.year}';
+}
+
+String _monthShortId(int month) {
+  const months = <String>[
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'Mei',
+    'Jun',
+    'Jul',
+    'Agu',
+    'Sep',
+    'Okt',
+    'Nov',
+    'Des',
+  ];
+  return (month >= 1 && month <= 12) ? months[month - 1] : '';
 }
 
 List<OmnichannelThreadGroupModel> _buildGroupsFromMessages(
