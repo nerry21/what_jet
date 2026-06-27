@@ -8,6 +8,7 @@ import 'package:what_jet/core/theme/app_dimensions.dart';
 import '../../data/models/omnichannel_conversation_list_model.dart';
 import '../../data/models/whatsapp_contact_model.dart';
 import '../../data/repositories/omnichannel_repository.dart';
+import '../services/device_contacts_service.dart';
 
 class OmnichannelNewChatPage extends StatefulWidget {
   const OmnichannelNewChatPage({
@@ -125,83 +126,29 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
   }
 
   Future<void> _openCreateContactPage() async {
-    final createdContact = await Navigator.of(context)
-        .push<_CreatedContactDraft>(
-          MaterialPageRoute<_CreatedContactDraft>(
-            builder: (_) => const OmnichannelCreateContactPage(),
-          ),
-        );
-
-    if (!mounted || createdContact == null) {
-      return;
-    }
-
-    // ─── Loading dialog ────────────────────────────────────────────────
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const Center(
-        child: SizedBox(
-          width: 56,
-          height: 56,
-          child: CircularProgressIndicator(strokeWidth: 3),
-        ),
+    final conversationId = await Navigator.of(context).push<int>(
+      MaterialPageRoute<int>(
+        builder: (_) =>
+            OmnichannelCreateContactPage(repository: widget.repository),
       ),
     );
 
-    // ─── POST ke backend ───────────────────────────────────────────────
-    try {
-      final result = await widget.repository.createWhatsAppContact(
-        firstName: createdContact.firstName,
-        lastName: createdContact.lastName,
-        phone: createdContact.phone,
-        email: createdContact.email,
-        countryCode: createdContact.countryCode,
-        syncToDevice: createdContact.syncToDevice,
-      );
+    if (!mounted || conversationId == null) {
+      return;
+    }
 
-      if (!mounted) return;
-      Navigator.of(context, rootNavigator: true).pop(); // dismiss loading
+    // Refresh list kontak tersimpan dari backend.
+    unawaited(_loadSavedContacts());
 
-      // Snackbar konfirmasi
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(
-              result.notice.isNotEmpty
-                  ? result.notice
-                  : 'Kontak ${createdContact.fullName} berhasil disimpan.',
-            ),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+    // Beri tahu dashboard untuk refresh conversation list.
+    widget.onContactSaved?.call();
 
-      // Refresh list kontak tersimpan dari backend
-      unawaited(_loadSavedContacts());
-
-      // Beri tahu dashboard untuk refresh conversation list
-      widget.onContactSaved?.call();
-
-      // ─── Auto-navigate ke chat baru ──────────────────────────────────
-      if (result.conversationId > 0) {
-        widget.onConversationSelected(result.conversationId);
-        if (mounted) Navigator.of(context).pop();
+    // Auto-navigate ke chat baru.
+    if (conversationId > 0) {
+      widget.onConversationSelected(conversationId);
+      if (mounted) {
+        Navigator.of(context).pop();
       }
-    } catch (error) {
-      if (!mounted) return;
-      Navigator.of(context, rootNavigator: true).pop(); // dismiss loading
-
-      final message = error.toString().replaceFirst('Exception: ', '');
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text('Gagal menyimpan kontak: $message'),
-            backgroundColor: Colors.red.shade700,
-            duration: const Duration(seconds: 4),
-          ),
-        );
     }
   }
 
@@ -376,7 +323,16 @@ class _OmnichannelNewChatPageState extends State<OmnichannelNewChatPage> {
 }
 
 class OmnichannelCreateContactPage extends StatefulWidget {
-  const OmnichannelCreateContactPage({super.key});
+  const OmnichannelCreateContactPage({
+    super.key,
+    required this.repository,
+    this.initialFirstName = '',
+    this.initialPhone = '',
+  });
+
+  final OmnichannelRepository repository;
+  final String initialFirstName;
+  final String initialPhone;
 
   @override
   State<OmnichannelCreateContactPage> createState() =>
@@ -385,23 +341,45 @@ class OmnichannelCreateContactPage extends StatefulWidget {
 
 class _OmnichannelCreateContactPageState
     extends State<OmnichannelCreateContactPage> {
-  final TextEditingController _firstNameController = TextEditingController();
+  static const Map<String, String> _countryOptions = <String, String>{
+    'ID +62': '+62',
+    'MY +60': '+60',
+    'SG +65': '+65',
+    'US +1': '+1',
+  };
+
+  late final TextEditingController _firstNameController = TextEditingController(
+    text: widget.initialFirstName,
+  );
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  late final TextEditingController _phoneController = TextEditingController(
+    text: widget.initialPhone,
+  );
+  final TextEditingController _emailController = TextEditingController();
 
   bool _syncToPhone = true;
-  String _selectedAccount = 'Akun perangkat';
+  bool _isSaving = false;
+  String _selectedCountryCode = '+62';
+  String _selectedCountryLabel = 'ID +62';
+  DeviceContactAccountOption? _selectedAccount;
+  String _accountLabel = 'Akun perangkat (default)';
 
   @override
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _phoneController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
   Future<void> _pickAccount() async {
-    final selection = await showModalBottomSheet<String>(
+    final accounts = await DeviceContactsService.loadAccounts();
+    if (!mounted) {
+      return;
+    }
+
+    final selection = await showModalBottomSheet<Object>(
       context: context,
       builder: (context) {
         return SafeArea(
@@ -409,30 +387,89 @@ class _OmnichannelCreateContactPageState
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               ListTile(
-                title: const Text('Akun perangkat'),
-                onTap: () => Navigator.of(context).pop('Akun perangkat'),
+                title: const Text('Akun perangkat (default)'),
+                onTap: () => Navigator.of(context).pop('__default__'),
               ),
-              ListTile(
-                title: const Text('Google'),
-                onTap: () => Navigator.of(context).pop('Google'),
-              ),
+              for (final account in accounts)
+                ListTile(
+                  title: Text(account.displayLabel),
+                  onTap: () => Navigator.of(context).pop(account),
+                ),
             ],
           ),
         );
       },
     );
 
-    if (selection == null || !mounted) {
+    if (!mounted || selection == null) {
       return;
     }
 
-    setState(() => _selectedAccount = selection);
+    setState(() {
+      if (selection is DeviceContactAccountOption) {
+        _selectedAccount = selection;
+        _accountLabel = selection.displayLabel;
+      } else {
+        _selectedAccount = null;
+        _accountLabel = 'Akun perangkat (default)';
+      }
+    });
   }
 
-  void _save() {
+  Future<void> _pickCountry() async {
+    final selectedLabel = await showModalBottomSheet<String>(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              for (final label in _countryOptions.keys)
+                ListTile(
+                  title: Text(label),
+                  onTap: () => Navigator.of(context).pop(label),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selectedLabel == null || !mounted) {
+      return;
+    }
+
+    setState(() {
+      _selectedCountryLabel = selectedLabel;
+      _selectedCountryCode = _countryOptions[selectedLabel]!;
+    });
+  }
+
+  String _normalizePhoneForSelectedCountry(String input) {
+    final digits = input.replaceAll(RegExp(r'[^0-9+]'), '');
+    if (digits.isEmpty) {
+      return '';
+    }
+    if (digits.startsWith('+')) {
+      return digits;
+    }
+    final countryDigits = _selectedCountryCode.replaceAll('+', '');
+    if (digits.startsWith(countryDigits)) {
+      return '+$digits';
+    }
+    final stripped = digits.startsWith('0') ? digits.substring(1) : digits;
+    return '$_selectedCountryCode$stripped';
+  }
+
+  Future<void> _save() async {
+    if (_isSaving) {
+      return;
+    }
+
     final firstName = _firstNameController.text.trim();
     final lastName = _lastNameController.text.trim();
     final phoneInput = _phoneController.text.trim();
+    final email = _emailController.text.trim();
 
     if (firstName.isEmpty || phoneInput.isEmpty) {
       ScaffoldMessenger.of(context)
@@ -445,26 +482,75 @@ class _OmnichannelCreateContactPageState
       return;
     }
 
-    // Normalisasi nomor telepon ke format internasional.
-    // Backend akan re-validate via PhoneNumberService::toE164().
-    String normalizedPhone = phoneInput;
-    if (!normalizedPhone.startsWith('+')) {
-      // Hilangkan leading 0 (format lokal Indonesia) lalu prepend +62
-      final digits = normalizedPhone.replaceAll(RegExp(r'\D'), '');
-      final stripped = digits.startsWith('0') ? digits.substring(1) : digits;
-      normalizedPhone = '+62$stripped';
-    }
+    final normalizedPhone = _normalizePhoneForSelectedCountry(phoneInput);
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
 
-    Navigator.of(context).pop(
-      _CreatedContactDraft(
+    setState(() => _isSaving = true);
+
+    try {
+      final result = await widget.repository.createWhatsAppContact(
         firstName: firstName,
         lastName: lastName,
         phone: normalizedPhone,
-        email: null,
-        countryCode: '+62',
+        email: email.isEmpty ? null : email,
+        countryCode: _selectedCountryCode,
         syncToDevice: _syncToPhone,
-      ),
-    );
+      );
+
+      // Backend sukses → optional device-write (tak menggagalkan backend).
+      String deviceNotice = '';
+      if (_syncToPhone && DeviceContactsService.isSupportedPlatform) {
+        final deviceResult = await DeviceContactsService.saveContact(
+          firstName: firstName,
+          lastName: lastName,
+          phone: normalizedPhone,
+          email: email.isEmpty ? null : email,
+          account: _selectedAccount?.account,
+        );
+        if (!deviceResult.success) {
+          deviceNotice = ' (sinkron HP gagal: ${deviceResult.message})';
+        }
+      }
+
+      if (!mounted) {
+        return;
+      }
+
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              (result.notice.isNotEmpty
+                      ? result.notice
+                      : 'Kontak berhasil disimpan.') +
+                  deviceNotice,
+            ),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+
+      navigator.pop(result.conversationId);
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      final message = error.toString().replaceFirst('Exception: ', '');
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('Gagal menyimpan kontak: $message'),
+            backgroundColor: Colors.red.shade700,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
   }
 
   @override
@@ -532,8 +618,8 @@ class _OmnichannelCreateContactPageState
                           Expanded(
                             flex: 11,
                             child: _CountryCodeField(
-                              value: 'ID +62',
-                              onTap: () {},
+                              value: _selectedCountryLabel,
+                              onTap: _pickCountry,
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -546,6 +632,15 @@ class _OmnichannelCreateContactPageState
                             ),
                           ),
                         ],
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                    _CreateContactInputRow(
+                      icon: Icons.mail_outline_rounded,
+                      child: _OutlinedField(
+                        controller: _emailController,
+                        hintText: 'Email (opsional)',
+                        keyboardType: TextInputType.emailAddress,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -617,7 +712,7 @@ class _OmnichannelCreateContactPageState
                                   children: <Widget>[
                                     Expanded(
                                       child: Text(
-                                        _selectedAccount,
+                                        _accountLabel,
                                         style: const TextStyle(
                                           fontSize: 16,
                                           color: AppColors.neutral800,
@@ -647,7 +742,7 @@ class _OmnichannelCreateContactPageState
                 child: SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: _save,
+                    onPressed: _isSaving ? null : _save,
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: AppColors.white,
@@ -656,13 +751,22 @@ class _OmnichannelCreateContactPageState
                         borderRadius: AppRadii.borderRadiusXxxl,
                       ),
                     ),
-                    child: const Text(
-                      'Simpan',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: _isSaving
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Simpan',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
                 ),
               ),
@@ -933,32 +1037,6 @@ class _NewChatContactTile extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _CreatedContactDraft {
-  const _CreatedContactDraft({
-    required this.firstName,
-    required this.lastName,
-    required this.phone,
-    required this.email,
-    required this.countryCode,
-    required this.syncToDevice,
-  });
-
-  final String firstName;
-  final String lastName;
-  final String phone;
-  final String? email;
-  final String countryCode;
-  final bool syncToDevice;
-
-  String get fullName {
-    final parts = <String>[
-      firstName.trim(),
-      lastName.trim(),
-    ].where((part) => part.isNotEmpty).toList();
-    return parts.join(' ');
   }
 }
 

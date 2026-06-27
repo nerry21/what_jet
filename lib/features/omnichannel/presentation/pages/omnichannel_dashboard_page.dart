@@ -39,6 +39,7 @@ import '../widgets/omnichannel_action_sheet.dart';
 import '../widgets/omnichannel_center_pane.dart';
 import '../widgets/omnichannel_call_settings_checklist_sheet.dart';
 import '../widgets/omnichannel_left_pane.dart';
+import '../widgets/omnichannel_new_chat_page.dart';
 import '../widgets/omnichannel_right_pane.dart';
 import '../widgets/omnichannel_shell_header.dart';
 import '../widgets/omnichannel_surface.dart';
@@ -2455,6 +2456,28 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
   }
 
+  Future<void> _saveDeviceContact() async {
+    final conversation = _controller.selectedConversation;
+    if (conversation == null) {
+      return;
+    }
+
+    final contact = conversation.customerContact.trim();
+    final conversationId = await Navigator.of(context).push<int>(
+      MaterialPageRoute<int>(
+        builder: (_) => OmnichannelCreateContactPage(
+          repository: widget.repository,
+          initialFirstName: conversation.customerName,
+          initialPhone: contact == '-' ? '' : contact,
+        ),
+      ),
+    );
+
+    if (conversationId != null && mounted) {
+      unawaited(_controller.refresh());
+    }
+  }
+
   Future<bool> _sendAdminContact({
     required String fullName,
     required String phone,
@@ -2952,6 +2975,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   onCancelVoiceNote: _cancelVoiceNoteRecording,
                   isRecordingVoiceNote: _isRecordingVoiceNote,
                   onSendContact: _sendAdminContact,
+                  onSaveContact: () => unawaited(_saveDeviceContact()),
                   isTogglingBot: _isTogglingBot,
                   onToggleBot: _toggleBot,
                   isCallLoading: _callController.isLoading,
@@ -3112,6 +3136,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       onCancelVoiceNote: _cancelVoiceNoteRecording,
                       isRecordingVoiceNote: _isRecordingVoiceNote,
                       onSendContact: _sendAdminContact,
+                      onSaveContact: () => unawaited(_saveDeviceContact()),
                       isTogglingBot: _isTogglingBot,
                       onToggleBot: _toggleBot,
                       isCallLoading: _callController.isLoading,

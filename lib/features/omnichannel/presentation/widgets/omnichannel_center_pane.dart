@@ -24,7 +24,7 @@ import 'omnichannel_surface.dart';
 import 'whatsapp_attachment_sheet.dart';
 import 'whatsapp_emoji_picker.dart';
 
-enum _MobileConversationMenuAction { sendContact, toggleBot }
+enum _MobileConversationMenuAction { sendContact, saveContact, toggleBot }
 
 const List<String> _kReactionEmojis = <String>[
   '👍',
@@ -188,6 +188,7 @@ class OmnichannelCenterPane extends StatefulWidget {
     this.onSwipeToReply,
     this.replyingTo,
     this.onCancelReply,
+    this.onSaveContact,
     this.selectionVersion = 0,
   });
 
@@ -246,6 +247,7 @@ class OmnichannelCenterPane extends StatefulWidget {
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
   final OmnichannelThreadMessageModel? replyingTo;
   final VoidCallback? onCancelReply;
+  final VoidCallback? onSaveContact;
   final int selectionVersion;
 
   @override
@@ -871,6 +873,9 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
     switch (action) {
       case _MobileConversationMenuAction.sendContact:
         await _openSendContactDialog();
+        return;
+      case _MobileConversationMenuAction.saveContact:
+        widget.onSaveContact?.call();
         return;
       case _MobileConversationMenuAction.toggleBot:
         final conversation = widget.conversation;
@@ -1540,6 +1545,10 @@ class _MobileConversationAppBar extends StatelessWidget {
                         const PopupMenuItem<_MobileConversationMenuAction>(
                           value: _MobileConversationMenuAction.sendContact,
                           child: Text('Kirim kontak'),
+                        ),
+                        const PopupMenuItem<_MobileConversationMenuAction>(
+                          value: _MobileConversationMenuAction.saveContact,
+                          child: Text('Simpan ke kontak'),
                         ),
                         PopupMenuItem<_MobileConversationMenuAction>(
                           value: _MobileConversationMenuAction.toggleBot,
