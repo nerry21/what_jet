@@ -375,6 +375,19 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> forwardConversationMessage({
+    required String accessToken,
+    required int conversationId,
+    required int messageId,
+    required int targetConversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationMessageForward(conversationId, messageId),
+      headers: _headers(accessToken),
+      body: <String, Object?>{'target_conversation_id': targetConversationId},
+    );
+  }
+
   Future<Map<String, dynamic>> sendAdminImageReply({
     required String accessToken,
     required int conversationId,

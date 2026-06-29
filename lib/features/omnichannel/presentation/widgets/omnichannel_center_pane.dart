@@ -73,6 +73,7 @@ Future<void> _showMessageActions(
   OmnichannelThreadMessageModel message,
   void Function(int messageId, String emoji)? onReact,
   void Function(int messageId, bool currentlyStarred) onToggleStar,
+  void Function(int messageId)? onForward,
 ) {
   return showModalBottomSheet<void>(
     context: context,
@@ -135,12 +136,26 @@ Future<void> _showMessageActions(
                     );
                 },
               ),
+            if (AppConfig.messageForwardEnabled &&
+                onForward != null &&
+                _isForwardableType(message.messageType))
+              ListTile(
+                leading: const Icon(Icons.forward_rounded),
+                title: const Text('Teruskan pesan'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  onForward(message.id);
+                },
+              ),
           ],
         ),
       );
     },
   );
 }
+
+bool _isForwardableType(String type) =>
+    type == 'text' || type == 'image' || type == 'video' || type == 'sticker';
 
 class OmnichannelCenterPane extends StatefulWidget {
   const OmnichannelCenterPane({
@@ -182,6 +197,7 @@ class OmnichannelCenterPane extends StatefulWidget {
     this.onComposerChanged,
     this.onReactToMessage,
     this.onToggleStar,
+    this.onForward,
     this.onResendSticker,
     this.onSaveSticker,
     this.onStickerPickerRequested,
@@ -241,6 +257,7 @@ class OmnichannelCenterPane extends StatefulWidget {
   final ValueChanged<String>? onComposerChanged;
   final void Function(int messageId, String emoji)? onReactToMessage;
   final void Function(int messageId, bool currentlyStarred)? onToggleStar;
+  final void Function(int messageId)? onForward;
   final void Function(int sourceMessageId)? onResendSticker;
   final void Function(int sourceMessageId)? onSaveSticker;
   final Future<void> Function()? onStickerPickerRequested;
@@ -973,6 +990,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         onMenuSelected: _handleMobileMenuAction,
         onReactToMessage: widget.onReactToMessage,
         onToggleStar: widget.onToggleStar,
+        onForward: widget.onForward,
         onResendSticker: widget.onResendSticker,
         onSaveSticker: widget.onSaveSticker,
         onSwipeToReply: widget.onSwipeToReply,
@@ -1104,6 +1122,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
                                             onReactToMessage:
                                                 widget.onReactToMessage,
                                             onToggleStar: widget.onToggleStar,
+                                            onForward: widget.onForward,
                                             onResendSticker:
                                                 widget.onResendSticker,
                                             onSaveSticker: widget.onSaveSticker,
@@ -1176,6 +1195,7 @@ class _MobileConversationScaffold extends StatelessWidget {
     required this.onMenuSelected,
     this.onReactToMessage,
     this.onToggleStar,
+    this.onForward,
     this.onResendSticker,
     this.onSaveSticker,
     this.onSwipeToReply,
@@ -1221,6 +1241,7 @@ class _MobileConversationScaffold extends StatelessWidget {
   onMenuSelected;
   final void Function(int messageId, String emoji)? onReactToMessage;
   final void Function(int messageId, bool currentlyStarred)? onToggleStar;
+  final void Function(int messageId)? onForward;
   final void Function(int sourceMessageId)? onResendSticker;
   final void Function(int sourceMessageId)? onSaveSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
@@ -1314,6 +1335,7 @@ class _MobileConversationScaffold extends StatelessWidget {
                                 maxWidth: bubbleMaxWidth,
                                 onReactToMessage: onReactToMessage,
                                 onToggleStar: onToggleStar,
+                                onForward: onForward,
                                 onResendSticker: onResendSticker,
                                 onSaveSticker: onSaveSticker,
                                 onSwipeToReply: onSwipeToReply,
@@ -1865,6 +1887,7 @@ class _MobileConversationBubble extends StatelessWidget {
     required this.maxWidth,
     this.onReactToMessage,
     this.onToggleStar,
+    this.onForward,
     this.onResendSticker,
     this.onSaveSticker,
     this.onSwipeToReply,
@@ -1875,6 +1898,7 @@ class _MobileConversationBubble extends StatelessWidget {
   final double maxWidth;
   final void Function(int messageId, String emoji)? onReactToMessage;
   final void Function(int messageId, bool currentlyStarred)? onToggleStar;
+  final void Function(int messageId)? onForward;
   final void Function(int sourceMessageId)? onResendSticker;
   final void Function(int sourceMessageId)? onSaveSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
@@ -2042,6 +2066,7 @@ class _MobileConversationBubble extends StatelessWidget {
                   message,
                   canReact ? onReactToMessage : null,
                   onToggleStar!,
+                  onForward,
                 );
               } else {
                 _showReactionPicker(context, message.id, onReactToMessage!);
@@ -2902,6 +2927,7 @@ class _ThreadBubble extends StatelessWidget {
     required this.maxWidth,
     this.onReactToMessage,
     this.onToggleStar,
+    this.onForward,
     this.onResendSticker,
     this.onSaveSticker,
     this.onSwipeToReply,
@@ -2912,6 +2938,7 @@ class _ThreadBubble extends StatelessWidget {
   final double maxWidth;
   final void Function(int messageId, String emoji)? onReactToMessage;
   final void Function(int messageId, bool currentlyStarred)? onToggleStar;
+  final void Function(int messageId)? onForward;
   final void Function(int sourceMessageId)? onResendSticker;
   final void Function(int sourceMessageId)? onSaveSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
@@ -3090,6 +3117,7 @@ class _ThreadBubble extends StatelessWidget {
                   message,
                   canReact ? onReactToMessage : null,
                   onToggleStar!,
+                  onForward,
                 );
               } else {
                 _showReactionPicker(context, message.id, onReactToMessage!);

@@ -577,6 +577,25 @@ class OmnichannelRepository {
     }
   }
 
+  Future<bool> forwardConversationMessage({
+    required int conversationId,
+    required int messageId,
+    required int targetConversationId,
+  }) async {
+    try {
+      final accessToken = await _ensureAdminSession();
+      await _apiService.forwardConversationMessage(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        messageId: messageId,
+        targetConversationId: targetConversationId,
+      );
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<String> sendAdminImageReply({
     required int conversationId,
     required List<int> fileBytes,

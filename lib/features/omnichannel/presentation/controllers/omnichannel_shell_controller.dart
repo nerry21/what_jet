@@ -371,6 +371,33 @@ class OmnichannelShellController extends ChangeNotifier {
     );
   }
 
+  Future<bool> forwardMessage({
+    required int messageId,
+    required int targetConversationId,
+  }) async {
+    final conversationId = selectedConversationId;
+    if (conversationId == null) {
+      return false;
+    }
+    return _repository.forwardConversationMessage(
+      conversationId: conversationId,
+      messageId: messageId,
+      targetConversationId: targetConversationId,
+    );
+  }
+
+  /// Daftar percakapan tujuan picker teruskan (5A): WhatsApp-only + exclude
+  /// percakapan sumber aktif. Baca daftar existing (loadShell), tak fetch baru.
+  List<OmnichannelConversationListItemModel> get conversationsForForwardPicker {
+    final sourceId = selectedConversationId;
+    final items =
+        _conversationList?.items ??
+        const <OmnichannelConversationListItemModel>[];
+    return items
+        .where((item) => item.channel == 'whatsapp' && item.id != sourceId)
+        .toList(growable: false);
+  }
+
   /// Resends a received WhatsApp sticker to the customer (BRIEF 4C-1).
   /// Returns BE notice string (success) | 'skipped' | 'failed'. WhatsApp only.
   Future<String> resendSticker({required int sourceMessageId}) async {

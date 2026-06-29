@@ -88,6 +88,12 @@ class ApiEndpoints {
   ) =>
       '$_adminMobileBase/conversations/$conversationId/messages/$messageId/unstar';
 
+  static String adminConversationMessageForward(
+    int conversationId,
+    int messageId,
+  ) =>
+      '$_adminMobileBase/conversations/$conversationId/messages/$messageId/forward';
+
   static String adminConversationSendContact(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/send-contact';
 
