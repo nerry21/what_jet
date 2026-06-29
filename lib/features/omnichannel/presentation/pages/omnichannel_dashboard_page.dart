@@ -45,6 +45,7 @@ import '../widgets/omnichannel_shell_header.dart';
 import '../widgets/omnichannel_surface.dart';
 import '../widgets/omnichannel_call_analytics_panel.dart';
 import '../widgets/sticker_picker_sheet.dart';
+import '../widgets/forward_target_picker_sheet.dart';
 
 enum _OmnichannelMobilePane {
   inbox,
@@ -2664,6 +2665,29 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     return 'Gagal mengirim stiker favorit.';
   }
 
+  Future<void> _handleForward(int messageId) async {
+    await showForwardTargetPickerSheet(
+      context: context,
+      items: _controller.conversationsForForwardPicker,
+      onPick: (targetConversationId) =>
+          unawaited(_handleForwardToTarget(messageId, targetConversationId)),
+    );
+  }
+
+  Future<void> _handleForwardToTarget(
+    int messageId,
+    int targetConversationId,
+  ) async {
+    final ok = await _controller.forwardMessage(
+      messageId: messageId,
+      targetConversationId: targetConversationId,
+    );
+    if (!mounted) {
+      return;
+    }
+    _showSnackBar(ok ? 'Pesan diteruskan.' : 'Gagal meneruskan pesan.');
+  }
+
   void _showSnackBar(String message) {
     final text = message.trim();
     if (text.isEmpty || !mounted) {
@@ -2937,6 +2961,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       unawaited(_handleReactToMessage(messageId, emoji)),
                   onToggleStar: (messageId, currentlyStarred) =>
                       unawaited(_handleToggleStar(messageId, currentlyStarred)),
+                  onForward: (messageId) =>
+                      unawaited(_handleForward(messageId)),
                   onResendSticker: (sourceMessageId) =>
                       unawaited(_handleResendSticker(sourceMessageId)),
                   onSaveSticker: (sourceMessageId) =>
@@ -3097,6 +3123,8 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       onToggleStar: (messageId, currentlyStarred) => unawaited(
                         _handleToggleStar(messageId, currentlyStarred),
                       ),
+                      onForward: (messageId) =>
+                          unawaited(_handleForward(messageId)),
                       onResendSticker: (sourceMessageId) =>
                           unawaited(_handleResendSticker(sourceMessageId)),
                       onSaveSticker: (sourceMessageId) =>

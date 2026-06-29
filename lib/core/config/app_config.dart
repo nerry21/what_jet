@@ -104,6 +104,15 @@ class AppConfig {
   // Rollback = rebuild false / git revert.
   static const bool starredListEnabled = true;
 
+  // BRIEF 5A-FORWARD-APP — Teruskan pesan (menu long-press -> picker tujuan).
+  // Compile-time flag, default OFF (dark-launch). ON => tile "Teruskan pesan"
+  // muncul di long-press sheet (tipe forwardable saja) -> picker percakapan
+  // tujuan (WhatsApp) -> POST forward. OFF => tile tak dirender, sheet identik
+  // (0 delta). Catatan: sheet hanya terbuka saat messageStarEnabled ON (D-2).
+  // Aktivasi = rebuild dgn true (BE endpoint sudah live).
+  // Rollback = rebuild false / git revert.
+  static const bool messageForwardEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {
