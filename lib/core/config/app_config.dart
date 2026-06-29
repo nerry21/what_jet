@@ -111,7 +111,7 @@ class AppConfig {
   // (0 delta). Catatan: sheet hanya terbuka saat messageStarEnabled ON (D-2).
   // Aktivasi = rebuild dgn true (BE endpoint sudah live).
   // Rollback = rebuild false / git revert.
-  static const bool messageForwardEnabled = false;
+  static const bool messageForwardEnabled = true;
 
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
