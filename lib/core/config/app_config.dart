@@ -113,6 +113,13 @@ class AppConfig {
   // Rollback = rebuild false / git revert.
   static const bool messageForwardEnabled = true;
 
+  // BRIEF 6 — Compile-time flag, default OFF (dark-launch). ON => tile "Kirim
+  // Daftar Rute" muncul di attachment sheet (WhatsApp only) -> POST send-carousel
+  // -> BE kirim template carousel. OFF => tile tak dirender, sheet identik (0 delta).
+  // Aktivasi = rebuild dgn true (BE flag + template Meta sudah live).
+  // Rollback = rebuild false / git revert.
+  static const bool routeCarouselEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {

@@ -163,6 +163,17 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> sendRouteCarousel({
+    required String accessToken,
+    required int conversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationCarousel(conversationId),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
+
   Future<Map<String, dynamic>> sendAdminStickerReply({
     required String accessToken,
     required int conversationId,

@@ -358,6 +358,23 @@ class OmnichannelRepository {
     return 'Stiker favorit berhasil dikirim.';
   }
 
+  Future<String> sendRouteCarousel({required int conversationId}) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.sendRouteCarousel(
+        accessToken: accessToken,
+        conversationId: conversationId,
+      ),
+    );
+
+    final message = payload['message']?.toString().trim();
+    if (message != null && message.isNotEmpty) {
+      return message;
+    }
+
+    return 'Daftar rute berhasil dikirim.';
+  }
+
   /// Mark conversation as read on the backend.
   /// Fails silently — this is a non-critical UX enhancement.
   Future<void> markConversationAsRead({required int conversationId}) async {
