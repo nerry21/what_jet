@@ -40,6 +40,9 @@ class ApiEndpoints {
   static String adminConversationReply(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/reply';
 
+  static String adminConversationCarousel(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/send-carousel';
+
   static String adminConversationMarkRead(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/mark-read';
 

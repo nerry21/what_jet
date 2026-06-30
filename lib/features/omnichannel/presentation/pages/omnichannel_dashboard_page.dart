@@ -2665,6 +2665,38 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     return 'Gagal mengirim stiker favorit.';
   }
 
+  Future<void> _handleSendRouteCarousel() async {
+    try {
+      final result = await _controller.sendRouteCarousel();
+      if (!mounted) {
+        return;
+      }
+      if (result == 'failed' || result == 'skipped') {
+        _showSnackBar(_sendRouteCarouselFeedbackMessage(result));
+        return;
+      }
+      await _controller.softRefreshAfterExternalAction();
+      if (mounted) {
+        _showSnackBar(result);
+      }
+    } on ApiException catch (error) {
+      if (mounted) {
+        _showSnackBar(error.message);
+      }
+    } catch (error) {
+      if (mounted) {
+        _showSnackBar('Gagal mengirim daftar rute: $error');
+      }
+    }
+  }
+
+  String _sendRouteCarouselFeedbackMessage(String status) {
+    if (status == 'skipped') {
+      return 'Kirim daftar rute hanya untuk percakapan WhatsApp.';
+    }
+    return 'Gagal mengirim daftar rute.';
+  }
+
   Future<void> _handleForward(int messageId) async {
     await showForwardTargetPickerSheet(
       context: context,
@@ -2968,6 +3000,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   onSaveSticker: (sourceMessageId) =>
                       unawaited(_handleSaveSticker(sourceMessageId)),
                   onStickerPickerRequested: _handleOpenStickerPicker,
+                  onSendRouteCarousel: _handleSendRouteCarousel,
                   onComposerChanged: (text) =>
                       _controller.notifyAdminTyping(text),
                   conversation: _controller.selectedConversation,
@@ -3130,6 +3163,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       onSaveSticker: (sourceMessageId) =>
                           unawaited(_handleSaveSticker(sourceMessageId)),
                       onStickerPickerRequested: _handleOpenStickerPicker,
+                      onSendRouteCarousel: _handleSendRouteCarousel,
                       onComposerChanged: (text) =>
                           _controller.notifyAdminTyping(text),
                       conversation: _controller.selectedConversation,

@@ -15,6 +15,7 @@ Future<void> showWhatsAppAttachmentSheet({
   required Future<void> Function() onEventTap,
   Future<void> Function()? onVideoFileTap,
   Future<void> Function()? onStickerTap,
+  Future<void> Function()? onCarouselTap,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -31,6 +32,7 @@ Future<void> showWhatsAppAttachmentSheet({
         onEventTap: onEventTap,
         onVideoFileTap: onVideoFileTap,
         onStickerTap: onStickerTap,
+        onCarouselTap: onCarouselTap,
       );
     },
   );
@@ -48,6 +50,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
     required this.onEventTap,
     this.onVideoFileTap,
     this.onStickerTap,
+    this.onCarouselTap,
   });
 
   final Future<void> Function() onGalleryTap;
@@ -60,6 +63,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
   final Future<void> Function() onEventTap;
   final Future<void> Function()? onVideoFileTap;
   final Future<void> Function()? onStickerTap;
+  final Future<void> Function()? onCarouselTap;
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +129,13 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
           icon: Icons.emoji_emotions_rounded,
           color: const Color(0xFF00B8D4),
           onTap: onStickerTap!,
+        ),
+      if (onCarouselTap != null)
+        _AttachmentAction(
+          label: 'Daftar Rute',
+          icon: Icons.alt_route_rounded,
+          color: const Color(0xFF2B7FFF),
+          onTap: onCarouselTap!,
         ),
     ];
 
