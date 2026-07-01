@@ -174,6 +174,18 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> sendPayment({
+    required String accessToken,
+    required int conversationId,
+    required String paymentType,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationPayment(conversationId),
+      headers: _headers(accessToken),
+      body: <String, Object?>{'payment_type': paymentType},
+    );
+  }
+
   Future<Map<String, dynamic>> sendAdminStickerReply({
     required String accessToken,
     required int conversationId,

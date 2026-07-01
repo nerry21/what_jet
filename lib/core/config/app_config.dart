@@ -120,6 +120,14 @@ class AppConfig {
   // Rollback = rebuild false / git revert.
   static const bool routeCarouselEnabled = false;
 
+  // BRICK 1-APP — Manual payment (Kirim QRIS / Kirim No-rek). Compile-time flag,
+  // default OFF (dark-launch). ON => tile "Kirim QRIS" & "Kirim No-rek" muncul di
+  // attachment sheet (WhatsApp only) -> POST send-payment -> BE resolve booking &
+  // kirim instruksi. OFF => tile tak dirender, sheet identik (0 delta). Aktivasi =
+  // rebuild dgn true (BE endpoint + flag sudah live). Rollback = rebuild false /
+  // git revert.
+  static const bool manualPaymentEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {

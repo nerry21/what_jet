@@ -375,6 +375,27 @@ class OmnichannelRepository {
     return 'Daftar rute berhasil dikirim.';
   }
 
+  Future<String> sendPayment({
+    required int conversationId,
+    required String paymentType,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.sendPayment(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        paymentType: paymentType,
+      ),
+    );
+
+    final message = payload['message']?.toString().trim();
+    if (message != null && message.isNotEmpty) {
+      return message;
+    }
+
+    return 'Instruksi pembayaran berhasil dikirim.';
+  }
+
   /// Mark conversation as read on the backend.
   /// Fails silently — this is a non-critical UX enhancement.
   Future<void> markConversationAsRead({required int conversationId}) async {
