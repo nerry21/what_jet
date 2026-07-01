@@ -16,6 +16,8 @@ Future<void> showWhatsAppAttachmentSheet({
   Future<void> Function()? onVideoFileTap,
   Future<void> Function()? onStickerTap,
   Future<void> Function()? onCarouselTap,
+  Future<void> Function()? onSendQrisTap,
+  Future<void> Function()? onSendNorekTap,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -33,6 +35,8 @@ Future<void> showWhatsAppAttachmentSheet({
         onVideoFileTap: onVideoFileTap,
         onStickerTap: onStickerTap,
         onCarouselTap: onCarouselTap,
+        onSendQrisTap: onSendQrisTap,
+        onSendNorekTap: onSendNorekTap,
       );
     },
   );
@@ -51,6 +55,8 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
     this.onVideoFileTap,
     this.onStickerTap,
     this.onCarouselTap,
+    this.onSendQrisTap,
+    this.onSendNorekTap,
   });
 
   final Future<void> Function() onGalleryTap;
@@ -64,6 +70,8 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
   final Future<void> Function()? onVideoFileTap;
   final Future<void> Function()? onStickerTap;
   final Future<void> Function()? onCarouselTap;
+  final Future<void> Function()? onSendQrisTap;
+  final Future<void> Function()? onSendNorekTap;
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +144,20 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
           icon: Icons.alt_route_rounded,
           color: const Color(0xFF2B7FFF),
           onTap: onCarouselTap!,
+        ),
+      if (onSendQrisTap != null)
+        _AttachmentAction(
+          label: 'Kirim QRIS',
+          icon: Icons.qr_code_rounded,
+          color: const Color(0xFF6C5CE7),
+          onTap: onSendQrisTap!,
+        ),
+      if (onSendNorekTap != null)
+        _AttachmentAction(
+          label: 'Kirim No-rek',
+          icon: Icons.account_balance_rounded,
+          color: const Color(0xFF22B07D),
+          onTap: onSendNorekTap!,
         ),
     ];
 

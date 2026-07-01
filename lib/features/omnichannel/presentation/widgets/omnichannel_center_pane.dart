@@ -202,6 +202,8 @@ class OmnichannelCenterPane extends StatefulWidget {
     this.onSaveSticker,
     this.onStickerPickerRequested,
     this.onSendRouteCarousel,
+    this.onSendPaymentQris,
+    this.onSendPaymentNorek,
     this.onSwipeToReply,
     this.replyingTo,
     this.onCancelReply,
@@ -263,6 +265,8 @@ class OmnichannelCenterPane extends StatefulWidget {
   final void Function(int sourceMessageId)? onSaveSticker;
   final Future<void> Function()? onStickerPickerRequested;
   final Future<void> Function()? onSendRouteCarousel;
+  final Future<void> Function()? onSendPaymentQris;
+  final Future<void> Function()? onSendPaymentNorek;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
   final OmnichannelThreadMessageModel? replyingTo;
   final VoidCallback? onCancelReply;
@@ -885,6 +889,12 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
           : null,
       onCarouselTap: AppConfig.routeCarouselEnabled
           ? widget.onSendRouteCarousel
+          : null,
+      onSendQrisTap: AppConfig.manualPaymentEnabled
+          ? widget.onSendPaymentQris
+          : null,
+      onSendNorekTap: AppConfig.manualPaymentEnabled
+          ? widget.onSendPaymentNorek
           : null,
     );
   }

@@ -455,6 +455,20 @@ class OmnichannelShellController extends ChangeNotifier {
     return _repository.sendRouteCarousel(conversationId: conversationId);
   }
 
+  Future<String> sendPayment(String paymentType) async {
+    final conversationId = selectedConversationId;
+    if (conversationId == null) {
+      return 'failed';
+    }
+    if (_selectedConversation?.channel != 'whatsapp') {
+      return 'skipped';
+    }
+    return _repository.sendPayment(
+      conversationId: conversationId,
+      paymentType: paymentType,
+    );
+  }
+
   /// Marks a conversation as unread (BRIEF 3A): optimistically bumps the local
   /// unread badge, then tells the backend (silent-fail). Inverse of the tap
   /// read-clear flow. Eventual consistency: next poll reconciles with backend.
