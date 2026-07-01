@@ -126,7 +126,7 @@ class AppConfig {
   // kirim instruksi. OFF => tile tak dirender, sheet identik (0 delta). Aktivasi =
   // rebuild dgn true (BE endpoint + flag sudah live). Rollback = rebuild false /
   // git revert.
-  static const bool manualPaymentEnabled = false;
+  static const bool manualPaymentEnabled = true;
 
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
