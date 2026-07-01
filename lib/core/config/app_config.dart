@@ -132,7 +132,7 @@ class AppConfig {
   // Compile-time flag, default OFF (dark). ON => tile "Kirim QRIS/No-rek" buka dialog
   // compose (bypass direct-send Brick 1); OFF => perilaku Brick 1 lama persis (0-delta).
   // Butuh BE manual_payment_compose_enabled ON juga. Rollback = rebuild false / git revert.
-  static const bool manualPaymentComposeEnabled = false;
+  static const bool manualPaymentComposeEnabled = true;
 
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
