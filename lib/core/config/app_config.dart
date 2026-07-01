@@ -134,6 +134,14 @@ class AppConfig {
   // Butuh BE manual_payment_compose_enabled ON juga. Rollback = rebuild false / git revert.
   static const bool manualPaymentComposeEnabled = true;
 
+  // BRICK 2-APP — Contacts inbound (kartu kontak WhatsApp). Compile-time flag,
+  // default OFF (dark-launch). ON => pesan message_type=contacts render kartu
+  // kontak (avatar + nama + Simpan Kontak + Message wa.me) di thread WhatsJet.
+  // OFF => kartu tak dirender, fallback '-' identik lama (0 delta). Aktivasi =
+  // rebuild dgn true BARENG BE WHATSAPP_CONTACTS_INBOUND_ENABLED=true.
+  // Rollback = rebuild false / git revert.
+  static const bool contactsInboundEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {
