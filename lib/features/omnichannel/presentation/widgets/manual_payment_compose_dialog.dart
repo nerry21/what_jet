@@ -230,27 +230,35 @@ class _ManualPaymentComposeDialogState
         ],
       );
     }
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          const Text(
-            'Pilih kode booking (belum lunas)',
-            style: TextStyle(fontWeight: FontWeight.w600),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        const Text(
+          'Pilih kode booking (belum lunas)',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        Flexible(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                for (final booking in _bookings) _buildBookingTile(booking),
+                _buildSelectTile(
+                  selected: _noCode,
+                  title: 'Tanpa kode booking',
+                  subtitle: null,
+                  onTap: _selectNoCode,
+                ),
+              ],
+            ),
           ),
-          for (final booking in _bookings) _buildBookingTile(booking),
-          _buildSelectTile(
-            selected: _noCode,
-            title: 'Tanpa kode booking',
-            subtitle: null,
-            onTap: _selectNoCode,
-          ),
-          const Divider(),
-          _buildTotalRow(),
-          if (_isQris && _noCode) _buildLoketRow(),
-        ],
-      ),
+        ),
+        const Divider(),
+        _buildTotalRow(),
+        if (_isQris && _noCode) _buildLoketRow(),
+      ],
     );
   }
 
