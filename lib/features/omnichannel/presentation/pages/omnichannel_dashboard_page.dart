@@ -37,6 +37,7 @@ import '../pages/omnichannel_updates_page.dart';
 import '../utils/omnichannel_call_status_ui.dart';
 import '../widgets/omnichannel_action_sheet.dart';
 import '../widgets/omnichannel_center_pane.dart';
+import '../widgets/manual_payment_compose_dialog.dart';
 import '../widgets/omnichannel_call_settings_checklist_sheet.dart';
 import '../widgets/omnichannel_left_pane.dart';
 import '../widgets/omnichannel_new_chat_page.dart';
@@ -2715,9 +2716,63 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
   }
 
-  Future<void> _handleSendPaymentQris() => _handleSendPayment('qris');
+  Future<void> _handleSendPaymentQris() async {
+    if (AppConfig.manualPaymentComposeEnabled) {
+      await _openComposeDialog('qris');
+    } else {
+      await _handleSendPayment('qris');
+    }
+  }
 
-  Future<void> _handleSendPaymentNorek() => _handleSendPayment('norek');
+  Future<void> _handleSendPaymentNorek() async {
+    if (AppConfig.manualPaymentComposeEnabled) {
+      await _openComposeDialog('norek');
+    } else {
+      await _handleSendPayment('norek');
+    }
+  }
+
+  Future<void> _openComposeDialog(String paymentType) async {
+    final result = await showDialog<ManualPaymentComposeResult>(
+      context: context,
+      builder: (dialogContext) {
+        return ManualPaymentComposeDialog(
+          paymentType: paymentType,
+          onFetchBookings: _controller.fetchComposeBookings,
+        );
+      },
+    );
+    if (result == null) {
+      return;
+    }
+    try {
+      final message = await _controller.sendComposedPayment(
+        paymentType: paymentType,
+        bookingCode: result.bookingCode,
+        total: result.total,
+        loket: result.loket,
+      );
+      if (!mounted) {
+        return;
+      }
+      if (message == 'failed' || message == 'skipped') {
+        _showSnackBar(_paymentFeedbackMessage(message));
+        return;
+      }
+      await _controller.softRefreshAfterExternalAction();
+      if (mounted) {
+        _showSnackBar(message);
+      }
+    } on ApiException catch (error) {
+      if (mounted) {
+        _showSnackBar(error.message);
+      }
+    } catch (error) {
+      if (mounted) {
+        _showSnackBar('Gagal mengirim instruksi pembayaran: $error');
+      }
+    }
+  }
 
   String _paymentFeedbackMessage(String status) {
     if (status == 'skipped') {

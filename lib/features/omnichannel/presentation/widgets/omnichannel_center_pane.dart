@@ -890,10 +890,14 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
       onCarouselTap: AppConfig.routeCarouselEnabled
           ? widget.onSendRouteCarousel
           : null,
-      onSendQrisTap: AppConfig.manualPaymentEnabled
+      onSendQrisTap:
+          (AppConfig.manualPaymentEnabled ||
+              AppConfig.manualPaymentComposeEnabled)
           ? widget.onSendPaymentQris
           : null,
-      onSendNorekTap: AppConfig.manualPaymentEnabled
+      onSendNorekTap:
+          (AppConfig.manualPaymentEnabled ||
+              AppConfig.manualPaymentComposeEnabled)
           ? widget.onSendPaymentNorek
           : null,
     );

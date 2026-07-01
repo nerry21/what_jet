@@ -128,6 +128,12 @@ class AppConfig {
   // git revert.
   static const bool manualPaymentEnabled = true;
 
+  // BRICK B-APP — Manual payment COMPOSE (dialog picker + total tambah/edit + loket).
+  // Compile-time flag, default OFF (dark). ON => tile "Kirim QRIS/No-rek" buka dialog
+  // compose (bypass direct-send Brick 1); OFF => perilaku Brick 1 lama persis (0-delta).
+  // Butuh BE manual_payment_compose_enabled ON juga. Rollback = rebuild false / git revert.
+  static const bool manualPaymentComposeEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {

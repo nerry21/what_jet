@@ -46,6 +46,12 @@ class ApiEndpoints {
   static String adminConversationPayment(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/send-payment';
 
+  static String adminConversationComposeBookings(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/manual-payment/bookings';
+
+  static String adminConversationSendComposed(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/manual-payment/send-composed';
+
   static String adminConversationMarkRead(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/mark-read';
 
