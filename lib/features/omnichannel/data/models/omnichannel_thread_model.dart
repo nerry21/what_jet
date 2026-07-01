@@ -159,6 +159,55 @@ class OmnichannelReactions {
   }
 }
 
+class OmnichannelThreadContact {
+  const OmnichannelThreadContact({
+    this.name,
+    this.phones = const <OmnichannelThreadContactPhone>[],
+  });
+
+  final String? name;
+  final List<OmnichannelThreadContactPhone> phones;
+
+  static OmnichannelThreadContact? fromJson(Object? value) {
+    final map = asOmnichannelMap(value);
+    if (map == null) {
+      return null;
+    }
+    final rawPhones = map['phones'];
+    final phones = <OmnichannelThreadContactPhone>[];
+    if (rawPhones is List) {
+      for (final item in rawPhones) {
+        final phone = OmnichannelThreadContactPhone.fromJson(item);
+        if (phone != null) {
+          phones.add(phone);
+        }
+      }
+    }
+    return OmnichannelThreadContact(
+      name: omnichannelString(map['name']),
+      phones: phones,
+    );
+  }
+}
+
+class OmnichannelThreadContactPhone {
+  const OmnichannelThreadContactPhone({this.phone, this.waId});
+
+  final String? phone;
+  final String? waId;
+
+  static OmnichannelThreadContactPhone? fromJson(Object? value) {
+    final map = asOmnichannelMap(value);
+    if (map == null) {
+      return null;
+    }
+    return OmnichannelThreadContactPhone(
+      phone: omnichannelString(map['phone']),
+      waId: omnichannelString(map['wa_id']),
+    );
+  }
+}
+
 class OmnichannelThreadMessageModel {
   const OmnichannelThreadMessageModel({
     required this.id,
@@ -204,6 +253,7 @@ class OmnichannelThreadMessageModel {
     this.replyContext,
     this.reactions,
     this.starred = false,
+    this.contacts = const <OmnichannelThreadContact>[],
   });
 
   final int id;
@@ -249,6 +299,7 @@ class OmnichannelThreadMessageModel {
   final OmnichannelReplyContext? replyContext;
   final OmnichannelReactions? reactions;
   final bool starred;
+  final List<OmnichannelThreadContact> contacts;
 
   bool get hasImage =>
       messageType == 'image' && (imageUrl?.trim().isNotEmpty ?? false);
@@ -282,6 +333,8 @@ class OmnichannelThreadMessageModel {
   bool get hasSticker =>
       messageType == 'sticker' && (stickerUrl?.trim().isNotEmpty ?? false);
 
+  bool get hasContacts => messageType == 'contacts' && contacts.isNotEmpty;
+
   String? get preferredImageDownloadUrl => imageDownloadUrl ?? imageUrl;
   String? get preferredAudioDownloadUrl => audioDownloadUrl ?? audioUrl;
   String? get preferredVideoDownloadUrl => videoDownloadUrl ?? videoUrl;
@@ -295,6 +348,10 @@ class OmnichannelThreadMessageModel {
     }
 
     if (hasImage || hasAudio || hasVideo || hasDocument || hasLocation) {
+      return '';
+    }
+
+    if (AppConfig.contactsInboundEnabled && hasContacts) {
       return '';
     }
 
@@ -584,6 +641,7 @@ class OmnichannelThreadMessageModel {
       replyContext: OmnichannelReplyContext.fromJson(json['reply_context']),
       reactions: OmnichannelReactions.fromJson(json['reactions']),
       starred: _parseStarred(json['starred']),
+      contacts: _parseContacts(json['contacts']),
     );
   }
 }
@@ -595,6 +653,21 @@ bool _parseStarred(Object? value) {
   if (value is bool) return value;
   if (value is Map) return value['starred'] == true;
   return false;
+}
+
+/// Parse field `contacts` (BRICK 2-APP) — kontrak BE contactsPayload:
+/// list of {name, phones:[{phone, wa_id}]}. Defensif terhadap kontrak:
+/// bukan-list => kosong; item non-map di-skip (mirror _parseStarred).
+List<OmnichannelThreadContact> _parseContacts(Object? value) {
+  if (value is! List) return const <OmnichannelThreadContact>[];
+  final contacts = <OmnichannelThreadContact>[];
+  for (final item in value) {
+    final contact = OmnichannelThreadContact.fromJson(item);
+    if (contact != null) {
+      contacts.add(contact);
+    }
+  }
+  return contacts;
 }
 
 /// Helper: accept int, double, or string and return a double.

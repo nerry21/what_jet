@@ -16,6 +16,7 @@ import '../../data/models/omnichannel_call_timeline_item_model.dart';
 import '../../data/models/omnichannel_conversation_detail_model.dart';
 import '../../data/models/omnichannel_thread_model.dart';
 import '../pages/location_picker_page.dart';
+import '../services/device_contacts_service.dart';
 import '../utils/omnichannel_call_status_ui.dart';
 import 'omnichannel_call_banner.dart';
 import 'omnichannel_call_history_section.dart';
@@ -2018,6 +2019,14 @@ class _MobileConversationBubble extends StatelessWidget {
                 _ConversationInteractiveCard(message: message),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
+              if (AppConfig.contactsInboundEnabled &&
+                  message.hasContacts) ...<Widget>[
+                ConversationContactCard(
+                  message: message,
+                  maxWidth: maxWidth - 24,
+                ),
+                if (message.displayText.isNotEmpty) const SizedBox(height: 8),
+              ],
               if (message.displayText.isNotEmpty &&
                   !(AppConfig.stickerInboundEnabled && message.hasSticker))
                 _FormattedMessageText(
@@ -2033,6 +2042,7 @@ class _MobileConversationBubble extends StatelessWidget {
                   !message.hasDocument &&
                   !message.hasLocation &&
                   !message.hasInteractive &&
+                  !(AppConfig.contactsInboundEnabled && message.hasContacts) &&
                   !(AppConfig.stickerInboundEnabled && message.hasSticker))
                 const Text(
                   '-',
@@ -3069,6 +3079,14 @@ class _ThreadBubble extends StatelessWidget {
                 _ConversationInteractiveCard(message: message),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
+              if (AppConfig.contactsInboundEnabled &&
+                  message.hasContacts) ...<Widget>[
+                ConversationContactCard(
+                  message: message,
+                  maxWidth: maxWidth - 28,
+                ),
+                if (message.displayText.isNotEmpty) const SizedBox(height: 8),
+              ],
               if (message.displayText.isNotEmpty &&
                   !(AppConfig.stickerInboundEnabled && message.hasSticker))
                 _FormattedMessageText(
@@ -3084,6 +3102,7 @@ class _ThreadBubble extends StatelessWidget {
                   !message.hasDocument &&
                   !message.hasLocation &&
                   !message.hasInteractive &&
+                  !(AppConfig.contactsInboundEnabled && message.hasContacts) &&
                   !(AppConfig.stickerInboundEnabled && message.hasSticker))
                 const Text(
                   '-',
@@ -3357,6 +3376,162 @@ class _ConversationLocationCard extends StatelessWidget {
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// BRICK 2-APP — kartu kontak inbound WhatsApp (mirror
+/// _ConversationLocationCard). Render kontak pertama: avatar + nama + nomor
+/// + aksi "Simpan Kontak" (DeviceContactsService) & "Message" (wa.me via
+/// wa_id, fallback digit-of-phone; disabled bila target kosong). Public
+/// (bukan private) agar bisa di-widget-test langsung — presedan
+/// ManualPaymentComposeDialog.
+class ConversationContactCard extends StatelessWidget {
+  const ConversationContactCard({
+    super.key,
+    required this.message,
+    required this.maxWidth,
+  });
+
+  final OmnichannelThreadMessageModel message;
+  final double maxWidth;
+
+  String get _waTarget {
+    if (message.contacts.isEmpty) {
+      return '';
+    }
+    final phones = message.contacts.first.phones;
+    if (phones.isEmpty) {
+      return '';
+    }
+    final waId = phones.first.waId?.trim() ?? '';
+    if (waId.isNotEmpty) {
+      return waId.replaceAll(RegExp(r'[^0-9]'), '');
+    }
+    final phone = phones.first.phone?.trim() ?? '';
+    return phone.replaceAll(RegExp(r'[^0-9]'), '');
+  }
+
+  Future<void> _openWhatsApp() async {
+    final target = _waTarget;
+    if (target.isEmpty) {
+      return;
+    }
+    final uri = Uri.parse('https://wa.me/$target');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (message.contacts.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final previewWidth = maxWidth.clamp(180.0, 260.0).toDouble();
+    final contact = message.contacts.first;
+    final rawName = contact.name?.trim() ?? '';
+    final name = rawName.isNotEmpty ? rawName : 'Kontak';
+    final displayPhone = contact.phones.isNotEmpty
+        ? (contact.phones.first.phone?.trim() ?? '')
+        : '';
+    final waTarget = _waTarget;
+    final savePhone = displayPhone.isNotEmpty ? displayPhone : waTarget;
+
+    return Container(
+      width: previewWidth,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceTertiary,
+        borderRadius: AppRadii.borderRadiusLg,
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+            child: Row(
+              children: <Widget>[
+                CircleAvatar(
+                  radius: 18,
+                  backgroundColor: AppColors.surfaceSecondary,
+                  child: Icon(
+                    Icons.person_rounded,
+                    size: 22,
+                    color: AppColors.neutral400,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        name,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.neutral800,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (displayPhone.isNotEmpty) ...<Widget>[
+                        const SizedBox(height: 2),
+                        Text(
+                          displayPhone,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.neutral500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(height: 1, color: AppColors.borderLight),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: TextButton(
+                  onPressed: savePhone.isEmpty
+                      ? null
+                      : () async {
+                          final messenger = ScaffoldMessenger.of(context);
+                          final result =
+                              await DeviceContactsService.saveContact(
+                                firstName: name,
+                                lastName: '',
+                                phone: savePhone,
+                              );
+                          if (result.message.isNotEmpty) {
+                            messenger.showSnackBar(
+                              SnackBar(content: Text(result.message)),
+                            );
+                          }
+                        },
+                  child: const Text('Simpan Kontak'),
+                ),
+              ),
+              Expanded(
+                child: TextButton(
+                  onPressed: waTarget.isEmpty ? null : _openWhatsApp,
+                  child: const Text('Message'),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
