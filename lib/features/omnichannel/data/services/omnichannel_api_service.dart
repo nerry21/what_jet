@@ -186,6 +186,36 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> fetchComposeBookings({
+    required String accessToken,
+    required int conversationId,
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminConversationComposeBookings(conversationId),
+      headers: _headers(accessToken),
+    );
+  }
+
+  Future<Map<String, dynamic>> sendComposedPayment({
+    required String accessToken,
+    required int conversationId,
+    required String paymentType,
+    String? bookingCode,
+    required int total,
+    String? loket,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationSendComposed(conversationId),
+      headers: _headers(accessToken),
+      body: <String, Object?>{
+        'payment_type': paymentType,
+        'booking_code': bookingCode,
+        'total': total,
+        'loket': loket,
+      },
+    );
+  }
+
   Future<Map<String, dynamic>> sendAdminStickerReply({
     required String accessToken,
     required int conversationId,

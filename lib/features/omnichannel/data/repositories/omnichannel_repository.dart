@@ -396,6 +396,49 @@ class OmnichannelRepository {
     return 'Instruksi pembayaran berhasil dikirim.';
   }
 
+  Future<List<Map<String, dynamic>>> fetchComposeBookings({
+    required int conversationId,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.fetchComposeBookings(
+        accessToken: accessToken,
+        conversationId: conversationId,
+      ),
+    );
+
+    final data = _extractPayloadData(payload);
+    final rawItems = data['bookings'] as List<dynamic>? ?? const <dynamic>[];
+    return rawItems.whereType<Map<String, dynamic>>().toList(growable: false);
+  }
+
+  Future<String> sendComposedPayment({
+    required int conversationId,
+    required String paymentType,
+    String? bookingCode,
+    required int total,
+    String? loket,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.sendComposedPayment(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        paymentType: paymentType,
+        bookingCode: bookingCode,
+        total: total,
+        loket: loket,
+      ),
+    );
+
+    final message = payload['message']?.toString().trim();
+    if (message != null && message.isNotEmpty) {
+      return message;
+    }
+
+    return 'Instruksi pembayaran berhasil dikirim.';
+  }
+
   /// Mark conversation as read on the backend.
   /// Fails silently — this is a non-critical UX enhancement.
   Future<void> markConversationAsRead({required int conversationId}) async {
