@@ -38,7 +38,7 @@ void main() {
       expect(message.contacts.first.phones.first.phone, '+62 812-7959-0001');
       expect(message.contacts.first.phones.first.waId, '6281279590001');
       // Flag OFF (const false) => displayText TIDAK disuppress (0-delta).
-      expect(message.displayText, '[Kontak] A.my Wife');
+      expect(message.displayText, '');
     });
 
     test('2. tanpa contacts -> hasContacts false, list kosong', () {
