@@ -140,7 +140,7 @@ class AppConfig {
   // OFF => kartu tak dirender, fallback '-' identik lama (0 delta). Aktivasi =
   // rebuild dgn true BARENG BE WHATSAPP_CONTACTS_INBOUND_ENABLED=true.
   // Rollback = rebuild false / git revert.
-  static const bool contactsInboundEnabled = false;
+  static const bool contactsInboundEnabled = true;
 
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
