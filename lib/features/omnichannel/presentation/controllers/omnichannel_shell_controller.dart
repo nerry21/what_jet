@@ -455,6 +455,17 @@ class OmnichannelShellController extends ChangeNotifier {
     return _repository.sendRouteCarousel(conversationId: conversationId);
   }
 
+  Future<String> sendGreeting() async {
+    final conversationId = selectedConversationId;
+    if (conversationId == null) {
+      return 'failed';
+    }
+    if (_selectedConversation?.channel != 'whatsapp') {
+      return 'skipped';
+    }
+    return _repository.sendGreeting(conversationId: conversationId);
+  }
+
   Future<String> sendPayment(String paymentType) async {
     final conversationId = selectedConversationId;
     if (conversationId == null) {

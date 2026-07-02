@@ -120,6 +120,13 @@ class AppConfig {
   // Rollback = rebuild false / git revert.
   static const bool routeCarouselEnabled = false;
 
+  // BRICK 0-APP — Compile-time flag, default OFF (dark-launch). ON => tile "Kirim
+  // Sapaan" muncul di attachment sheet (WhatsApp only) -> POST send-greeting -> BE
+  // kirim template jet_sapaan_awal_v1. OFF => tile tak dirender, sheet identik (0 delta).
+  // Aktivasi = rebuild dgn true (BE endpoint + flag + template sudah live).
+  // Rollback = rebuild false / git revert.
+  static const bool greetingEnabled = false;
+
   // BRICK 1-APP — Manual payment (Kirim QRIS / Kirim No-rek). Compile-time flag,
   // default OFF (dark-launch). ON => tile "Kirim QRIS" & "Kirim No-rek" muncul di
   // attachment sheet (WhatsApp only) -> POST send-payment -> BE resolve booking &
