@@ -125,7 +125,7 @@ class AppConfig {
   // kirim template jet_sapaan_awal_v1. OFF => tile tak dirender, sheet identik (0 delta).
   // Aktivasi = rebuild dgn true (BE endpoint + flag + template sudah live).
   // Rollback = rebuild false / git revert.
-  static const bool greetingEnabled = false;
+  static const bool greetingEnabled = true;
 
   // BRICK 1-APP — Manual payment (Kirim QRIS / Kirim No-rek). Compile-time flag,
   // default OFF (dark-launch). ON => tile "Kirim QRIS" & "Kirim No-rek" muncul di
