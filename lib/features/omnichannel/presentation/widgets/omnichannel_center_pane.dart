@@ -209,6 +209,7 @@ class OmnichannelCenterPane extends StatefulWidget {
     this.replyingTo,
     this.onCancelReply,
     this.onSaveContact,
+    this.onMessageContact,
     this.selectionVersion = 0,
   });
 
@@ -272,6 +273,8 @@ class OmnichannelCenterPane extends StatefulWidget {
   final OmnichannelThreadMessageModel? replyingTo;
   final VoidCallback? onCancelReply;
   final VoidCallback? onSaveContact;
+  final Future<void> Function(String contactName, String phone)?
+  onMessageContact;
   final int selectionVersion;
 
   @override
@@ -1017,6 +1020,7 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
         replyingTo: widget.replyingTo,
         onCancelReply: widget.onCancelReply,
         onTapQuotedReply: _scrollToMessage,
+        onMessageContact: widget.onMessageContact,
         keyForMessage: _keyForMessage,
         onSearchTap: _searchEntryEnabled ? _toggleSearch : null,
         searchActive: _searchActive,
@@ -1149,6 +1153,8 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
                                             onSwipeToReply:
                                                 widget.onSwipeToReply,
                                             onTapQuotedReply: _scrollToMessage,
+                                            onMessageContact:
+                                                widget.onMessageContact,
                                           ),
                                         ),
                                       ),
@@ -1222,6 +1228,7 @@ class _MobileConversationScaffold extends StatelessWidget {
     this.replyingTo,
     this.onCancelReply,
     this.onTapQuotedReply,
+    this.onMessageContact,
     this.keyForMessage,
     this.onSearchTap,
     this.searchActive = false,
@@ -1268,6 +1275,8 @@ class _MobileConversationScaffold extends StatelessWidget {
   final OmnichannelThreadMessageModel? replyingTo;
   final VoidCallback? onCancelReply;
   final void Function(int quotedMessageId)? onTapQuotedReply;
+  final Future<void> Function(String contactName, String phone)?
+  onMessageContact;
   final GlobalKey Function(int messageId)? keyForMessage;
   final VoidCallback? onSearchTap;
   final bool searchActive;
@@ -1360,6 +1369,7 @@ class _MobileConversationScaffold extends StatelessWidget {
                                 onSaveSticker: onSaveSticker,
                                 onSwipeToReply: onSwipeToReply,
                                 onTapQuotedReply: onTapQuotedReply,
+                                onMessageContact: onMessageContact,
                               );
                               if (!AppConfig.inChatSearchEnabled) {
                                 return bubble;
@@ -1912,6 +1922,7 @@ class _MobileConversationBubble extends StatelessWidget {
     this.onSaveSticker,
     this.onSwipeToReply,
     this.onTapQuotedReply,
+    this.onMessageContact,
   });
 
   final OmnichannelThreadMessageModel message;
@@ -1923,6 +1934,8 @@ class _MobileConversationBubble extends StatelessWidget {
   final void Function(int sourceMessageId)? onSaveSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
   final void Function(int quotedMessageId)? onTapQuotedReply;
+  final Future<void> Function(String contactName, String phone)?
+  onMessageContact;
 
   @override
   Widget build(BuildContext context) {
@@ -2024,6 +2037,7 @@ class _MobileConversationBubble extends StatelessWidget {
                 ConversationContactCard(
                   message: message,
                   maxWidth: maxWidth - 24,
+                  onMessageContact: onMessageContact,
                 ),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
@@ -2961,6 +2975,7 @@ class _ThreadBubble extends StatelessWidget {
     this.onSaveSticker,
     this.onSwipeToReply,
     this.onTapQuotedReply,
+    this.onMessageContact,
   });
 
   final OmnichannelThreadMessageModel message;
@@ -2972,6 +2987,8 @@ class _ThreadBubble extends StatelessWidget {
   final void Function(int sourceMessageId)? onSaveSticker;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
   final void Function(int quotedMessageId)? onTapQuotedReply;
+  final Future<void> Function(String contactName, String phone)?
+  onMessageContact;
 
   @override
   Widget build(BuildContext context) {
@@ -3084,6 +3101,7 @@ class _ThreadBubble extends StatelessWidget {
                 ConversationContactCard(
                   message: message,
                   maxWidth: maxWidth - 28,
+                  onMessageContact: onMessageContact,
                 ),
                 if (message.displayText.isNotEmpty) const SizedBox(height: 8),
               ],
@@ -3392,10 +3410,13 @@ class ConversationContactCard extends StatelessWidget {
     super.key,
     required this.message,
     required this.maxWidth,
+    this.onMessageContact,
   });
 
   final OmnichannelThreadMessageModel message;
   final double maxWidth;
+  final Future<void> Function(String contactName, String phone)?
+  onMessageContact;
 
   String get _waTarget {
     if (message.contacts.isEmpty) {
@@ -3552,7 +3573,14 @@ class ConversationContactCard extends StatelessWidget {
                 child: TextButton(
                   onPressed: waTarget.isEmpty
                       ? null
-                      : () => _openWhatsApp(context),
+                      : () {
+                          if (AppConfig.contactMessageOpensWhatsJetEnabled &&
+                              onMessageContact != null) {
+                            onMessageContact!(name, waTarget);
+                          } else {
+                            _openWhatsApp(context);
+                          }
+                        },
                   child: const Text('Message'),
                 ),
               ),

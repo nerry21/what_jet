@@ -142,6 +142,12 @@ class AppConfig {
   // Rollback = rebuild false / git revert.
   static const bool contactsInboundEnabled = true;
 
+  // BRICK M1b — Message di kartu kontak membuka thread WhatsJet
+  // (find-or-create via createWhatsAppContact) alih-alih WhatsApp eksternal.
+  // false = fallback perilaku M1 (deep-link whatsapp:// / wa.me eksternal).
+  // Rollback = rebuild false / git revert.
+  static const bool contactMessageOpensWhatsJetEnabled = true;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {

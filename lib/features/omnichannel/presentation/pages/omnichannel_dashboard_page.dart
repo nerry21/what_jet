@@ -89,6 +89,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
   bool _isSendingContact = false;
   bool _isTogglingBot = false;
   bool _isRecordingVoiceNote = false;
+  bool _isOpeningContactChat = false;
   OmnichannelThreadMessageModel? _replyingTo;
   int? _replyingToConversationId;
   _OmnichannelMobilePane _mobilePane = _OmnichannelMobilePane.inbox;
@@ -2480,6 +2481,55 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
   }
 
+  /// BRICK M1b — tombol Message kartu kontak: find-or-create thread WhatsJet
+  /// via createWhatsAppContact (idempotent by phone_e164) lalu buka percakapan.
+  Future<void> _handleContactMessage(
+    String contactName,
+    String phone, {
+    required bool showConversationOnMobile,
+  }) async {
+    if (_isOpeningContactChat) {
+      return;
+    }
+    setState(() => _isOpeningContactChat = true);
+    try {
+      final trimmedName = contactName.trim();
+      final result = await widget.repository.createWhatsAppContact(
+        firstName: trimmedName.isNotEmpty ? trimmedName : phone,
+        lastName: '',
+        phone: phone,
+      );
+      if (!mounted) {
+        return;
+      }
+      if (result.conversationId <= 0) {
+        _showSnackBar(
+          result.notice.isNotEmpty
+              ? result.notice
+              : 'Gagal membuka chat untuk kontak ini.',
+        );
+        return;
+      }
+      unawaited(_controller.refresh());
+      _handleConversationTap(
+        result.conversationId,
+        showConversationOnMobile: showConversationOnMobile,
+      );
+    } on ApiException catch (error) {
+      if (mounted) {
+        _showSnackBar(error.message);
+      }
+    } catch (error) {
+      if (mounted) {
+        _showSnackBar('Gagal membuka chat kontak: $error');
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isOpeningContactChat = false);
+      }
+    }
+  }
+
   Future<bool> _sendAdminContact({
     required String fullName,
     required String phone,
@@ -3128,6 +3178,12 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   isRecordingVoiceNote: _isRecordingVoiceNote,
                   onSendContact: _sendAdminContact,
                   onSaveContact: () => unawaited(_saveDeviceContact()),
+                  onMessageContact: (contactName, phone) =>
+                      _handleContactMessage(
+                        contactName,
+                        phone,
+                        showConversationOnMobile: false,
+                      ),
                   isTogglingBot: _isTogglingBot,
                   onToggleBot: _toggleBot,
                   isCallLoading: _callController.isLoading,
@@ -3294,6 +3350,12 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       isRecordingVoiceNote: _isRecordingVoiceNote,
                       onSendContact: _sendAdminContact,
                       onSaveContact: () => unawaited(_saveDeviceContact()),
+                      onMessageContact: (contactName, phone) =>
+                          _handleContactMessage(
+                            contactName,
+                            phone,
+                            showConversationOnMobile: true,
+                          ),
                       isTogglingBot: _isTogglingBot,
                       onToggleBot: _toggleBot,
                       isCallLoading: _callController.isLoading,
