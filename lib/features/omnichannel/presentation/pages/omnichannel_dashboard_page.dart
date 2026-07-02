@@ -2510,7 +2510,10 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
         );
         return;
       }
-      unawaited(_controller.refresh());
+      await _controller.refresh();
+      if (!mounted) {
+        return;
+      }
       _handleConversationTap(
         result.conversationId,
         showConversationOnMobile: showConversationOnMobile,
