@@ -174,6 +174,17 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> sendGreeting({
+    required String accessToken,
+    required int conversationId,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationGreeting(conversationId),
+      headers: _headers(accessToken),
+      body: const <String, Object?>{},
+    );
+  }
+
   Future<Map<String, dynamic>> sendPayment({
     required String accessToken,
     required int conversationId,

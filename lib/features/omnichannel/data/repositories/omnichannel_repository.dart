@@ -375,6 +375,23 @@ class OmnichannelRepository {
     return 'Daftar rute berhasil dikirim.';
   }
 
+  Future<String> sendGreeting({required int conversationId}) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.sendGreeting(
+        accessToken: accessToken,
+        conversationId: conversationId,
+      ),
+    );
+
+    final message = payload['message']?.toString().trim();
+    if (message != null && message.isNotEmpty) {
+      return message;
+    }
+
+    return 'Sapaan berhasil dikirim.';
+  }
+
   Future<String> sendPayment({
     required int conversationId,
     required String paymentType,

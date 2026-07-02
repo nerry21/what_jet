@@ -43,6 +43,9 @@ class ApiEndpoints {
   static String adminConversationCarousel(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/send-carousel';
 
+  static String adminConversationGreeting(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/send-greeting';
+
   static String adminConversationPayment(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/send-payment';
 

@@ -16,6 +16,7 @@ Future<void> showWhatsAppAttachmentSheet({
   Future<void> Function()? onVideoFileTap,
   Future<void> Function()? onStickerTap,
   Future<void> Function()? onCarouselTap,
+  Future<void> Function()? onGreetingTap,
   Future<void> Function()? onSendQrisTap,
   Future<void> Function()? onSendNorekTap,
 }) {
@@ -35,6 +36,7 @@ Future<void> showWhatsAppAttachmentSheet({
         onVideoFileTap: onVideoFileTap,
         onStickerTap: onStickerTap,
         onCarouselTap: onCarouselTap,
+        onGreetingTap: onGreetingTap,
         onSendQrisTap: onSendQrisTap,
         onSendNorekTap: onSendNorekTap,
       );
@@ -55,6 +57,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
     this.onVideoFileTap,
     this.onStickerTap,
     this.onCarouselTap,
+    this.onGreetingTap,
     this.onSendQrisTap,
     this.onSendNorekTap,
   });
@@ -70,6 +73,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
   final Future<void> Function()? onVideoFileTap;
   final Future<void> Function()? onStickerTap;
   final Future<void> Function()? onCarouselTap;
+  final Future<void> Function()? onGreetingTap;
   final Future<void> Function()? onSendQrisTap;
   final Future<void> Function()? onSendNorekTap;
 
@@ -144,6 +148,13 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
           icon: Icons.alt_route_rounded,
           color: const Color(0xFF2B7FFF),
           onTap: onCarouselTap!,
+        ),
+      if (onGreetingTap != null)
+        _AttachmentAction(
+          label: 'Kirim Sapaan',
+          icon: Icons.waving_hand_rounded,
+          color: const Color(0xFFFFB020),
+          onTap: onGreetingTap!,
         ),
       if (onSendQrisTap != null)
         _AttachmentAction(

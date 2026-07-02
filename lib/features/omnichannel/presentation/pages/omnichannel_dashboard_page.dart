@@ -2744,6 +2744,31 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     }
   }
 
+  Future<void> _handleSendGreeting() async {
+    try {
+      final result = await _controller.sendGreeting();
+      if (!mounted) {
+        return;
+      }
+      if (result == 'failed' || result == 'skipped') {
+        _showSnackBar(_sendGreetingFeedbackMessage(result));
+        return;
+      }
+      await _controller.softRefreshAfterExternalAction();
+      if (mounted) {
+        _showSnackBar(result);
+      }
+    } on ApiException catch (error) {
+      if (mounted) {
+        _showSnackBar(error.message);
+      }
+    } catch (error) {
+      if (mounted) {
+        _showSnackBar('Gagal mengirim sapaan: $error');
+      }
+    }
+  }
+
   Future<void> _handleSendPayment(String paymentType) async {
     try {
       final result = await _controller.sendPayment(paymentType);
@@ -2839,6 +2864,13 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       return 'Kirim daftar rute hanya untuk percakapan WhatsApp.';
     }
     return 'Gagal mengirim daftar rute.';
+  }
+
+  String _sendGreetingFeedbackMessage(String status) {
+    if (status == 'skipped') {
+      return 'Kirim sapaan hanya untuk percakapan WhatsApp.';
+    }
+    return 'Gagal mengirim sapaan.';
   }
 
   Future<void> _handleForward(int messageId) async {
@@ -3145,6 +3177,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       unawaited(_handleSaveSticker(sourceMessageId)),
                   onStickerPickerRequested: _handleOpenStickerPicker,
                   onSendRouteCarousel: _handleSendRouteCarousel,
+                  onSendGreeting: _handleSendGreeting,
                   onSendPaymentQris: _handleSendPaymentQris,
                   onSendPaymentNorek: _handleSendPaymentNorek,
                   onComposerChanged: (text) =>
@@ -3316,6 +3349,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                           unawaited(_handleSaveSticker(sourceMessageId)),
                       onStickerPickerRequested: _handleOpenStickerPicker,
                       onSendRouteCarousel: _handleSendRouteCarousel,
+                      onSendGreeting: _handleSendGreeting,
                       onSendPaymentQris: _handleSendPaymentQris,
                       onSendPaymentNorek: _handleSendPaymentNorek,
                       onComposerChanged: (text) =>
