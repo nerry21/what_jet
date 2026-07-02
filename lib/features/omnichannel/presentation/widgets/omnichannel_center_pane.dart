@@ -3413,14 +3413,39 @@ class ConversationContactCard extends StatelessWidget {
     return phone.replaceAll(RegExp(r'[^0-9]'), '');
   }
 
-  Future<void> _openWhatsApp() async {
+  Future<void> _openWhatsApp(BuildContext context) async {
     final target = _waTarget;
     if (target.isEmpty) {
       return;
     }
-    final uri = Uri.parse('https://wa.me/$target');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final messenger = ScaffoldMessenger.of(context);
+    final waApp = Uri.parse('whatsapp://send?phone=$target');
+    final waWeb = Uri.parse('https://wa.me/$target');
+    try {
+      if (await canLaunchUrl(waApp)) {
+        final ok = await launchUrl(waApp, mode: LaunchMode.externalApplication);
+        if (ok) {
+          return;
+        }
+      }
+      final okWeb = await launchUrl(
+        waWeb,
+        mode: LaunchMode.externalApplication,
+      );
+      if (okWeb) {
+        return;
+      }
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Tidak bisa membuka WhatsApp untuk nomor ini.'),
+        ),
+      );
+    } catch (_) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Tidak bisa membuka WhatsApp untuk nomor ini.'),
+        ),
+      );
     }
   }
 
@@ -3525,7 +3550,9 @@ class ConversationContactCard extends StatelessWidget {
               ),
               Expanded(
                 child: TextButton(
-                  onPressed: waTarget.isEmpty ? null : _openWhatsApp,
+                  onPressed: waTarget.isEmpty
+                      ? null
+                      : () => _openWhatsApp(context),
                   child: const Text('Message'),
                 ),
               ),
