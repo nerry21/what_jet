@@ -23,6 +23,7 @@ Future<void> showWhatsAppAttachmentSheet({
 }) {
   return showModalBottomSheet<void>(
     context: context,
+    isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (context) {
       return _WhatsAppAttachmentSheet(
@@ -187,39 +188,47 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
       top: false,
       child: Padding(
         padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
-        child: Material(
-          color: AppColors.surfaceSecondary,
-          borderRadius: AppRadii.borderRadiusXxl,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(18, 18, 18, 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Container(
-                  width: 42,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderDefault,
-                    borderRadius: AppRadii.borderRadiusPill,
-                  ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+          ),
+          child: Material(
+            color: AppColors.surfaceSecondary,
+            borderRadius: AppRadii.borderRadiusXxl,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(18, 18, 18, 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      width: 42,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.borderDefault,
+                        borderRadius: AppRadii.borderRadiusPill,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      itemCount: actions.length,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            mainAxisSpacing: 18,
+                            crossAxisSpacing: 12,
+                            childAspectRatio: 0.9,
+                          ),
+                      itemBuilder: (context, index) {
+                        final action = actions[index];
+                        return _AttachmentActionTile(action: action);
+                      },
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 18),
-                GridView.builder(
-                  shrinkWrap: true,
-                  itemCount: actions.length,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    mainAxisSpacing: 18,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 0.9,
-                  ),
-                  itemBuilder: (context, index) {
-                    final action = actions[index];
-                    return _AttachmentActionTile(action: action);
-                  },
-                ),
-              ],
+              ),
             ),
           ),
         ),
