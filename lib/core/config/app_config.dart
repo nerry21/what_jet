@@ -160,7 +160,7 @@ class AppConfig {
   // booking -> POST confirm-cash -> BE tandai lunas (TIDAK auto e-tiket). OFF => tile
   // tak dirender, sheet identik (0 delta). Butuh BE MANUAL_CASH_CONFIRM_ENABLED ON juga.
   // Rollback = rebuild false / git revert.
-  static const bool manualCashConfirmEnabled = false;
+  static const bool manualCashConfirmEnabled = true;
 
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
