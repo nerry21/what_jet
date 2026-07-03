@@ -197,6 +197,18 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> confirmCash({
+    required String accessToken,
+    required int conversationId,
+    required String bookingCode,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationConfirmCash(conversationId),
+      headers: _headers(accessToken),
+      body: <String, Object?>{'booking_code': bookingCode},
+    );
+  }
+
   Future<Map<String, dynamic>> fetchComposeBookings({
     required String accessToken,
     required int conversationId,

@@ -413,6 +413,27 @@ class OmnichannelRepository {
     return 'Instruksi pembayaran berhasil dikirim.';
   }
 
+  Future<String> confirmCash({
+    required int conversationId,
+    required String bookingCode,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.confirmCash(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        bookingCode: bookingCode,
+      ),
+    );
+
+    final message = payload['message']?.toString().trim();
+    if (message != null && message.isNotEmpty) {
+      return message;
+    }
+
+    return 'Pembayaran cash berhasil dikonfirmasi.';
+  }
+
   Future<List<Map<String, dynamic>>> fetchComposeBookings({
     required int conversationId,
   }) async {

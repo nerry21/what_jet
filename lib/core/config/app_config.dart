@@ -155,6 +155,13 @@ class AppConfig {
   // Rollback = rebuild false / git revert.
   static const bool contactMessageOpensWhatsJetEnabled = true;
 
+  // BRICK 3-APP — Konfirmasi Cash Manual. Compile-time flag, default OFF (dark-launch).
+  // ON => tile "Konfirmasi Cash" muncul di attachment sheet (WhatsApp only) -> pilih
+  // booking -> POST confirm-cash -> BE tandai lunas (TIDAK auto e-tiket). OFF => tile
+  // tak dirender, sheet identik (0 delta). Butuh BE MANUAL_CASH_CONFIRM_ENABLED ON juga.
+  // Rollback = rebuild false / git revert.
+  static const bool manualCashConfirmEnabled = true;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {

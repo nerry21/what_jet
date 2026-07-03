@@ -19,6 +19,7 @@ Future<void> showWhatsAppAttachmentSheet({
   Future<void> Function()? onGreetingTap,
   Future<void> Function()? onSendQrisTap,
   Future<void> Function()? onSendNorekTap,
+  Future<void> Function()? onConfirmCashTap,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -39,6 +40,7 @@ Future<void> showWhatsAppAttachmentSheet({
         onGreetingTap: onGreetingTap,
         onSendQrisTap: onSendQrisTap,
         onSendNorekTap: onSendNorekTap,
+        onConfirmCashTap: onConfirmCashTap,
       );
     },
   );
@@ -60,6 +62,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
     this.onGreetingTap,
     this.onSendQrisTap,
     this.onSendNorekTap,
+    this.onConfirmCashTap,
   });
 
   final Future<void> Function() onGalleryTap;
@@ -76,6 +79,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
   final Future<void> Function()? onGreetingTap;
   final Future<void> Function()? onSendQrisTap;
   final Future<void> Function()? onSendNorekTap;
+  final Future<void> Function()? onConfirmCashTap;
 
   @override
   Widget build(BuildContext context) {
@@ -169,6 +173,13 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
           icon: Icons.account_balance_rounded,
           color: const Color(0xFF22B07D),
           onTap: onSendNorekTap!,
+        ),
+      if (onConfirmCashTap != null)
+        _AttachmentAction(
+          label: 'Konfirmasi Cash',
+          icon: Icons.payments_rounded,
+          color: const Color(0xFF16A34A),
+          onTap: onConfirmCashTap!,
         ),
     ];
 
