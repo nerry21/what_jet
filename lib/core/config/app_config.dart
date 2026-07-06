@@ -167,7 +167,7 @@ class AppConfig {
   // state, TIDAK ke customer). OFF => tile tak dirender, sheet identik (0 delta).
   // Butuh BE MANUAL_ISSUE_TICKET_ENABLED ON juga (sudah ON di prod).
   // Rollback = rebuild false / git revert. Aktivasi true di commit chore terpisah.
-  static const bool manualIssueTicketEnabled = false;
+  static const bool manualIssueTicketEnabled = true;
 
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
