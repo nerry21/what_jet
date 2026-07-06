@@ -162,6 +162,13 @@ class AppConfig {
   // Rollback = rebuild false / git revert.
   static const bool manualCashConfirmEnabled = true;
 
+  // ON => tile "Terbit Tiket" muncul di attachment sheet (WhatsApp only) -> pilih
+  // booking lunas -> POST issue-ticket -> BE kirim e-tiket ke owner (TIDAK ubah
+  // state, TIDAK ke customer). OFF => tile tak dirender, sheet identik (0 delta).
+  // Butuh BE MANUAL_ISSUE_TICKET_ENABLED ON juga (sudah ON di prod).
+  // Rollback = rebuild false / git revert. Aktivasi true di commit chore terpisah.
+  static const bool manualIssueTicketEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {

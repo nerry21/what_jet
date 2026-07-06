@@ -450,6 +450,43 @@ class OmnichannelRepository {
     return rawItems.whereType<Map<String, dynamic>>().toList(growable: false);
   }
 
+  Future<String> issueTicket({
+    required int conversationId,
+    required String bookingCode,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.issueTicket(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        bookingCode: bookingCode,
+      ),
+    );
+
+    final message = payload['message']?.toString().trim();
+    if (message != null && message.isNotEmpty) {
+      return message;
+    }
+
+    return 'E-tiket berhasil diterbitkan.';
+  }
+
+  Future<List<Map<String, dynamic>>> fetchIssueTicketBookings({
+    required int conversationId,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.fetchIssueTicketBookings(
+        accessToken: accessToken,
+        conversationId: conversationId,
+      ),
+    );
+
+    final data = _extractPayloadData(payload);
+    final rawItems = data['bookings'] as List<dynamic>? ?? const <dynamic>[];
+    return rawItems.whereType<Map<String, dynamic>>().toList(growable: false);
+  }
+
   Future<String> sendComposedPayment({
     required int conversationId,
     required String paymentType,

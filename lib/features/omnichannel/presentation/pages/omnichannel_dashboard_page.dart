@@ -38,6 +38,7 @@ import '../utils/omnichannel_call_status_ui.dart';
 import '../widgets/omnichannel_action_sheet.dart';
 import '../widgets/omnichannel_center_pane.dart';
 import '../widgets/confirm_cash_picker_dialog.dart';
+import '../widgets/issue_ticket_picker_dialog.dart';
 import '../widgets/manual_payment_compose_dialog.dart';
 import '../widgets/omnichannel_call_settings_checklist_sheet.dart';
 import '../widgets/omnichannel_left_pane.dart';
@@ -2903,6 +2904,49 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     return 'Gagal konfirmasi cash.';
   }
 
+  Future<void> _handleIssueTicket() async {
+    final bookingCode = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return IssueTicketPickerDialog(
+          onFetchBookings: _controller.fetchIssueTicketBookings,
+        );
+      },
+    );
+    if (bookingCode == null) {
+      return;
+    }
+    try {
+      final result = await _controller.issueTicket(bookingCode);
+      if (!mounted) {
+        return;
+      }
+      if (result == 'failed' || result == 'skipped') {
+        _showSnackBar(_issueTicketFeedbackMessage(result));
+        return;
+      }
+      await _controller.softRefreshAfterExternalAction();
+      if (mounted) {
+        _showSnackBar(result);
+      }
+    } on ApiException catch (error) {
+      if (mounted) {
+        _showSnackBar(error.message);
+      }
+    } catch (error) {
+      if (mounted) {
+        _showSnackBar('Gagal terbit tiket: $error');
+      }
+    }
+  }
+
+  String _issueTicketFeedbackMessage(String status) {
+    if (status == 'skipped') {
+      return 'Terbit tiket hanya untuk percakapan WhatsApp.';
+    }
+    return 'Gagal terbit tiket.';
+  }
+
   String _sendRouteCarouselFeedbackMessage(String status) {
     if (status == 'skipped') {
       return 'Kirim daftar rute hanya untuk percakapan WhatsApp.';
@@ -3225,6 +3269,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   onSendPaymentQris: _handleSendPaymentQris,
                   onSendPaymentNorek: _handleSendPaymentNorek,
                   onConfirmCash: _handleConfirmCash,
+                  onIssueTicket: _handleIssueTicket,
                   onComposerChanged: (text) =>
                       _controller.notifyAdminTyping(text),
                   conversation: _controller.selectedConversation,
@@ -3398,6 +3443,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       onSendPaymentQris: _handleSendPaymentQris,
                       onSendPaymentNorek: _handleSendPaymentNorek,
                       onConfirmCash: _handleConfirmCash,
+                      onIssueTicket: _handleIssueTicket,
                       onComposerChanged: (text) =>
                           _controller.notifyAdminTyping(text),
                       conversation: _controller.selectedConversation,

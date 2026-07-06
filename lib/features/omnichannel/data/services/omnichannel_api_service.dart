@@ -219,6 +219,28 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> issueTicket({
+    required String accessToken,
+    required int conversationId,
+    required String bookingCode,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationIssueTicket(conversationId),
+      headers: _headers(accessToken),
+      body: <String, Object?>{'booking_code': bookingCode},
+    );
+  }
+
+  Future<Map<String, dynamic>> fetchIssueTicketBookings({
+    required String accessToken,
+    required int conversationId,
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminConversationIssueTicketBookings(conversationId),
+      headers: _headers(accessToken),
+    );
+  }
+
   Future<Map<String, dynamic>> sendComposedPayment({
     required String accessToken,
     required int conversationId,
