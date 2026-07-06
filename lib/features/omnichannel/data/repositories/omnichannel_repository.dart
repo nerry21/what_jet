@@ -487,6 +487,31 @@ class OmnichannelRepository {
     return rawItems.whereType<Map<String, dynamic>>().toList(growable: false);
   }
 
+  Future<String> verifyTransfer({
+    required int conversationId,
+    required String bookingCode,
+    required int amount,
+    String? reference,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.verifyTransfer(
+        accessToken: accessToken,
+        conversationId: conversationId,
+        bookingCode: bookingCode,
+        amount: amount,
+        reference: reference,
+      ),
+    );
+
+    final message = payload['message']?.toString().trim();
+    if (message != null && message.isNotEmpty) {
+      return message;
+    }
+
+    return 'Pembayaran transfer diverifikasi.';
+  }
+
   Future<String> sendComposedPayment({
     required int conversationId,
     required String paymentType,

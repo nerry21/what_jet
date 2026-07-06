@@ -241,6 +241,27 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> verifyTransfer({
+    required String accessToken,
+    required int conversationId,
+    required String bookingCode,
+    required int amount,
+    String? reference,
+  }) {
+    final body = <String, Object?>{
+      'booking_code': bookingCode,
+      'amount': amount,
+    };
+    if (reference != null && reference.trim().isNotEmpty) {
+      body['reference'] = reference.trim();
+    }
+    return _apiClient.post(
+      ApiEndpoints.adminConversationVerifyTransfer(conversationId),
+      headers: _headers(accessToken),
+      body: body,
+    );
+  }
+
   Future<Map<String, dynamic>> sendComposedPayment({
     required String accessToken,
     required int conversationId,

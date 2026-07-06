@@ -39,6 +39,7 @@ import '../widgets/omnichannel_action_sheet.dart';
 import '../widgets/omnichannel_center_pane.dart';
 import '../widgets/confirm_cash_picker_dialog.dart';
 import '../widgets/issue_ticket_picker_dialog.dart';
+import '../widgets/verify_transfer_picker_dialog.dart';
 import '../widgets/manual_payment_compose_dialog.dart';
 import '../widgets/omnichannel_call_settings_checklist_sheet.dart';
 import '../widgets/omnichannel_left_pane.dart';
@@ -2947,6 +2948,61 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     return 'Gagal terbit tiket.';
   }
 
+  Future<void> _handleVerifyTransfer() async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (dialogContext) {
+        return VerifyTransferPickerDialog(
+          onFetchBookings: _controller.fetchComposeBookings,
+        );
+      },
+    );
+    if (result == null) {
+      return;
+    }
+    final bookingCode = result['booking_code']?.toString() ?? '';
+    final amount = result['amount'] is int
+        ? result['amount'] as int
+        : int.tryParse('${result['amount']}') ?? 0;
+    final reference = result['reference']?.toString();
+    if (bookingCode.isEmpty || amount <= 0) {
+      return;
+    }
+    try {
+      final statusResult = await _controller.verifyTransfer(
+        bookingCode,
+        amount,
+        reference,
+      );
+      if (!mounted) {
+        return;
+      }
+      if (statusResult == 'failed' || statusResult == 'skipped') {
+        _showSnackBar(_verifyTransferFeedbackMessage(statusResult));
+        return;
+      }
+      await _controller.softRefreshAfterExternalAction();
+      if (mounted) {
+        _showSnackBar(statusResult);
+      }
+    } on ApiException catch (error) {
+      if (mounted) {
+        _showSnackBar(error.message);
+      }
+    } catch (error) {
+      if (mounted) {
+        _showSnackBar('Gagal verify transfer: $error');
+      }
+    }
+  }
+
+  String _verifyTransferFeedbackMessage(String status) {
+    if (status == 'skipped') {
+      return 'Verify transfer hanya untuk percakapan WhatsApp.';
+    }
+    return 'Gagal verify transfer.';
+  }
+
   String _sendRouteCarouselFeedbackMessage(String status) {
     if (status == 'skipped') {
       return 'Kirim daftar rute hanya untuk percakapan WhatsApp.';
@@ -3270,6 +3326,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   onSendPaymentNorek: _handleSendPaymentNorek,
                   onConfirmCash: _handleConfirmCash,
                   onIssueTicket: _handleIssueTicket,
+                  onVerifyTransfer: _handleVerifyTransfer,
                   onComposerChanged: (text) =>
                       _controller.notifyAdminTyping(text),
                   conversation: _controller.selectedConversation,
@@ -3444,6 +3501,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       onSendPaymentNorek: _handleSendPaymentNorek,
                       onConfirmCash: _handleConfirmCash,
                       onIssueTicket: _handleIssueTicket,
+                      onVerifyTransfer: _handleVerifyTransfer,
                       onComposerChanged: (text) =>
                           _controller.notifyAdminTyping(text),
                       conversation: _controller.selectedConversation,
