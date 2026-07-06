@@ -208,6 +208,7 @@ class OmnichannelCenterPane extends StatefulWidget {
     this.onSendPaymentNorek,
     this.onConfirmCash,
     this.onIssueTicket,
+    this.onVerifyTransfer,
     this.onSwipeToReply,
     this.replyingTo,
     this.onCancelReply,
@@ -275,6 +276,7 @@ class OmnichannelCenterPane extends StatefulWidget {
   final Future<void> Function()? onSendPaymentNorek;
   final Future<void> Function()? onConfirmCash;
   final Future<void> Function()? onIssueTicket;
+  final Future<void> Function()? onVerifyTransfer;
   final void Function(OmnichannelThreadMessageModel message)? onSwipeToReply;
   final OmnichannelThreadMessageModel? replyingTo;
   final VoidCallback? onCancelReply;
@@ -916,6 +918,9 @@ class _OmnichannelCenterPaneState extends State<OmnichannelCenterPane> {
           : null,
       onIssueTicketTap: AppConfig.manualIssueTicketEnabled
           ? widget.onIssueTicket
+          : null,
+      onVerifyTransferTap: AppConfig.manualTransferVerifyEnabled
+          ? widget.onVerifyTransfer
           : null,
     );
   }

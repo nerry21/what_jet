@@ -530,6 +530,26 @@ class OmnichannelShellController extends ChangeNotifier {
     return _repository.fetchIssueTicketBookings(conversationId: conversationId);
   }
 
+  Future<String> verifyTransfer(
+    String bookingCode,
+    int amount,
+    String? reference,
+  ) async {
+    final conversationId = selectedConversationId;
+    if (conversationId == null) {
+      return 'failed';
+    }
+    if (_selectedConversation?.channel != 'whatsapp') {
+      return 'skipped';
+    }
+    return _repository.verifyTransfer(
+      conversationId: conversationId,
+      bookingCode: bookingCode,
+      amount: amount,
+      reference: reference,
+    );
+  }
+
   Future<String> sendComposedPayment({
     required String paymentType,
     String? bookingCode,

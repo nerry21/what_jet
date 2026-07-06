@@ -169,6 +169,12 @@ class AppConfig {
   // Rollback = rebuild false / git revert. Aktivasi true di commit chore terpisah.
   static const bool manualIssueTicketEnabled = true;
 
+  // ON => tile "Verify Transfer" muncul (WhatsApp only) -> pilih booking + isi nominal
+  // -> POST verify-transfer -> BE verifikasi ke LKT (mark-paid). OFF => tile tak dirender,
+  // sheet identik (0 delta). Rollback = rebuild false / git revert. Aktivasi true di
+  // commit chore terpisah (FLAG-A). Butuh BE MANUAL_TRANSFER_VERIFY_ENABLED ON (sudah ON prod).
+  static const bool manualTransferVerifyEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {

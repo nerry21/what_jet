@@ -64,6 +64,9 @@ class ApiEndpoints {
   static String adminConversationIssueTicketBookings(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/issue-ticket/bookings';
 
+  static String adminConversationVerifyTransfer(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/verify-transfer';
+
   static String adminConversationMarkRead(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/mark-read';
 
