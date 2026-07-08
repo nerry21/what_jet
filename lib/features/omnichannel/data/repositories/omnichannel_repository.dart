@@ -512,6 +512,87 @@ class OmnichannelRepository {
     return 'Pembayaran transfer diverifikasi.';
   }
 
+  // POST mutating: JANGAN _readWithRetry (blind-retry bisa dobel). Idempotensi =
+  // idempotency_key (BE done-marker + LKT seat-lock). Non-2xx -> ApiException.
+  Future<Map<String, dynamic>> createReguler({
+    required int conversationId,
+    required Map<String, Object?> body,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _apiService.createReguler(
+      accessToken: accessToken,
+      conversationId: conversationId,
+      body: body,
+    );
+
+    final data = _extractPayloadData(payload);
+    return <String, dynamic>{
+      'booking_code': data['booking_code']?.toString() ?? '',
+      'total_amount': data['total_amount'],
+      'booking_status': data['booking_status']?.toString() ?? '',
+    };
+  }
+
+  Future<List<Map<String, dynamic>>> fetchRegulerRoutes() async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.fetchRegulerRoutes(accessToken: accessToken),
+    );
+    final data = _extractPayloadData(payload);
+    final raw = data['routes'] as List<dynamic>? ?? const <dynamic>[];
+    return raw.whereType<Map<String, dynamic>>().toList(growable: false);
+  }
+
+  Future<List<Map<String, dynamic>>> fetchRegulerSeatAvailability({
+    required String tripDate,
+    required String direction,
+    String? tripTime,
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.fetchRegulerSeatAvailability(
+        accessToken: accessToken,
+        tripDate: tripDate,
+        direction: direction,
+        tripTime: tripTime,
+      ),
+    );
+    final data = _extractPayloadData(payload);
+    final raw = data['trips'] as List<dynamic>? ?? const <dynamic>[];
+    return raw.whereType<Map<String, dynamic>>().toList(growable: false);
+  }
+
+  Future<List<Map<String, dynamic>>> fetchRegulerSeatLayout() async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.fetchRegulerSeatLayout(accessToken: accessToken),
+    );
+    final data = _extractPayloadData(payload);
+    final raw = data['seats'] as List<dynamic>? ?? const <dynamic>[];
+    return raw.whereType<Map<String, dynamic>>().toList(growable: false);
+  }
+
+  Future<Map<String, dynamic>> fetchRegulerFare({
+    required String fromCity,
+    required String toCity,
+    String category = 'Reguler',
+  }) async {
+    final accessToken = await _ensureAdminSession();
+    final payload = await _readWithRetry(
+      () => _apiService.fetchRegulerFare(
+        accessToken: accessToken,
+        fromCity: fromCity,
+        toCity: toCity,
+        category: category,
+      ),
+    );
+    final data = _extractPayloadData(payload);
+    return <String, dynamic>{
+      'auto_fare_available': data['auto_fare_available'] == true,
+      'fare': data['fare'],
+    };
+  }
+
   Future<String> sendComposedPayment({
     required int conversationId,
     required String paymentType,

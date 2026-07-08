@@ -550,6 +550,50 @@ class OmnichannelShellController extends ChangeNotifier {
     );
   }
 
+  // M9: conversationId dicapture caller saat form dibuka (bukan selectedConversationId
+  // yang mutable). BE tetap enforce isWhatsApp pada conversation itu.
+  Future<Map<String, dynamic>> createRegulerFor({
+    required int conversationId,
+    required Map<String, Object?> body,
+  }) {
+    return _repository.createReguler(
+      conversationId: conversationId,
+      body: body,
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> fetchRegulerRoutes() {
+    return _repository.fetchRegulerRoutes();
+  }
+
+  Future<List<Map<String, dynamic>>> fetchRegulerSeatAvailability({
+    required String tripDate,
+    required String direction,
+    String? tripTime,
+  }) {
+    return _repository.fetchRegulerSeatAvailability(
+      tripDate: tripDate,
+      direction: direction,
+      tripTime: tripTime,
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> fetchRegulerSeatLayout() {
+    return _repository.fetchRegulerSeatLayout();
+  }
+
+  Future<Map<String, dynamic>> fetchRegulerFare({
+    required String fromCity,
+    required String toCity,
+    String category = 'Reguler',
+  }) {
+    return _repository.fetchRegulerFare(
+      fromCity: fromCity,
+      toCity: toCity,
+      category: category,
+    );
+  }
+
   Future<String> sendComposedPayment({
     required String paymentType,
     String? bookingCode,

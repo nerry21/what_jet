@@ -30,6 +30,7 @@ import '../controllers/omnichannel_call_controller.dart';
 import '../controllers/omnichannel_shell_controller.dart';
 import '../notifications/in_app_notification_overlay.dart';
 import '../../../../core/services/push_notification_service.dart';
+import '../pages/create_reguler_page.dart';
 import '../pages/omnichannel_call_page.dart';
 import '../pages/omnichannel_call_history_page.dart';
 import '../pages/omnichannel_starred_messages_page.dart';
@@ -3003,6 +3004,46 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
     return 'Gagal verify transfer.';
   }
 
+  Future<void> _handleCreateReguler() async {
+    final conversation = _controller.selectedConversation;
+    if (conversation == null) {
+      return;
+    }
+    // M9: capture ID saat buka; onSubmit pakai ID ini (bukan selectedConversationId mutable).
+    final conversationId = conversation.id;
+    final initialContact = conversation.customerContact.trim();
+    final result = await Navigator.of(context).push<Map<String, dynamic>>(
+      MaterialPageRoute<Map<String, dynamic>>(
+        builder: (_) => CreateRegulerPage(
+          onFetchRoutes: _controller.fetchRegulerRoutes,
+          onFetchSeatAvailability: (tripDate, direction, tripTime) =>
+              _controller.fetchRegulerSeatAvailability(
+                tripDate: tripDate,
+                direction: direction,
+                tripTime: tripTime,
+              ),
+          onFetchSeatLayout: _controller.fetchRegulerSeatLayout,
+          onFetchFare: (fromCity, toCity) =>
+              _controller.fetchRegulerFare(fromCity: fromCity, toCity: toCity),
+          onSubmit: (body) => _controller.createRegulerFor(
+            conversationId: conversationId,
+            body: body,
+          ),
+          initialCustomerName: conversation.customerName,
+          initialCustomerContact: initialContact == '-' ? '' : initialContact,
+        ),
+      ),
+    );
+    if (result == null || !mounted) {
+      return; // gagal ditangani in-form; hanya SUKSES yang pop hasil.
+    }
+    final code = result['booking_code']?.toString() ?? '';
+    await _controller.softRefreshAfterExternalAction();
+    if (mounted) {
+      _showSnackBar('Booking reguler dibuat: $code (Draft)');
+    }
+  }
+
   String _sendRouteCarouselFeedbackMessage(String status) {
     if (status == 'skipped') {
       return 'Kirim daftar rute hanya untuk percakapan WhatsApp.';
@@ -3327,6 +3368,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                   onConfirmCash: _handleConfirmCash,
                   onIssueTicket: _handleIssueTicket,
                   onVerifyTransfer: _handleVerifyTransfer,
+                  onCreateReguler: _handleCreateReguler,
                   onComposerChanged: (text) =>
                       _controller.notifyAdminTyping(text),
                   conversation: _controller.selectedConversation,
@@ -3502,6 +3544,7 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
                       onConfirmCash: _handleConfirmCash,
                       onIssueTicket: _handleIssueTicket,
                       onVerifyTransfer: _handleVerifyTransfer,
+                      onCreateReguler: _handleCreateReguler,
                       onComposerChanged: (text) =>
                           _controller.notifyAdminTyping(text),
                       conversation: _controller.selectedConversation,
