@@ -175,6 +175,11 @@ class AppConfig {
   // commit chore terpisah (FLAG-A). Butuh BE MANUAL_TRANSFER_VERIFY_ENABLED ON (sudah ON prod).
   static const bool manualTransferVerifyEnabled = true;
 
+  // ON => tile "Buat Booking Reguler" (WhatsApp only) -> form full-page -> POST create-reguler.
+  // OFF => tile tak dirender (0 delta). Dark-launch: ship false. AKTIVASI DITUNDA sampai LKT
+  // mendukung trip/armada binding + persistent idempotency (lihat Naskah §DEPLOY Fase 2).
+  static const bool manualCreateRegulerEnabled = false;
+
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
     if (configured.isNotEmpty) {

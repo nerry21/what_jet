@@ -22,6 +22,7 @@ Future<void> showWhatsAppAttachmentSheet({
   Future<void> Function()? onConfirmCashTap,
   Future<void> Function()? onIssueTicketTap,
   Future<void> Function()? onVerifyTransferTap,
+  Future<void> Function()? onCreateRegulerTap,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -46,6 +47,7 @@ Future<void> showWhatsAppAttachmentSheet({
         onConfirmCashTap: onConfirmCashTap,
         onIssueTicketTap: onIssueTicketTap,
         onVerifyTransferTap: onVerifyTransferTap,
+        onCreateRegulerTap: onCreateRegulerTap,
       );
     },
   );
@@ -70,6 +72,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
     this.onConfirmCashTap,
     this.onIssueTicketTap,
     this.onVerifyTransferTap,
+    this.onCreateRegulerTap,
   });
 
   final Future<void> Function() onGalleryTap;
@@ -89,6 +92,7 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
   final Future<void> Function()? onConfirmCashTap;
   final Future<void> Function()? onIssueTicketTap;
   final Future<void> Function()? onVerifyTransferTap;
+  final Future<void> Function()? onCreateRegulerTap;
 
   @override
   Widget build(BuildContext context) {
@@ -203,6 +207,13 @@ class _WhatsAppAttachmentSheet extends StatelessWidget {
           icon: Icons.price_check_rounded,
           color: const Color(0xFF7C3AED),
           onTap: onVerifyTransferTap!,
+        ),
+      if (onCreateRegulerTap != null)
+        _AttachmentAction(
+          label: 'Buat Booking Reguler',
+          icon: Icons.event_seat_rounded,
+          color: const Color(0xFF0D9488),
+          onTap: onCreateRegulerTap!,
         ),
     ];
 

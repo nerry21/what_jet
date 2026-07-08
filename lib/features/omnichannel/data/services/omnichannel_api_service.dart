@@ -262,6 +262,70 @@ class OmnichannelApiService {
     );
   }
 
+  Future<Map<String, dynamic>> createReguler({
+    required String accessToken,
+    required int conversationId,
+    required Map<String, Object?> body,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.adminConversationCreateReguler(conversationId),
+      headers: _headers(accessToken),
+      body: body,
+    );
+  }
+
+  Future<Map<String, dynamic>> fetchRegulerRoutes({
+    required String accessToken,
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminManualBookingRoutes(),
+      headers: _headers(accessToken),
+    );
+  }
+
+  Future<Map<String, dynamic>> fetchRegulerSeatAvailability({
+    required String accessToken,
+    required String tripDate,
+    required String direction,
+    String? tripTime,
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminManualBookingSeatAvailability(),
+      headers: _headers(accessToken),
+      queryParameters: <String, Object?>{
+        'trip_date': tripDate,
+        'direction': direction,
+        if (tripTime != null && tripTime.isNotEmpty) 'trip_time': tripTime,
+      },
+    );
+  }
+
+  Future<Map<String, dynamic>> fetchRegulerSeatLayout({
+    required String accessToken,
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminManualBookingSeatLayout(),
+      headers: _headers(accessToken),
+    );
+  }
+
+  Future<Map<String, dynamic>> fetchRegulerFare({
+    required String accessToken,
+    required String fromCity,
+    required String toCity,
+    String category = 'Reguler',
+  }) {
+    return _apiClient.get(
+      ApiEndpoints.adminManualBookingFare(),
+      headers: _headers(accessToken),
+      queryParameters: <String, Object?>{
+        'from_city': fromCity,
+        'to_city': toCity,
+        'category': category,
+      },
+    );
+  }
+
   Future<Map<String, dynamic>> sendComposedPayment({
     required String accessToken,
     required int conversationId,

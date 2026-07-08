@@ -67,6 +67,21 @@ class ApiEndpoints {
   static String adminConversationVerifyTransfer(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/verify-transfer';
 
+  static String adminConversationCreateReguler(int conversationId) =>
+      '$_adminMobileBase/conversations/$conversationId/create-reguler';
+
+  static String adminManualBookingRoutes() =>
+      '$_adminMobileBase/manual-booking/routes';
+
+  static String adminManualBookingSeatAvailability() =>
+      '$_adminMobileBase/manual-booking/seat-availability';
+
+  static String adminManualBookingSeatLayout() =>
+      '$_adminMobileBase/manual-booking/seat-layout';
+
+  static String adminManualBookingFare() =>
+      '$_adminMobileBase/manual-booking/fare';
+
   static String adminConversationMarkRead(int conversationId) =>
       '$_adminMobileBase/conversations/$conversationId/mark-read';
 
