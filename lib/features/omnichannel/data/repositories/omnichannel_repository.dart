@@ -546,7 +546,9 @@ class OmnichannelRepository {
   Future<List<Map<String, dynamic>>> fetchRegulerSeatAvailability({
     required String tripDate,
     required String direction,
-    String? tripTime,
+    required String routeVia,
+    required String fromCity,
+    required String toCity,
   }) async {
     final accessToken = await _ensureAdminSession();
     final payload = await _readWithRetry(
@@ -554,7 +556,9 @@ class OmnichannelRepository {
         accessToken: accessToken,
         tripDate: tripDate,
         direction: direction,
-        tripTime: tripTime,
+        routeVia: routeVia,
+        fromCity: fromCity,
+        toCity: toCity,
       ),
     );
     final data = _extractPayloadData(payload);

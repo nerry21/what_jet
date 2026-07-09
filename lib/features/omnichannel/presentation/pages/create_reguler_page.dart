@@ -55,7 +55,9 @@ class CreateRegulerPage extends StatefulWidget {
   final Future<List<Map<String, dynamic>>> Function(
     String tripDate,
     String direction,
-    String? tripTime,
+    String routeVia,
+    String fromCity,
+    String toCity,
   )
   onFetchSeatAvailability;
   final Future<List<Map<String, dynamic>>> Function() onFetchSeatLayout;
@@ -241,7 +243,11 @@ class _CreateRegulerPageState extends State<CreateRegulerPage> {
     final direction = _tripPlanningDirection;
     final date = _tripDate;
     final routeVia = _routeVia;
-    if (direction == null || date == null || routeVia == null) {
+    if (direction == null ||
+        date == null ||
+        routeVia == null ||
+        _fromCity == null ||
+        _toCity == null) {
       return;
     }
     setState(() {
@@ -255,7 +261,9 @@ class _CreateRegulerPageState extends State<CreateRegulerPage> {
       final trips = await widget.onFetchSeatAvailability(
         _formatDate(date),
         direction,
-        null,
+        routeVia,
+        _fromCity!,
+        _toCity!,
       );
       if (!mounted) {
         return;
@@ -385,6 +393,8 @@ class _CreateRegulerPageState extends State<CreateRegulerPage> {
       'customer_name': _nameCtrl.text.trim(),
       'trip_date': _formatDate(_tripDate!),
       'trip_time': trip['trip_time']?.toString() ?? '',
+      'trip_id': (trip['trip_id'] as num?)?.toInt(),
+      'route_via': 'BANGKINANG',
       'direction': _bookingDirection,
       'from_city': _fromCity,
       'to_city': _toCity,
@@ -682,11 +692,12 @@ class _CreateRegulerPageState extends State<CreateRegulerPage> {
           final selected = identical(_selectedTrip, trip);
           final time = trip['trip_time']?.toString() ?? '-';
           final avail = trip['available_count']?.toString() ?? '';
+          final plat = trip['mobil_plat']?.toString() ?? '-';
           return ListTile(
             leading: Icon(
               selected ? Icons.radio_button_checked : Icons.radio_button_off,
             ),
-            title: Text('Jam $time'),
+            title: Text('Jam $time · $plat'),
             subtitle: Text('Sisa $avail kursi'),
             onTap: () => setState(() {
               _selectedTrip = trip;

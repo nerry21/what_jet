@@ -118,12 +118,16 @@ void main() {
   Widget harness({
     Future<Map<String, dynamic>> Function(Map<String, Object?>)? onSubmit,
     List<Map<String, dynamic>>? trips,
+    void Function(String d, String dir, String via, String from, String to)?
+    onSeatArgs,
   }) {
     return MaterialApp(
       home: CreateRegulerPage(
         onFetchRoutes: () async => routesTwo(),
-        onFetchSeatAvailability: (d, dir, t) async =>
-            trips ?? <Map<String, dynamic>>[],
+        onFetchSeatAvailability: (d, dir, via, from, to) async {
+          onSeatArgs?.call(d, dir, via, from, to);
+          return trips ?? <Map<String, dynamic>>[];
+        },
         onFetchSeatLayout: () async => layout(),
         onFetchFare: (f, t) async => <String, dynamic>{
           'auto_fare_available': false,
@@ -150,19 +154,23 @@ void main() {
 
   // Isi form sampai valid (BANGKINANG → kota → tanggal → trip → kursi 1A → override tarif).
   // PIN: interaksi showDatePicker ('OK') & item dropdown mungkin butuh tweak per-SDK.
-  Future<void> fillValidForm(WidgetTester tester) async {
+  Future<void> fillValidForm(
+    WidgetTester tester, {
+    String fromCity = 'Pasirpengaraian',
+    String toCity = 'Pekanbaru',
+  }) async {
     tallSurface(tester);
     await tester.pumpAndSettle();
     await pickDropdown(tester, 0, 'BANGKINANG');
-    await pickDropdown(tester, 1, 'Pasirpengaraian');
-    await pickDropdown(tester, 2, 'Pekanbaru');
+    await pickDropdown(tester, 1, fromCity);
+    await pickDropdown(tester, 2, toCity);
     await tester.tap(find.text('Pilih tanggal'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('OK')); // terima tanggal default (hari ini)
     await tester.pumpAndSettle();
     await tester.tap(find.text('Muat trip & kursi'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Jam 08:00'));
+    await tester.tap(find.textContaining('Jam 08:00'));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilterChip, '1A'));
     await tester.pumpAndSettle();
@@ -312,7 +320,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Muat trip & kursi'));
     await tester.pumpAndSettle();
-    expect(find.text('Jam 08:00'), findsOneWidget); // BANGKINANG
+    expect(find.textContaining('Jam 08:00'), findsOneWidget); // BANGKINANG
     expect(find.text('Jam 09:00'), findsNothing); // PETAPAHAN difilter keluar
   });
 
@@ -361,4 +369,86 @@ void main() {
     );
     expect(btn.onPressed, isNull); // TETAP terkunci (reconcile terminal)
   });
+
+  testWidgets(
+    'maju: nilai 5-param + body trip_id/route_via, tanpa binding_mode',
+    (tester) async {
+      Map<String, Object?>? sent;
+      List<String>? seat;
+      await tester.pumpWidget(
+        harness(
+          trips: <Map<String, dynamic>>[trip()],
+          onSeatArgs: (d, dir, via, from, to) =>
+              seat = <String>[d, dir, via, from, to],
+          onSubmit: (b) async {
+            sent = b;
+            return <String, dynamic>{'booking_code': 'RBK-2'};
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+      await fillValidForm(tester);
+      expect(find.textContaining('BM1'), findsOneWidget); // tile: jam · plat
+      expect(seat, isNotNull);
+      expect(
+        seat![0],
+        matches(RegExp(r'^\d{4}-\d{2}-\d{2}$')),
+      ); // trip_date yyyy-MM-dd
+      expect(seat![1], 'ROHUL_TO_PKB'); // read vocab UPPERCASE
+      expect(seat![2], 'BANGKINANG');
+      expect(seat![3], 'Pasirpengaraian'); // from
+      expect(seat![4], 'Pekanbaru'); // to
+      await tester.tap(
+        find.widgetWithText(FilledButton, 'Buat Booking (Draft)'),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Buat (Draft)'));
+      await tester.pumpAndSettle();
+      expect(sent?['trip_id'], 1);
+      expect(sent?['route_via'], 'BANGKINANG');
+      expect(sent?['direction'], 'to_pkb'); // submit vocab lowercase
+      expect(sent?.containsKey('binding_mode'), isFalse);
+    },
+  );
+
+  testWidgets(
+    'balik: fetch PKB_TO_ROHUL + body from_pkb, from/to tak tertukar',
+    (tester) async {
+      Map<String, Object?>? sent;
+      List<String>? seat;
+      await tester.pumpWidget(
+        harness(
+          trips: <Map<String, dynamic>>[trip()],
+          onSeatArgs: (d, dir, via, from, to) =>
+              seat = <String>[d, dir, via, from, to],
+          onSubmit: (b) async {
+            sent = b;
+            return <String, dynamic>{'booking_code': 'RBK-3'};
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+      await fillValidForm(
+        tester,
+        fromCity: 'Pekanbaru',
+        toCity: 'Pasirpengaraian',
+      );
+      expect(seat, isNotNull);
+      expect(seat![1], 'PKB_TO_ROHUL'); // read vocab UPPERCASE arah balik
+      expect(seat![3], 'Pekanbaru'); // from
+      expect(seat![4], 'Pasirpengaraian'); // to (tak tertukar)
+      await tester.tap(
+        find.widgetWithText(FilledButton, 'Buat Booking (Draft)'),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Buat (Draft)'));
+      await tester.pumpAndSettle();
+      expect(
+        sent?['direction'],
+        'from_pkb',
+      ); // submit vocab lowercase arah balik
+      expect(sent?['from_city'], 'Pekanbaru');
+      expect(sent?['to_city'], 'Pasirpengaraian');
+    },
+  );
 }

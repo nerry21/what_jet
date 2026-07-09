@@ -569,12 +569,16 @@ class OmnichannelShellController extends ChangeNotifier {
   Future<List<Map<String, dynamic>>> fetchRegulerSeatAvailability({
     required String tripDate,
     required String direction,
-    String? tripTime,
+    required String routeVia,
+    required String fromCity,
+    required String toCity,
   }) {
     return _repository.fetchRegulerSeatAvailability(
       tripDate: tripDate,
       direction: direction,
-      tripTime: tripTime,
+      routeVia: routeVia,
+      fromCity: fromCity,
+      toCity: toCity,
     );
   }
 
