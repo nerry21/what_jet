@@ -603,7 +603,7 @@ class _CreateRegulerPageState extends State<CreateRegulerPage> {
       title: '1. Rute',
       children: <Widget>[
         DropdownButtonFormField<String>(
-          value: _routeVia,
+          initialValue: _routeVia,
           decoration: const InputDecoration(labelText: 'Cluster / rute'),
           items: _routes
               .map((route) => route['route_via']?.toString() ?? '')
@@ -618,7 +618,7 @@ class _CreateRegulerPageState extends State<CreateRegulerPage> {
         if (_stops.isNotEmpty) ...<Widget>[
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
-            value: _fromCity,
+            initialValue: _fromCity,
             decoration: const InputDecoration(labelText: 'Kota asal'),
             items: _stops
                 .map(
@@ -633,7 +633,7 @@ class _CreateRegulerPageState extends State<CreateRegulerPage> {
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
-            value: _toCity,
+            initialValue: _toCity,
             decoration: const InputDecoration(labelText: 'Kota tujuan'),
             items: _stops
                 .map(
