@@ -287,7 +287,9 @@ class OmnichannelApiService {
     required String accessToken,
     required String tripDate,
     required String direction,
-    String? tripTime,
+    required String routeVia,
+    required String fromCity,
+    required String toCity,
   }) {
     return _apiClient.get(
       ApiEndpoints.adminManualBookingSeatAvailability(),
@@ -295,7 +297,9 @@ class OmnichannelApiService {
       queryParameters: <String, Object?>{
         'trip_date': tripDate,
         'direction': direction,
-        if (tripTime != null && tripTime.isNotEmpty) 'trip_time': tripTime,
+        'route_via': routeVia,
+        'from_city': fromCity,
+        'to_city': toCity,
       },
     );
   }

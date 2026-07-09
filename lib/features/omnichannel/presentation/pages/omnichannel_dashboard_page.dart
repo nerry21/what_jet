@@ -3016,12 +3016,15 @@ class _OmnichannelDashboardPageState extends State<OmnichannelDashboardPage>
       MaterialPageRoute<Map<String, dynamic>>(
         builder: (_) => CreateRegulerPage(
           onFetchRoutes: _controller.fetchRegulerRoutes,
-          onFetchSeatAvailability: (tripDate, direction, tripTime) =>
-              _controller.fetchRegulerSeatAvailability(
-                tripDate: tripDate,
-                direction: direction,
-                tripTime: tripTime,
-              ),
+          onFetchSeatAvailability:
+              (tripDate, direction, routeVia, fromCity, toCity) =>
+                  _controller.fetchRegulerSeatAvailability(
+                    tripDate: tripDate,
+                    direction: direction,
+                    routeVia: routeVia,
+                    fromCity: fromCity,
+                    toCity: toCity,
+                  ),
           onFetchSeatLayout: _controller.fetchRegulerSeatLayout,
           onFetchFare: (fromCity, toCity) =>
               _controller.fetchRegulerFare(fromCity: fromCity, toCity: toCity),
