@@ -178,7 +178,7 @@ class AppConfig {
   // ON => tile "Buat Booking Reguler" (WhatsApp only) -> form full-page -> POST create-reguler.
   // OFF => tile tak dirender (0 delta). Dark-launch: ship false. AKTIVASI DITUNDA sampai LKT
   // mendukung trip/armada binding + persistent idempotency (lihat Naskah §DEPLOY Fase 2).
-  static const bool manualCreateRegulerEnabled = false;
+  static const bool manualCreateRegulerEnabled = true;
 
   static String get baseUrl {
     const configured = String.fromEnvironment('API_BASE_URL');
