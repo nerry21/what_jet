@@ -1706,13 +1706,11 @@ class _BotControlBanner extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: isEnabled
-            ? AppColors.primary.withValues(alpha: 0.08)
-            : AppColors.warning50,
+        color: isEnabled ? AppColors.success50 : AppColors.warning50,
         borderRadius: AppRadii.borderRadiusLg,
         border: Border.all(
           color: isEnabled
-              ? AppColors.primary.withValues(alpha: 0.20)
+              ? AppColors.primary.withValues(alpha: 0.30)
               : AppColors.warning,
         ),
       ),
