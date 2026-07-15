@@ -12,7 +12,7 @@ import 'app_colors.dart';
 class AppTypography {
   const AppTypography._();
 
-  static const String _fontFamily = 'SF Pro Display';
+  static const String _fontFamily = 'Plus Jakarta Sans';
   static const String _fontFamilyMono = 'SF Mono';
 
   // ─── Display (32px / w700) ───────────────────────────────────────────────

@@ -44,7 +44,7 @@ class AppTheme {
       canvasColor: AppColors.surfacePrimary,
 
       // ─── Typography ──────────────────────────────────────────────────
-      fontFamily: 'SF Pro Display',
+      fontFamily: 'Plus Jakarta Sans',
 
       // ─── AppBar (Dark translucent) ───────────────────────────────────
       appBarTheme: AppBarTheme(
