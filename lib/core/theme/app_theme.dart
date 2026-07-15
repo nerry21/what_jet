@@ -145,7 +145,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.error, width: 1.5),
         ),
-        hintStyle: const TextStyle(fontSize: 14, color: AppColors.neutral300),
+        hintStyle: const TextStyle(fontSize: 14, color: AppColors.neutral400),
         labelStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
