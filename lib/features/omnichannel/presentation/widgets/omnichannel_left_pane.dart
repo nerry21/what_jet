@@ -775,21 +775,28 @@ class _MobileWhatsAppInbox extends StatelessWidget {
               // ═══ PREMIUM HEADER ═══
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.fromLTRB(20, 14, 16, 14),
+                margin: EdgeInsets.fromLTRB(12, 12, 12, 4),
+                padding: EdgeInsets.fromLTRB(20, 16, 16, 16),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      AppColors.surfaceSecondary,
-                      AppColors.scaffoldBackground,
+                      AppColors.primary.withValues(alpha: 0.16),
+                      AppColors.surfacePrimary.withValues(alpha: 0.72),
                     ],
                   ),
-                  border: Border(
-                    bottom: BorderSide(
-                      color: AppColors.primary.withValues(alpha: 0.08),
-                    ),
+                  borderRadius: AppRadii.borderRadiusXxxl,
+                  border: Border.all(
+                    color: AppColors.white.withValues(alpha: 0.85),
                   ),
+                  boxShadow: <BoxShadow>[
+                    BoxShadow(
+                      color: const Color(0x18000000),
+                      blurRadius: 28,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -871,9 +878,16 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                  ],
+                ),
+              ),
 
-                    // Scope chips with glow
+              // ═══ SCOPE FILTERS ═══
+              Padding(
+                padding: EdgeInsets.fromLTRB(16, 4, 16, 6),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(

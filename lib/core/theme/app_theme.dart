@@ -24,12 +24,12 @@ class AppTheme {
   static ThemeData light() {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
 
       // ─── Colors ──────────────────────────────────────────────────────
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primary,
-        brightness: Brightness.dark,
+        brightness: Brightness.light,
         primary: AppColors.primary,
         onPrimary: AppColors.white,
         secondary: AppColors.accent,
@@ -53,11 +53,11 @@ class AppTheme {
         backgroundColor: AppColors.surfacePrimary,
         foregroundColor: AppColors.neutral800,
         surfaceTintColor: Colors.transparent,
-        systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
+        systemOverlayStyle: SystemUiOverlayStyle.dark.copyWith(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.light,
+          statusBarIconBrightness: Brightness.dark,
           systemNavigationBarColor: AppColors.scaffoldBackground,
-          systemNavigationBarIconBrightness: Brightness.light,
+          systemNavigationBarIconBrightness: Brightness.dark,
         ),
         titleTextStyle: const TextStyle(
           fontSize: 18,
@@ -186,7 +186,7 @@ class AppTheme {
       // ─── Snackbar ────────────────────────────────────────────────────
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.surfaceTertiary,
+        backgroundColor: AppColors.neutral900,
         contentTextStyle: const TextStyle(fontSize: 14, color: AppColors.white),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 0,
@@ -196,7 +196,7 @@ class AppTheme {
       // ─── Chip ────────────────────────────────────────────────────────
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceSecondary,
-        selectedColor: AppColors.primary800,
+        selectedColor: AppColors.primary50,
         side: const BorderSide(color: AppColors.borderLight),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         labelStyle: const TextStyle(
@@ -210,7 +210,7 @@ class AppTheme {
       // ─── Tooltip ─────────────────────────────────────────────────────
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: AppColors.surfaceTertiary,
+          color: AppColors.neutral900,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: AppColors.borderLight),
         ),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
@@ -10,27 +11,55 @@ class OmnichannelPaneCard extends StatelessWidget {
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(20),
+    this.glass = false,
   });
 
   final Widget child;
   final EdgeInsetsGeometry padding;
+  final bool glass;
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceSecondary,
-        borderRadius: AppRadii.borderRadiusXxxl,
-        border: Border.all(color: AppColors.borderLight.withValues(alpha: 0.9)),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: const Color(0x18000000),
-            blurRadius: 28,
-            offset: const Offset(0, 10),
+    final Widget content = Padding(padding: padding, child: child);
+    if (!glass) {
+      return DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.surfaceSecondary,
+          borderRadius: AppRadii.borderRadiusXxxl,
+          border: Border.all(
+            color: AppColors.borderLight.withValues(alpha: 0.9),
           ),
-        ],
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: const Color(0x18000000),
+              blurRadius: 28,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: content,
+      );
+    }
+    return ClipRRect(
+      borderRadius: AppRadii.borderRadiusXxxl,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.62),
+            borderRadius: AppRadii.borderRadiusXxxl,
+            border: Border.all(color: Colors.white.withValues(alpha: 0.85)),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: const Color(0x18000000),
+                blurRadius: 28,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: content,
+        ),
       ),
-      child: Padding(padding: padding, child: child),
     );
   }
 }
