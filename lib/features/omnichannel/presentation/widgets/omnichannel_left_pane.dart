@@ -878,9 +878,16 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                  ],
+                ),
+              ),
 
-                    // Scope chips with glow
+              // ═══ SCOPE FILTERS ═══
+              Padding(
+                padding: EdgeInsets.fromLTRB(16, 4, 16, 6),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
