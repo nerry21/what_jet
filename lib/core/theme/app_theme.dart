@@ -24,12 +24,12 @@ class AppTheme {
   static ThemeData light() {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
 
       // ─── Colors ──────────────────────────────────────────────────────
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primary,
-        brightness: Brightness.dark,
+        brightness: Brightness.light,
         primary: AppColors.primary,
         onPrimary: AppColors.white,
         secondary: AppColors.accent,
@@ -53,11 +53,11 @@ class AppTheme {
         backgroundColor: AppColors.surfacePrimary,
         foregroundColor: AppColors.neutral800,
         surfaceTintColor: Colors.transparent,
-        systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
+        systemOverlayStyle: SystemUiOverlayStyle.dark.copyWith(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.light,
+          statusBarIconBrightness: Brightness.dark,
           systemNavigationBarColor: AppColors.scaffoldBackground,
-          systemNavigationBarIconBrightness: Brightness.light,
+          systemNavigationBarIconBrightness: Brightness.dark,
         ),
         titleTextStyle: const TextStyle(
           fontSize: 18,
