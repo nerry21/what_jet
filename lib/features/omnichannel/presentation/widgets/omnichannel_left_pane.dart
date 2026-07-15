@@ -85,7 +85,6 @@ class OmnichannelLeftPane extends StatelessWidget {
     }
 
     return OmnichannelPaneCard(
-      glass: true,
       child: LayoutBuilder(
         builder: (context, constraints) {
           return SizedBox(
