@@ -809,22 +809,22 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Text(
+                                'OMNICHANNEL INBOX',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1.6,
+                                  color: AppColors.primary600,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
                                 'WhatsJet',
                                 style: TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: -0.8,
                                   color: AppColors.primary,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Omnichannel Console',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.neutral400,
-                                  letterSpacing: 0.3,
                                 ),
                               ),
                             ],
@@ -863,11 +863,11 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                           prefixIcon: Icon(
                             Icons.search_rounded,
                             size: 20,
-                            color: AppColors.neutral300,
+                            color: AppColors.neutral400,
                           ),
                           hintText: 'Cari percakapan...',
                           hintStyle: TextStyle(
-                            color: AppColors.neutral300,
+                            color: AppColors.neutral400,
                             fontSize: 14,
                           ),
                           border: InputBorder.none,
