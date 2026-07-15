@@ -186,7 +186,7 @@ class AppTheme {
       // ─── Snackbar ────────────────────────────────────────────────────
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.surfaceTertiary,
+        backgroundColor: AppColors.neutral900,
         contentTextStyle: const TextStyle(fontSize: 14, color: AppColors.white),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 0,
@@ -196,7 +196,7 @@ class AppTheme {
       // ─── Chip ────────────────────────────────────────────────────────
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceSecondary,
-        selectedColor: AppColors.primary800,
+        selectedColor: AppColors.primary50,
         side: const BorderSide(color: AppColors.borderLight),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         labelStyle: const TextStyle(
@@ -210,7 +210,7 @@ class AppTheme {
       // ─── Tooltip ─────────────────────────────────────────────────────
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: AppColors.surfaceTertiary,
+          color: AppColors.neutral900,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: AppColors.borderLight),
         ),
