@@ -778,14 +778,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                 margin: EdgeInsets.fromLTRB(12, 12, 12, 4),
                 padding: EdgeInsets.fromLTRB(20, 16, 16, 16),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.primary.withValues(alpha: 0.16),
-                      AppColors.surfacePrimary.withValues(alpha: 0.72),
-                    ],
-                  ),
+                  color: AppColors.primary800,
                   borderRadius: AppRadii.borderRadiusXxxl,
                   border: Border.all(
                     color: AppColors.white.withValues(alpha: 0.85),
@@ -805,29 +798,13 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                     Row(
                       children: <Widget>[
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                'OMNICHANNEL INBOX',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 1.6,
-                                  color: AppColors.primary600,
-                                ),
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                'WhatsJet',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: -0.8,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                            ],
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Image.asset(
+                              'assets/images/whatsjet-lockup-dark.png',
+                              height: 36,
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ),
                         _PremiumHeaderIcon(
