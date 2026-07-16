@@ -802,7 +802,7 @@ class _MobileWhatsAppInbox extends StatelessWidget {
                             alignment: Alignment.centerLeft,
                             child: Image.asset(
                               'assets/images/whatsjet-lockup-dark.png',
-                              height: 36,
+                              height: 50,
                               fit: BoxFit.contain,
                             ),
                           ),
